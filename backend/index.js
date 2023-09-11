@@ -40,7 +40,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/users", userRoutes);
-app.use("/api/users", authRoutes);
+app.use("/api/auth", authRoutes);
 
 
 app.listen(PORT, () => {
