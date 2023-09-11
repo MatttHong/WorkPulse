@@ -5,10 +5,10 @@ const multer = require("multer");
 const morgan = require('morgan');
 
 const PORT = process.env.PORT || 3000;
-const MONGO = process.env.MONGO = "129.114.27.13:27017/test";
+const MONGO = process.env.MONGO = "129.114.27.13:27017/Pulse";
 
 const userRoutes = require("./routes/user.js");
-const authRoutes = require("./routes/auth");
+const authRoutes = require("./routes/auth.js");
 
 const { initializeFirebase } = require('./utils/firebase');
 

@@ -8,8 +8,8 @@ exports.login = async (req, res, next) => {
         let email = req.body.email;
         // let password = "poopscoop";
         let password = req.body.password;
-        console.log(email);
-        console.log(password);
+        // console.log(email);
+        // console.log(password);
         // console.log("a");
         let user = await User.findOne({ email: email });
         // print(user)
