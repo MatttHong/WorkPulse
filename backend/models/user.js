@@ -9,8 +9,8 @@ const userSchema = mongoose.Schema({
     email : { type: String, required: true },
     birthday : {type: String, required: true },
     bio : {type: String, required: true },
-    companies : {type: [String], default: [], required: true },
-    logs: {type: [String], default: [], required: true},
+    employments : {type: [String], default: [], required: true },
+    reviews : {type: [String], default: [], required: true},
 
 });
 

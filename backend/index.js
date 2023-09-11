@@ -7,8 +7,9 @@ const morgan = require('morgan');
 const PORT = process.env.PORT || 3000;
 const MONGO = process.env.MONGO = "129.114.27.13:27017/Pulse";
 
-const userRoutes = require("./routes/user.js");
-const authRoutes = require("./routes/auth.js");
+const userRoutes = require("./routes/user");
+const authRoutes = require("./routes/auth");
+const inviteRoutes =  require("./routes/invite");
 
 const { initializeFirebase } = require('./utils/firebase');
 
@@ -41,7 +42,7 @@ app.use((req, res, next) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
-
+app.use("/api/invite", inviteRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
