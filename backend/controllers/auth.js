@@ -3,9 +3,16 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 
 exports.login = async (req, res, next) => {
     try {
-        let { email, password } = req.body;
+        // let { email, password } = req.body;
+        // let email = "gabe@denton";
+        let email = req.body.email;
+        // let password = "poopscoop";
+        let password = req.body.password;
+        console.log(email);
+        console.log(password);
+        // console.log("a");
         let user = await User.findOne({ email: email });
-
+        // print(user)
         if (!user) {
             return res.status(400).json({
                 type: "Not Found",
