@@ -17,7 +17,7 @@ exports.createUser = (req, res, next) => {
         companies: req.body.companies,
         logs: req.body.logs,
     });
-    // console.log(user);
+    console.log(user);
     User.findOne({
         email: user.email 
     })
