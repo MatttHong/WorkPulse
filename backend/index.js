@@ -4,9 +4,11 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const morgan = require('morgan');
 
-
 const PORT = process.env.PORT || 3000;
 const MONGO = process.env.MONGO = "129.114.27.13:27017/test";
+
+const userRoutes = require("./routes/user.js");
+const authRoutes = require("./routes/auth");
 
 const { initializeFirebase } = require('./utils/firebase');
 
@@ -36,6 +38,10 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
+
+app.use("/api/users", userRoutes);
+app.use("/api/users", authRoutes);
+
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);

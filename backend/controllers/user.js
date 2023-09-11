@@ -4,10 +4,11 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 exports.createUser = (req, res, next) => {
     // console.log('got createUser req');
     let salt = generateSalt(10);
-
+    let hashedpassword = hash(req.body.password, salt)
+        
     const user = new User({
         userName: req.body.userName,
-        password: await hash(req.body.password, salt),
+        password: hashedpassword,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
