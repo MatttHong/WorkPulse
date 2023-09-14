@@ -1,1 +1,5 @@
 # WorkPulse
+
+This project is a suite of software to give companies insights into worker productivity. It is a software-as-a-service product that tracks and monitors time and activity of employees on their devices. The product’s algorithms will be tailored for making sure humans are active on the computer and will track idle, active, and suspicious periods of time. We will save this data along with what is occurring on the computer at that time into secure reports for managers and executives. Any business that has remote hourly-salary workers (freelancers, team managers overseeing remote teams, small to medium enterprises that manage remote teams) is considered a prospective client.
+
+We are going to use AWS to host an instance of mongo db, node.js, and our react server. This will allow our clients to view the React front-end in real time as we update and push changes. Also, a standalone app to run the tracking algorithms and send data to the server will be installed on the user's machine. Thus, we will be able to notify our client when we have finished and pushed updates and they can verify and test our software as they wish.
