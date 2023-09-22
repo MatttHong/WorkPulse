@@ -6,3 +6,5 @@ package-lock.json
 # macOS
 .DS_Store
 
+# Ignore log files
+*.log
