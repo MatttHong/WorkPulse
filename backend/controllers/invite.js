@@ -1,5 +1,3 @@
-// import { v4 as uuidv4 } from 'uuid';
-
 const emailNewUser = require('../utils/smtps.js');
 const Employee = require('../models/employee'); // Import your Mongoose model for employees
 const Status = require('../utils/status'); // Import your Mongoose model for employees
