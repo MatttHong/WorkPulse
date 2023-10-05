@@ -8,6 +8,7 @@ exports.createUser = (req, res, next) => {
         
     const user = new User({
         userName: req.body.userName,
+        // salt: salt,
         password: hashedpassword,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -45,27 +46,131 @@ exports.createUser = (req, res, next) => {
     });
 };
 
-// module.exports = (app) => {
-//     const {
-//         generateSalt,
-//         hash,
-//         compare
-//     } = require('./index');
-//     let salt = generateSalt(10);
-//     app.post('/register', async (req, res) => {
-//         try {
-//             let user = new User({
-//                 name: req.body.name,
-//                 email: req.body.email,
-//                 password: await hash(req.body.password, salt) // dont remove the await
-//             })
-//             let response = await user.save();
-//             res.status(200).json({
-//                 status: "Success",
-//                 data: response
-//             })
-//         } catch (err) {
-//             //handle error
-//         }
-//     });
-// }
+// Update a user by ID
+exports.updateUser = async (req, res, next) => {
+    const userId = req.params.id;
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        // Update user properties as needed
+        user.userName = req.body.userName;
+        user.firstName = req.body.firstName;
+        user.lastName = req.body.lastName;
+        user.email = req.body.email;
+        user.birthday = req.body.birthday;
+        user.bio = req.body.bio;
+        user.employments = req.body.employments;
+        user.reviews = req.body.reviews;
+
+        // Check if a new password is provided and it's different from the existing one
+        if (req.body.password && req.body.password !== user.password) {
+            // Check if the provided password is not already hashed
+            let match = await compare(req.body.password, user.password);
+            if (!match) {
+                let salt = generateSalt(10);
+                let hashedpassword = hash(req.body.password, salt);
+                user.password = hashedpassword;
+            }
+        }
+
+        await user.save();
+
+        return res.json({
+            message: "User updated successfully",
+            user: user.toObject(),
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({
+            message: err.message || "Failed to update user!",
+        });
+    }
+};
+
+//get all users 
+exports.getUsers = (req, res, next) => {
+    User.find()
+    .then((users) => {
+        res.json({
+            users: users.map(user => user.toObject()),
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+            message: err.message || "Failed to fetch users!",
+        });
+    });
+};
+
+// Get a user by ID
+exports.getUserById = (req, res, next) => {
+    const userId = req.params.id;
+
+    User.findById(userId)
+    .then((user) => {
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        res.json({
+            user: user.toObject(),
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(404).json({
+            message: err.message || "User not found!",
+        });
+    });
+};
+
+// Delete a user by ID
+exports.deleteUser = (req, res, next) => {
+    const userId = req.params.id;
+
+    User.findByIdAndRemove(userId)
+    .then((user) => {
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        res.json({
+            message: "User deleted successfully",
+            user: user.toObject(),
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(404).json({
+            message: err.message || "User not found!",
+        });
+    });
+};
+
+// Get a user by email (using a query parameter)
+exports.getUserByEmail = (req, res, next) => {
+    const email = req.query.email;
+
+    User.findOne({ email })
+    .then((user) => {
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        res.json({
+            user: user.toObject(),
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(404).json({
+            message: err.message || "User not found!",
+        });
+    });
+};
