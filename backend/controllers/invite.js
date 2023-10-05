@@ -4,7 +4,7 @@ const emailNewUser = require('../utils/smtps.js');
 const Employee = require('../models/employee'); // Import your Mongoose model for employees
 const Status = require('../utils/status'); // Import your Mongoose model for employees
 const User = require('../models/user')
-const { REACTURL } = require('./environment');
+const { REACTURL } = require('../utils/environment');
 
 exports.inviteUser = async (req, res) => {
   try {
@@ -24,10 +24,6 @@ exports.inviteUser = async (req, res) => {
       await existingEmployee.save(); // Save the updated employee with the new token
       const inviteEmail = CreateEmailInvite(email,existingEmployee._id, true, token)
 
-    //   generateInviteEmail(email, existingEmployee._id, existingEmployee.inviteToken); // Pass the token
-      // Send the inviteEmail using your email sending method
-      // e.g., sendEmail(inviteEmail);
-
     } else {
       // Create a new employee object with default values
       const newEmployee = new Employee({
@@ -43,9 +39,6 @@ exports.inviteUser = async (req, res) => {
 
       // Generate the invite email with the new employeeId and token
       const inviteEmail = CreateEmailInvite(email,existingEmployee._id, false, token)
-    //    generateInviteEmail(email, newEmployee._id, newEmployee.inviteToken);
-      // Send the inviteEmail using your email sending method
-      // e.g., sendEmail(inviteEmail);
 
       // Respond with the newly created employee's _id
       res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
@@ -131,5 +124,5 @@ function CreateEmailInvite(email, employeeId, invited, token) {
     
     If you have any questions or need assistance with the onboarding process, please don't hesitate to reach out to our support.
     `;
-    return generateInviteEmail(email, header, body)
+    return emailNewUser(email, header, body)
 }

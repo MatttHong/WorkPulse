@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const morgan = require('morgan');
 
-const { PORT, MONGO } = require('./environment');
+const { PORT, MONGO } = require('./utils/environment');
 
 
 const userRoutes = require("./routes/user");
