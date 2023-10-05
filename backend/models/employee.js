@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const uuid = require('uuid');
 const Organization = require("../models/organization"); 
+const Department = require("../models/department");
+
 
 const employeeSchema = new Schema({
   userid: { type: String, default: "" },
@@ -63,4 +65,28 @@ employeeSchema.methods.addToBusiness = function () {
     });
   };  
 
+// employeeSchema.methods.addToDepartment = function () {
+// return new Promise((resolve, reject) => {
+//     Department.findOne({ departmentName: this.departmentName })
+//     .then(department => {
+//         if (!department) {
+//         reject(new Error("Department not found."));
+//         return;
+//         }
+
+//         // Check if the employee's ID is not in the department's employees array
+//         if (!department.employees.includes(this._id.toString())) {
+//         department.employees.push(this._id);
+//         return department.save();
+//         }
+//     })
+//     .then(() => {
+//         resolve("Operation successful.");
+//     })
+//     .catch(err => {
+//         reject(err);
+//     });
+// });
+// };
+  
   module.exports = mongoose.model("Employee", employeeSchema);
