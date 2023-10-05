@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const uuid = require('uuid');
+const Organization = require("../models/organization"); 
 
 const employeeSchema = new Schema({
   userid: { type: String, default: "" },
@@ -38,4 +39,28 @@ employeeSchema.statics.isInviteTokenValid = async function (token) {
   return currentTimestamp <= employee.inviteTokenExpiration;
 };
 
-module.exports = mongoose.model("Employee", employeeSchema);
+employeeSchema.methods.addToBusiness = function () {
+    return new Promise((resolve, reject) => {
+      Organization.findById(this.businessId)
+        .then(org => {
+          if (!org) {
+            reject(new Error("Organization not found."));
+            return;
+          }
+  
+          // Check if the employee's ID is not in the organization's employees array
+          if (!org.employees.includes(this._id.toString())) {
+            org.employees.push(this._id);
+            return org.save();
+          }
+        })
+        .then(() => {
+          resolve("Operation successful.");
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  };  
+
+  module.exports = mongoose.model("Employee", employeeSchema);

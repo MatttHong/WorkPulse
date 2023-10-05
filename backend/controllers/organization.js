@@ -1,4 +1,4 @@
-const Organization = require("../models/Organization");
+const Organization = require("../models/organization");
 
 // Create a new organization
 exports.createOrg = (req, res, next) => {
