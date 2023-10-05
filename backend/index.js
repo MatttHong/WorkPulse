@@ -4,8 +4,8 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const morgan = require('morgan');
 
-const PORT = process.env.PORT || 3000;
-const MONGO = process.env.MONGO = "129.114.27.13:27017/Pulse";
+const { PORT, MONGO } = require('./environment');
+
 
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");

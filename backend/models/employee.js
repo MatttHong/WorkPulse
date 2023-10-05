@@ -1,14 +1,41 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
+const uuid = require('uuid');
 
-const employeeSchema = mongoose.Schema({
-
-    userid: { type: String, default: ""},
-    email: { type: String, required: true},
-    logs: { type: [String], default: [], required: true},
-    employees: { type: [String], default: [], required: true},
-    businessId: { type: String, required: true},
-    status: { type: String, required: true},
-
+const employeeSchema = new Schema({
+  userid: { type: String, default: "" },
+  email: { type: String, required: true },
+  logs: { type: [String], default: [], required: true },
+  employees: { type: [String], default: [], required: true },
+  businessId: { type: String, required: true },
+  status: { type: String, required: true },
+  inviteToken: {
+    type: String,
+    required: false,
+  },
+  inviteTokenExpiration: {
+    type: Date,
+    required: false,
+  },
 });
 
-module.exports = mongoose.model("Employee", employeeSchema)
+// Function to generate and set the inviteToken
+employeeSchema.methods.generateInviteToken = function () {
+  const token = uuid.v4();
+  const expirationTimestamp = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72 hours in milliseconds
+  this.inviteToken = token;
+  this.inviteTokenExpiration = expirationTimestamp;
+};
+
+// Function to check if an invite token is valid
+employeeSchema.statics.isInviteTokenValid = async function (token) {
+  const employee = await this.findOne({ inviteToken: token });
+  if (!employee || !employee.inviteTokenExpiration) {
+    return false; // Token not found or expiration timestamp not set
+  }
+
+  const currentTimestamp = new Date();
+  return currentTimestamp <= employee.inviteTokenExpiration;
+};
+
+module.exports = mongoose.model("Employee", employeeSchema);

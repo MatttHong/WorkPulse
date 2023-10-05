@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const { generateSalt, hash, compare } = require('../utils/salt.js');
 
+// Create a new user (makes a hash for the password)
 exports.createUser = (req, res, next) => {
     // console.log('got createUser req');
     let salt = generateSalt(10);
@@ -46,7 +47,7 @@ exports.createUser = (req, res, next) => {
     });
 };
 
-// Update a user by ID
+// Update a user by ID (makes a hash if the password is new)
 exports.updateUser = async (req, res, next) => {
     const userId = req.params.id;
 
