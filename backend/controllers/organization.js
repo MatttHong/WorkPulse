@@ -3,7 +3,7 @@ const Organization = require("../models/organization");
 // Create a new organization
 exports.createOrg = (req, res, next) => {
     const org = new Organization(req.body);
-
+    
     Organization.findOne({ organizationEmail: org.organizationEmail })
     .then(foundOrg => {
         if (!foundOrg) {
