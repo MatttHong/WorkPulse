@@ -1,0 +1,123 @@
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    overflow-x: auto; /* For horizontal scrolling if the table gets too wide */
+}
+
+.dashboard-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.dashboard-container > .dashboard-top {
+    background: none; /* This ensures that the top part doesn't get a background from other styles */
+}
+
+.activity-metrics-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 70%; /* Adjust width as per your requirements */
+}
+
+.status-container,
+.daily-activity,
+.weekly-activity {
+    padding: 10px;
+    height: auto; /* adjust to your preference */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.WeeklyBarGraph {
+    flex-grow: 1; /* allows it to take up any remaining space */
+}
+
+.status-container {
+    display: flex;
+    align-items: center;
+    background: #f7f7f7;
+    padding: 5px 10px;
+    border-radius: 5px;
+    width: 50%; /* this is just a starting point, adjust as needed */
+}
+
+.status-indicator {
+    width: 15px;
+    height: 15px;
+    background: darkgrey;
+    border-radius: 50%;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+}
+
+.status-indicator.active {
+    background: green;
+    box-shadow: 0 0 10px green;
+}
+
+.activity-metrics {
+    background: #f7f7f7;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    width: 50%; /* this is just a starting point, adjust as needed */
+}
+
+.activity-metrics-container > .activity-metrics:first-child {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.activity-metrics-container > .activity-metrics:last-child {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.session-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f7f7f7;
+    border-radius: 5px;
+    overflow: hidden;  /* This will ensure the border-radius affects inner rows */
+    margin-top: 10px;
+}
+
+.session-table thead th {
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px 15px;
+    font-weight: bold;
+}
+
+.session-table th, .session-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.session-table th {
+    background: #e7e7e7;
+}
+
+.session-table tbody td, .session-table thead th {
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+}
+
+.session-table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.session-table tbody tr:hover {
+    background-color: #e0e0e0;
+}

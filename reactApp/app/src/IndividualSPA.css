@@ -1,0 +1,19 @@
+.app-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.navbar {
+    width: 250px; /* adjust as per your design */
+    height: 100%;
+    /* other navbar styles */
+}
+
+.dashboard-container {
+    flex-grow: 1;
+    display: flex; /* this ensures that the flex rules inside dashboard.css are respected */
+    flex-direction: column; /* this ensures that the children of .dashboard-container stack vertically */
+    padding: 20px;
+    overflow-x: auto;
+}
