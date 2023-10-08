@@ -24,14 +24,14 @@ import Divider from "@mui/material/Divider";
 import Fade from "@mui/material/Fade";
 
 // Material Dashboard 2 React components
-import MDBox from "../MDBox";
-import MDTypography from "../MDTypography";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
 
 // Custom styles for the MDSnackbar
-import MDSnackbarIconRoot from "../MDSnackbar/MDSnackbarIconRoot";
+import MDSnackbarIconRoot from "components/MDSnackbar/MDSnackbarIconRoot";
 
 // Material Dashboard 2 React context
-import { useMaterialUIController } from "../../context";
+import { useMaterialUIController } from "context";
 
 function MDSnackbar({ color, icon, title, dateTime, content, close, bgWhite, ...rest }) {
   const [controller] = useMaterialUIController();

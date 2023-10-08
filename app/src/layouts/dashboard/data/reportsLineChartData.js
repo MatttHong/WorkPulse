@@ -13,16 +13,13 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-/**
-  The rgba() function helps you to create a rgba color code, it uses the hexToRgb() function
-  to convert the hex code into rgb for using it inside the rgba color format.
- */
-
-// Material Dashboard 2 React helper functions
-import hexToRgb from "assets/theme/functions/hexToRgb";
-
-function rgba(color, opacity) {
-  return `rgba(${hexToRgb(color)}, ${opacity})`;
-}
-
-export default rgba;
+export default {
+  sales: {
+    labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: { label: "Mobile apps", data: [50, 40, 300, 320, 500, 350, 200, 230, 500] },
+  },
+  tasks: {
+    labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: { label: "Desktop apps", data: [50, 40, 300, 220, 500, 250, 400, 230, 500] },
+  },
+};

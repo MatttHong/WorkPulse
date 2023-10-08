@@ -15,6 +15,8 @@ Coded by www.creative-tim.com
 
 import { useState, useEffect } from "react";
 
+// react-github-btn
+import GitHubButton from "react-github-btn";
 
 // @mui material components
 import Divider from "@mui/material/Divider";
@@ -28,12 +30,12 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import FacebookIcon from "@mui/icons-material/Facebook";
 
 // Material Dashboard 2 React components
-import MDBox from "../../components/MDBox"
-import MDTypography from "../../components/MDTypography";
-import MDButton from "../../components/MDButton";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
 
 // Custom styles for the Configurator
-import ConfiguratorRoot from "./ConfiguratorRoot";
+import ConfiguratorRoot from "examples/Configurator/ConfiguratorRoot";
 
 // Material Dashboard 2 React context
 import {
@@ -44,7 +46,7 @@ import {
   setFixedNavbar,
   setSidenavColor,
   setDarkMode,
-} from "../../context";
+} from "context";
 
 function Configurator() {
   const [controller, dispatch] = useMaterialUIController();
@@ -295,6 +297,17 @@ function Configurator() {
           >
             view documentation
           </MDButton>
+        </MDBox>
+        <MDBox display="flex" justifyContent="center">
+          <GitHubButton
+            href="https://github.com/creativetimofficial/material-dashboard-react"
+            data-icon="octicon-star"
+            data-size="large"
+            data-show-count="true"
+            aria-label="Star creativetimofficial/material-dashboard-react on GitHub"
+          >
+            Star
+          </GitHubButton>
         </MDBox>
         <MDBox mt={2} textAlign="center">
           <MDBox mb={0.5}>

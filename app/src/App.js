@@ -24,19 +24,19 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
 
 // Material Dashboard 2 React components
-import MDBox from "./components/MDBox";
+import MDBox from "components/MDBox";
 
 // Material Dashboard 2 React example components
-import Sidenav from "./examples/Sidenav";
-import Configurator from "./examples/Configurator";
+import Sidenav from "examples/Sidenav";
+import Configurator from "examples/Configurator";
 
 // Material Dashboard 2 React themes
-import theme from "./assets/theme";
-import themeRTL from "./assets/theme/theme-rtl";
+import theme from "assets/theme";
+import themeRTL from "assets/theme/theme-rtl";
 
 // Material Dashboard 2 React Dark Mode themes
-import themeDark from "./assets/theme-dark";
-import themeDarkRTL from "./assets/theme-dark/theme-rtl";
+import themeDark from "assets/theme-dark";
+import themeDarkRTL from "assets/theme-dark/theme-rtl";
 
 // RTL plugins
 import rtlPlugin from "stylis-plugin-rtl";
@@ -44,14 +44,14 @@ import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 
 // Material Dashboard 2 React routes
-import routes from "./routes";
+import routes from "routes";
 
 // Material Dashboard 2 React contexts
-import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "./context";
+import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
 // Images
-import brandWhite from "./assets/images/logo-ct.png";
-import brandDark from "./assets/images/logo-ct-dark.png";
+import brandWhite from "assets/images/logo-ct.png";
+import brandDark from "assets/images/logo-ct-dark.png";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -167,7 +167,7 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="./dashboard" />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -191,46 +191,8 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="./dashboard" />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </ThemeProvider>
   );
 }
-
-
-// import React from 'react';
-// // import Dashboard from './components/Dashboard';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-
-// import {
-//   BrowserRouter as Router,
-//   Route,
-//   Routes,
-//   Link
-// } from 'react-router-dom';
-
-// const Dashboard = () => <h1>Dashboard</h1>;
-// const Settings = () => <h1>Settings</h1>;
-
-// const App = () => {
-//   return (
-//     <Router>
-//       <div>
-
-//       </div>
-//       <nav>
-//         <ul>
-//           <li><Link to="/">Dashboard</Link></li>
-//           <li><Link to="/settings">Settings</Link></li>
-//         </ul>
-//       </nav>
-//       <Routes>
-//         <Route path="/" element={<Dashboard />} />
-//         <Route path="/settings" element={<Settings />} />
-//       </Routes>
-//     </Router>
-    
-//   );
-// }
-
-// export default App;
