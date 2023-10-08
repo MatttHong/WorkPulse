@@ -1,6 +1,7 @@
 .dashboard-container {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
     gap: 20px;
     padding: 20px;
     overflow-x: auto; /* For horizontal scrolling if the table gets too wide */
@@ -82,6 +83,36 @@
     flex-grow: 1;
     display: flex;
     align-items: center;
+}
+
+.project-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f7f7f7;
+    padding: 10px;
+    border-radius: 5px;
+    width: 50%; /* adjust as needed */
+}
+
+.project-dropdown select {
+    flex-grow: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    appearance: none; /* to remove the default select appearance */
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* To give the dropdown arrow a custom look */
+.project-dropdown select::-ms-expand {
+    display: none; /* For IE and Edge */
+}
+
+.project-dropdown select:hover {
+    border-color: #aaa;
 }
 
 .session-table {

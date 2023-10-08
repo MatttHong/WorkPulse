@@ -1,5 +1,5 @@
 import React from 'react';
-import './Navbar.css';  // You can create a separate CSS file for styling
+import './css/Navbar.css';  // You can create a separate CSS file for styling
 
 interface NavbarProps {
     changeView: (view: string) => void;

@@ -1,10 +1,9 @@
-import React, {useState} from 'react';
-import './IndividualSPA.css';
-import Navbar from './Navbar';
-import Dashboard from './Dashboard';
-import Profile from './Profile';
+import React, {useState} from "react";
+import Navbar from "../IndividualSPA/Navbar";
+import Dashboard from "../IndividualSPA/Dashboard";
 
-function IndividualSPA() {
+
+function EnterpriseSPA() {
     const [currentView, setCurrentView] = useState("dashboard"); // default view
 
     return (
@@ -15,5 +14,4 @@ function IndividualSPA() {
         </div>
     );
 }
-
-export default IndividualSPA;
+export default EnterpriseSPA;

@@ -1,0 +1,11 @@
+.app-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.navbar {
+    width: 250px; /* adjust as per your design */
+    height: 100%;
+    /* other navbar styles */
+}

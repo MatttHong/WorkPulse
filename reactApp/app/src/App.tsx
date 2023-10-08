@@ -3,7 +3,8 @@ import './style.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Auth from "./Auth";
 import Home from "./Home";
-import Individual from "./IndividualSPA";
+import Individual from "./IndividualSPA/IndividualSPA";
+import Enterprise from "./EnterpriseSPA/EnterpriseSPA"
 
 export default function App() {
     return (
@@ -12,6 +13,7 @@ export default function App() {
                 <Route index element={<Home />} />
                 <Route path="auth" element={<Auth />} />
                 <Route path="individual" element={<Individual />} />
+                <Route path="enterprise" element={<Enterprise />} />
                 {/* Removed the direct route to Dashboard, as it's now part of WorkerSPA */}
             </Routes>
         </BrowserRouter>

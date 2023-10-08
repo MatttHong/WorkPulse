@@ -1,15 +1,6 @@
 import React from 'react';
-import './Dashboard.css';  // For the styles
+import './css/Dashboard.css';  // For the styles
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
-
-function WorkingStatus({ isWorking }: { isWorking: boolean }) {
-    return (
-        <div className="status-container">
-            <div className={`status-indicator ${isWorking ? 'active' : ''}`}></div>
-            <span>{isWorking ? 'Currently Working' : 'Not Working'}</span>
-        </div>
-    );
-}
 
 // Sample data
 const weeklyData = [
@@ -20,6 +11,23 @@ const weeklyData = [
     { name: 'Fri', hours: 3 },
     // ...rest of the days
 ];
+
+const projects = [
+    'Project A',
+    'Project B',
+    'Project C',
+    // ... add more projects as needed
+];
+
+function WorkingStatus({ isWorking }: { isWorking: boolean }) {
+    return (
+        <div className="status-container">
+            <div className={`status-indicator ${isWorking ? 'active' : ''}`}></div>
+            <span>{isWorking ? 'Currently Working' : 'Not Working'}</span>
+        </div>
+    );
+}
+
 
 function DailyActivity({ dailyPercentage }: { dailyPercentage: number }) {
     return (
@@ -48,6 +56,20 @@ function WeeklyBarGraph() {
     );
 }
 
+function ProjectDropdown({ selectedProject, onProjectChange }: { selectedProject: string, onProjectChange: (project: string) => void }) {
+    return (
+        <div className="project-dropdown">
+            <label>Project: </label>
+            <select value={selectedProject} onChange={(e) => onProjectChange(e.target.value)}>
+                {projects.map(project => (
+                    <option key={project} value={project}>
+                        {project}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+}
 
 function Dashboard() {
     const sessions = [
@@ -55,11 +77,14 @@ function Dashboard() {
         //... more sessions
     ];
 
+    const [selectedProject, setSelectedProject] = React.useState(projects[0]);
+
     return (
         <div className="dashboard-container">
             <div className="dashboard-top">
                 <WeeklyBarGraph />
                 <div className="activity-metrics-container">
+                    <ProjectDropdown selectedProject={selectedProject} onProjectChange={setSelectedProject} />
                     <WorkingStatus isWorking={true} />
                     <DailyActivity dailyPercentage={80} />
                     <WeeklyActivity weeklyPercentage={75} />
