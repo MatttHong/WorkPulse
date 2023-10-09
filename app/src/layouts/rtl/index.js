@@ -13,6 +13,8 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+import { useEffect } from "react";
+
 // @mui material components
 import Grid from "@mui/material/Grid";
 
@@ -28,34 +30,57 @@ import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 
 // Data
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
+import reportsBarChartData from "layouts/rtl/data/reportsBarChartData";
+import reportsLineChartData from "layouts/rtl/data/reportsLineChartData";
 
-// Dashboard components
-import ProjectsOverview from "layouts/dashboard/components/ProjectsOverview";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
-import MembersOverview from "layouts/dashboard/components/MembersOverview";
-import InviteComponent from "./components/MembersOverview/invite/invite";
+// RTL components
+import Projects from "layouts/rtl/components/Projects";
+import OrdersOverview from "layouts/rtl/components/OrdersOverview";
 
-function Dashboard() {
+// Material Dashboard 2 React contexts
+import { useMaterialUIController, setDirection } from "context";
+
+function RTL() {
+  const [, dispatch] = useMaterialUIController();
   const { sales, tasks } = reportsLineChartData;
+
+  // Changing the direction to rtl
+  useEffect(() => {
+    setDirection(dispatch, "rtl");
+
+    return () => setDirection(dispatch, "ltr");
+  }, []);
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
         <Grid container spacing={3}>
-          
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="dark"
+                icon="weekend"
+                title="أموال اليوم"
+                count={281}
+                percentage={{
+                  color: "success",
+                  amount: "+55%",
+                  label: "من الأسبوع الماضي",
+                }}
+              />
+            </MDBox>
+          </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 icon="leaderboard"
-                title="Today's Work"
-                count="2,300 Employees"
+                title="مستخدمو اليوم"
+                count="2,300"
                 percentage={{
                   color: "success",
                   amount: "+3%",
-                  label: "than last month",
+                  label: "من الأسبوع الماضي",
                 }}
               />
             </MDBox>
@@ -65,12 +90,27 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="store"
-                title="Revenue"
+                title="عملاء جدد"
                 count="34k"
                 percentage={{
                   color: "success",
                   amount: "+1%",
-                  label: "than yesterday",
+                  label: "من الشهر الماضي",
+                }}
+              />
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="primary"
+                icon="person_add"
+                title="مبيعات"
+                count="+91"
+                percentage={{
+                  color: "success",
+                  amount: "",
+                  label: "مقارنة بيوم أمس",
                 }}
               />
             </MDBox>
@@ -80,15 +120,26 @@ function Dashboard() {
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
+                <ReportsBarChart
+                  color="info"
+                  title="مشاهدات الموقع"
+                  description="آخر أداء للحملة"
+                  date="الحملة أرسلت قبل يومين"
+                  chart={reportsBarChartData}
+                />
+              </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <MDBox mb={3}>
                 <ReportsLineChart
                   color="success"
-                  title="daily sales"
+                  title="المبيعات اليومية"
                   description={
                     <>
-                      (<strong>+15%</strong>) increase in today sales.
+                      (<strong>+15%</strong>) زيادة في مبيعات اليوم..
                     </>
                   }
-                  date="updated 4 min ago"
+                  date="تم التحديث منذ 4 دقائق"
                   chart={sales}
                 />
               </MDBox>
@@ -97,9 +148,9 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="dark"
-                  title="completed tasks"
-                  description="Last Campaign Performance"
-                  date="just updated"
+                  title="المهام المكتملة"
+                  description="آخر أداء للحملة"
+                  date="تم تحديثه للتو"
                   chart={tasks}
                 />
               </MDBox>
@@ -109,15 +160,10 @@ function Dashboard() {
         <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
-              <ProjectsOverview />
+              <Projects />
             </Grid>
-            {/* <Grid item xs={12} md={6} lg={4}>
+            <Grid item xs={12} md={6} lg={4}>
               <OrdersOverview />
-            </Grid> */}
-            <Grid item xs={12} md={6} lg={8}>
-              <MDBox>
-                <MembersOverview />
-              </MDBox>
             </Grid>
           </Grid>
         </MDBox>
@@ -127,5 +173,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
-
+export default RTL;
