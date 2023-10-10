@@ -34,7 +34,7 @@ exports.inviteUser = async (req, res) => {
       });
       
       newEmployee.generateInviteToken();
-      // existingEmployee.addToBusiness();
+      newEmployee.addToBusiness();
       // Save the new employee object to the database
       await newEmployee.save();
 
