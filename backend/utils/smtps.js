@@ -13,10 +13,13 @@ function emailNewUser(emailAddress, subject, body) {
     mailTransporter.sendMail(mailDetails, function(err, data) {
         if(err) {
             console.log('Error Occurs');
+            return false;
         } else {
             console.log('Email sent successfully');
+            return true;
         }
     })
+    
 }
 
 module.exports = emailNewUser;
