@@ -17,17 +17,27 @@ exports.inviteUser = async (req, res) => {
     const existingEmployee = await Employee.findOne({ email, businessId });
 
     if (existingEmployee) {
+      console.log('existing')
       // Employee with the same email and businessId found; proceed with sending an email
       existingEmployee.generateInviteToken(); // Generate a new token
       await existingEmployee.save(); // Save the updated employee with the new token
       //existingEmployee.addToBusiness();
-      const inviteEmail = CreateEmailInvite(email,existingEmployee._id, true, existingEmployee.inviteToken)
-      if (inviteEmail){
-        return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
-      } else {
-        return res.status(500).json({ error: 'Internal server error' });
-      }
+      CreateEmailInvite(email, existingEmployee._id, true, existingEmployee.inviteToken)
+        .then((inviteEmail) => {
+            if (inviteEmail) {
+                console.log('win');
+                return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
+            } else {
+                console.log('loss');
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+        })
+        .catch((error) => {
+            console.error('Error sending invitation email:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        });
     } else {
+      console.log('new')
       // Create a new employee object with default values
       const newEmployee = new Employee({
         email,
@@ -40,14 +50,29 @@ exports.inviteUser = async (req, res) => {
       newEmployee.addToBusiness();
       // Save the new employee object to the database
       await newEmployee.save();
-
-      // Generate the invite email with the new employeeId and token
-      const inviteEmail = CreateEmailInvite(email,existingEmployee._id, false, existingEmployee.token)
-      if (inviteEmail){
-        return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
+      inviteEmail = await CreateEmailInvite(email, newEmployee._id, false, existingEmployee.inviteToken)
+      if (inviteEmail) {
+          console.log('win');
+          return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
       } else {
-        return res.status(500).json({ error: 'Internal server error' });
+          console.log('loss');
+          return res.status(500).json({ error: 'Internal server error' });
       }
+      // Generate the invite email with the new employeeId and token
+      // CreateEmailInvite(email, existingEmployee._id, true, existingEmployee.inviteToken)
+      //   .then((inviteEmail) => {
+      //       if (inviteEmail) {
+      //           console.log('win');
+      //           return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
+      //       } else {
+      //           console.log('loss');
+      //           return res.status(500).json({ error: 'Internal server error' });
+      //       }
+      //   })
+      //   .catch((error) => {
+      //       console.error('Error sending invitation email:', error);
+      //       return res.status(500).json({ error: 'Internal server error' });
+      //   });
       // Respond with the newly created employee's _id
     }
   } catch (error) {
@@ -131,5 +156,20 @@ function CreateEmailInvite(email, employeeId, invited, token) {
     
     If you have any questions or need assistance with the onboarding process, please don't hesitate to reach out to our support.
     `;
-    return emailNewUser(email, header, body)
+    return new Promise((resolve, reject) => {
+      emailNewUser(email, header, body)
+        .then((result) => {
+            if (result) {
+                console.log('success');
+                resolve(true);
+            } else {
+                console.log('fail');
+                resolve(false);
+            }
+        })
+        .catch((error) => {
+            console.error('Error sending email:', error);
+            resolve(false);
+        });
+    });
 }
