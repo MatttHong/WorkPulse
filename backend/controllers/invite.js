@@ -21,9 +21,12 @@ exports.inviteUser = async (req, res) => {
       existingEmployee.generateInviteToken(); // Generate a new token
       await existingEmployee.save(); // Save the updated employee with the new token
       //existingEmployee.addToBusiness();
-
-      const inviteEmail = CreateEmailInvite(email,existingEmployee._id, true, token)
-
+      const inviteEmail = CreateEmailInvite(email,existingEmployee._id, true, existingEmployee.inviteToken)
+      if (inviteEmail){
+        return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
+      } else {
+        return res.status(500).json({ error: 'Internal server error' });
+      }
     } else {
       // Create a new employee object with default values
       const newEmployee = new Employee({
@@ -39,10 +42,13 @@ exports.inviteUser = async (req, res) => {
       await newEmployee.save();
 
       // Generate the invite email with the new employeeId and token
-      const inviteEmail = CreateEmailInvite(email,existingEmployee._id, false, token)
-
+      const inviteEmail = CreateEmailInvite(email,existingEmployee._id, false, existingEmployee.token)
+      if (inviteEmail){
+        return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
+      } else {
+        return res.status(500).json({ error: 'Internal server error' });
+      }
       // Respond with the newly created employee's _id
-      res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
     }
   } catch (error) {
     console.error(error);
@@ -117,7 +123,7 @@ function CreateEmailInvite(email, employeeId, invited, token) {
     
     To accept this invitation, simply click on the link below:
     
-    ${inviteLink}
+    ${urlWithParameters}
     
     Note that this link will only be valid for one week, and you may need to contact your team to resend the link if it has been too long.
     
