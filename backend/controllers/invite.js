@@ -19,8 +19,9 @@ exports.inviteUser = async (req, res) => {
     if (existingEmployee) {
       // Employee with the same email and businessId found; proceed with sending an email
       existingEmployee.generateInviteToken(); // Generate a new token
-      existingEmployee.addToBusiness();
       await existingEmployee.save(); // Save the updated employee with the new token
+      //existingEmployee.addToBusiness();
+
       const inviteEmail = CreateEmailInvite(email,existingEmployee._id, true, token)
 
     } else {
@@ -31,7 +32,7 @@ exports.inviteUser = async (req, res) => {
         status: Status.invited,
         // Add any other default values from your Employee model here
       });
-
+      
       newEmployee.generateInviteToken();
       newEmployee.addToBusiness();
       // Save the new employee object to the database
