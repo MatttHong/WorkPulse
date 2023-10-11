@@ -6,7 +6,11 @@ from scapy.all import sniff, DNSQR, TCP, IP
 from PIL import Image
 import pytesseract
 import time
-
+# check googles ml kit - 
+# these is some driver in the system which runs the network card - there is a piece of software manufactured
+    # can be selected somehow - write a driver
+    # network driver - proxy network driver
+    # pass all the network traffic through a proxy server
 # Initialize the dictionary to store IP: [domain, count(packets)] mapping
 ip_domain_count_dict = {}
 
@@ -38,6 +42,7 @@ def ip_to_domain(ip_address):
 
 def update_log_file():
     # Create a log entry for each IP in the dictionary and write to the log file
+    print('updating logs')
     with open('ip_domain_count.log', 'w') as f:
         for ip, (domain, count) in ip_domain_count_dict.items():
             f.write(f"{ip}: [{domain}, {count}]\n")
