@@ -10,16 +10,19 @@ function emailNewUser(emailAddress, subject, body) {
         text: body
     };
 
-    mailTransporter.sendMail(mailDetails, function(err, data) {
-        if(err) {
-            console.log('Error Occurs');
-            return false;
-        } else {
-            console.log('Email sent successfully');
-            return true;
-        }
-    })
-    
+    return new Promise((resolve, reject) => {
+        mailTransporter.sendMail(mailDetails, function (err, data) {
+            if (err) {
+                console.error(err);
+                console.log('Error Occurs');
+                resolve(false);
+            } else {
+                console.log('Email sent successfully');
+                console.log(data);
+                resolve(true);
+            }
+        });
+    });
 }
 
 module.exports = emailNewUser;
