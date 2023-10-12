@@ -31,7 +31,6 @@ import MDInput from "components/MDInput";
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
 
-import InviteComponent from "layouts/dashboard/components/MembersOverview/invite";
 // Data
 import MDButton from "components/MDButton";
 import membersTableData from "layouts/dashboard/components/MembersOverview/data/membersTableData";
@@ -79,18 +78,7 @@ function MembersOverview() {
       <MDTypography variant="h6" color="white">
         Members Overview
       </MDTypography>
-      <MDBox>
-        <MDBox>
-        <MDInput>
-        </MDInput>
-        <MDInput>
-        </MDInput>
-      </MDBox>
-        
-        <MDButton>
-          Send Invitation
-        </MDButton>
-      </MDBox>
+      
     </MDBox>
     <MDBox pt={3}>
       <DataTable

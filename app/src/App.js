@@ -48,10 +48,14 @@ import routes from "routes";
 
 // Material Dashboard 2 React contexts
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
+import ProtectedRoute from "routes"
 
 // Images
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import Dashboard from "layouts/dashboard";
+
+
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -68,16 +72,18 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
+  // const { setUser } = useUser();
 
-  // Cache for the rtl
-  useMemo(() => {
-    const cacheRtl = createCache({
-      key: "rtl",
-      stylisPlugins: [rtlPlugin],
-    });
 
-    setRtlCache(cacheRtl);
-  }, []);
+  // // Cache for the rtl
+  // useMemo(() => {
+  //   const cacheRtl = createCache({
+  //     key: "rtl",
+  //     stylisPlugins: [rtlPlugin],
+  //   });
+
+  //   setRtlCache(cacheRtl);
+  // }, []);
 
   // Open sidenav when mouse enter on mini sidenav
   const handleOnMouseEnter = () => {
@@ -109,7 +115,24 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
-  const getRoutes = (allRoutes) =>
+
+  // useEffect(() => {
+  //   // Example function that checks user authentication and returns user data
+  //   const authenticateUser = async () => {
+  //     try {
+  //       // const userData = await checkUserAuthentication();
+  //       // setUser(userData);
+  //     } catch (error) {
+  //       console.error("User authentication failed", error);
+  //       setUser(null);
+  //     }
+  //   };
+
+  //   authenticateUser();
+  // }, [setUser]);
+
+
+    const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
       if (route.collapse) {
         return getRoutes(route.collapse);
@@ -154,7 +177,7 @@ export default function App() {
           <Sidenav
             color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="Material Dashboard 2"
+            brandName="WorkPulse"
             routes={routes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
@@ -164,10 +187,17 @@ export default function App() {
         </>
       )}
       {layout === "vr" && <Configurator />}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
+       {/* {getRoutes(routes)} */}
+        {layout === "vr" && <Configurator />}
+          <Routes>
+          {getRoutes(routes)}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        {/* <ProtectedRoute>
+          path="/Dashboard"
+          component={Dashboard}
+          allowedRoles={['admin']}
+        </ProtectedRoute> */}
     </ThemeProvider>
   );
 }

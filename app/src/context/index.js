@@ -18,13 +18,29 @@ Coded by www.creative-tim.com
   you can customize the states for the different components here.
 */
 
-import { createContext, useContext, useReducer, useMemo } from "react";
+import React, { createContext, useContext, useReducer, useMemo } from "react";
 
 // prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
 // Material Dashboard 2 React main context
 const MaterialUI = createContext();
+
+// const UserContext = createContext();
+
+// export const useUser = () => useContext(UserContext);
+
+// export const UserProvider = ({ children }) => {
+//   const [user, setUser] = useState(null); // user object which includes user information and role
+//   const [admin, setAdmin] = useState(null);
+
+//   return (
+//     <UserContext.Provider value={[{ user, setUser }, {admin, setAdmin}]}>
+//       {children}
+//     </UserContext.Provider>
+//   );
+// };
+
 
 // Setting custom name for the context which is visible on react dev tools
 MaterialUI.displayName = "MaterialUIContext";

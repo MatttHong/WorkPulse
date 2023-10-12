@@ -47,7 +47,7 @@ function Cover() {
             Reset Password
           </MDTypography>
           <MDTypography display="block" variant="button" color="white" my={1}>
-            You will receive an e-mail in maximum 60 seconds
+            You will receive an e-mail within 60 seconds
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>

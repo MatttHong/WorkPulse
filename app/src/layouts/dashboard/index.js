@@ -35,7 +35,8 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 import ProjectsOverview from "layouts/dashboard/components/ProjectsOverview";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import MembersOverview from "layouts/dashboard/components/MembersOverview";
-import InviteComponent from "./components/MembersOverview/invite/invite";
+// import InviteComponent from "components/MembersOverview/invite/invite";
+
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;

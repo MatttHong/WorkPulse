@@ -44,8 +44,21 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
+import { Navigate, Route } from "react-router-dom";
+// import { useUser } from "context";
 // @mui icons
 import Icon from "@mui/material/Icon";
+
+
+// const ProtectedRoute = ({allowedRoles, path, component: Component}) => {
+//   const { user } = useUser();
+
+//   if (!user || !allowedRoles.includes(user.role)) {
+//     // Redirect to a login page or unauthorized page
+//     return <Navigate to="/login" />;
+//   }
+//   return <Route path={path} element={<Component />} />;
+// };
 
 const routes = [
   {
@@ -55,6 +68,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+    // allowedRoles: ["admin"],
   },
   {
     type: "collapse",
@@ -63,6 +77,7 @@ const routes = [
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/tables",
     component: <Tables />,
+    // allowedRoles: ["admin"],
   },
   {
     type: "collapse",
