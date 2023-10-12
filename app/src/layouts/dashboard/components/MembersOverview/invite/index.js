@@ -15,9 +15,13 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+import { useState } from "react";
 // @mui material components
 import Tooltip from "@mui/material/Tooltip";
 import MDBox from "components/MDBox";
+import MDInput from "components/MDInput";
+import MDButton from "components/MDButton";
+
 import MDTypography from "components/MDTypography";
 import MDAvatar from "components/MDAvatar";
 import MDProgress from "components/MDProgress";
@@ -58,9 +62,12 @@ const body = "test body";
             },
             body: JSON.stringify(invitationData)
         });
-        
-        const data = await response.json();
-        console.log("TESTING GOOD");
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok' + response.statusText);
+        }
+       const data = await response.json();
+       console.log('Response:', data);
         // Handle the response: e.g., showing a success message
     } catch (error) {
         // Log the error or display a message to the user

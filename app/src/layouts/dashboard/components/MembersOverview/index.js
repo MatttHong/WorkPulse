@@ -34,6 +34,7 @@ import DataTable from "examples/Tables/DataTable";
 // Data
 import MDButton from "components/MDButton";
 import membersTableData from "layouts/dashboard/components/MembersOverview/data/membersTableData";
+import InviteComponent from "./invite";
 
 
 function MembersOverview() {
@@ -78,7 +79,9 @@ function MembersOverview() {
       <MDTypography variant="h6" color="white">
         Members Overview
       </MDTypography>
-      
+      <Grid item xs={12}>
+        <InviteComponent />
+      </Grid>
     </MDBox>
     <MDBox pt={3}>
       <DataTable

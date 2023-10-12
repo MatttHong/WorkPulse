@@ -132,18 +132,18 @@ export default function App() {
   // }, [setUser]);
 
 
-    const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
-      if (route.collapse) {
-        return getRoutes(route.collapse);
-      }
+  const getRoutes = (allRoutes) =>
+  allRoutes.map((route) => {
+    if (route.collapse) {
+      return getRoutes(route.collapse);
+    }
 
-      if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
-      }
+    if (route.route) {
+      return <Route exact path={route.route} element={route.component} key={route.key} />;
+    }
 
-      return null;
-    });
+    return null;
+  });
 
   const configsButton = (
     <MDBox
@@ -186,18 +186,11 @@ export default function App() {
           {configsButton}
         </>
       )}
-      {layout === "vr" && <Configurator />}
-       {/* {getRoutes(routes)} */}
-        {layout === "vr" && <Configurator />}
-          <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        {/* <ProtectedRoute>
-          path="/Dashboard"
-          component={Dashboard}
-          allowedRoles={['admin']}
-        </ProtectedRoute> */}
+       {layout === "vr" && <Configurator />}
+      <Routes>
+        {getRoutes(routes)}
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      </Routes>
     </ThemeProvider>
   );
 }
