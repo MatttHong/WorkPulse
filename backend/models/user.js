@@ -10,9 +10,9 @@ const userSchema = mongoose.Schema({
     email : { type: String, required: true },
     birthday : {type: String, required: false },
     bio : {type: String, required: false },
-    employments : {type: [String], default: [], required: true },
-    reviews : {type: [Object], default: [], required: true},
-
+    userType: {type: String, required:true},
+    employments : {type: [String], default: ["Company X"], required: true },
+    reviews : {type: [Object], default: [], required: true}
 });
 
 module.exports = mongoose.model("User", userSchema);

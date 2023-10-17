@@ -4,19 +4,21 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 // Create a new user (makes a hash for the password)
 exports.createUser = (req, res, next) => {
     // console.log('got createUser req');
-    let salt = generateSalt(10);
-    let hashedpassword = hash(req.body.password, salt)
+    console.error(req.body);
+    console.log(req.body.password);
+    let hashedpassword = hash(req.body.password)
         
     const user = new User({
         userName: req.body.userName,
         // salt: salt,
         password: hashedpassword,
+        userType: req.body.userType,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
         birthday: req.body.birthday,
         bio: req.body.bio,
-        companies: req.body.companies,
+        employments: req.body.employments,
         logs: req.body.logs,
     });
     console.log(user);
@@ -65,6 +67,7 @@ exports.updateUser = async (req, res, next) => {
         user.email = req.body.email;
         user.birthday = req.body.birthday;
         user.bio = req.body.bio;
+        user.userType = req.body.userType;
         user.employments = req.body.employments;
         user.reviews = req.body.reviews;
 
@@ -156,16 +159,19 @@ exports.deleteUser = (req, res, next) => {
 
 // Get a user by email (using a query parameter)
 exports.getUserByEmail = (req, res, next) => {
-    const email = req.query.email;
-
+    const email = req.params.email;
+    console.log("email: ", email);
     User.findOne({ email })
     .then((user) => {
         if (!user) {
-            throw new Error("User not found");
+            return res.status(404).json({
+                message: "User not found"
+            });
         }
 
         res.json({
-            user: user.toObject(),
+            user: { ...user._doc },
+            status: "Success"
         });
     })
     .catch((err) => {

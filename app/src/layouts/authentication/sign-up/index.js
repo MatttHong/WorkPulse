@@ -14,11 +14,14 @@ Coded by www.creative-tim.com
 */
 
 // react-router-dom components
+import * as React from 'react';
 import { Link } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
-import Checkbox from "@mui/material/Checkbox";
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+// import Checkbox from "@mui/material/Checkbox";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -31,8 +34,60 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-up-cover.jpeg";
+import {useState} from "react";
 
 function Cover() {
+  const [formData, setFormData] = useState({
+    userName: '',
+    firstName: '',
+    lastName: '',
+    birthday: '',
+    email: '',
+    password: '',
+    userType: ''
+  });
+  const [feedback, setFeedback] = useState('');
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleUserTypeChange = (event, newUserType) => {
+    setFormData({
+      ...formData,
+      userType: newUserType
+    });
+  };
+
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    // Make an API call to create user
+    try {
+      const response = await fetch('http://localhost:3000/api/users', { // replace with your backend endpoint
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setFeedback('User created successfully!');
+      } else {
+        const data = await response.json();
+        setFeedback(data.error || 'An error occurred.');
+      }
+    } catch (error) {
+      setFeedback('An error occurred.');
+    }
+  };
+
+
   return (
     <CoverLayout image={bgImage}>
       <Card>
@@ -51,46 +106,139 @@ function Cover() {
             Join us today
           </MDTypography>
           <MDTypography display="block" variant="button" color="white" my={1}>
-            Enter your email and password to register
+            Fill your information to register
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
+          <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
-              <MDInput type="text" label="Name" variant="standard" fullWidth />
+              <MDInput
+                  type="text"
+                  label="Username"
+                  variant="standard"
+                  fullWidth
+                  name="userName"
+                  value={formData.username}
+                  onChange={handleInputChange}
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="email" label="Email" variant="standard" fullWidth />
+              <MDInput
+                  type="text"
+                  label="First Name"
+                  variant="standard"
+                  fullWidth
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" variant="standard" fullWidth />
+              <MDInput
+                  type="text"
+                  label="Last Name"
+                  variant="standard"
+                  fullWidth
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+              />
             </MDBox>
-            <MDBox display="flex" alignItems="center" ml={-1}>
-              <Checkbox />
-              <MDTypography
-                variant="button"
-                fontWeight="regular"
-                color="text"
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-              >
-                &nbsp;&nbsp;I agree the&nbsp;
-              </MDTypography>
-              <MDTypography
-                component="a"
-                href="#"
-                variant="button"
-                fontWeight="bold"
-                color="info"
-                textGradient
-              >
-                Terms and Conditions
-              </MDTypography>
+            <MDBox mb={2}>
+              <MDInput
+                  type="date"
+                  label="Birthday"
+                  variant="standard"
+                  fullWidth
+                  name="birthday"
+                  value={formData.birthday}
+                  onChange={handleInputChange}
+              />
             </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                  type="email"
+                  label="Email"
+                  variant="standard"
+                  fullWidth
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                  type="password"
+                  label="Password"
+                  variant="standard"
+                  fullWidth
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+              />
+            </MDBox>
+
+            <ToggleButtonGroup
+                color="primary"
+                name="userType"
+                value={formData.userType}
+                exclusive
+                onChange={handleUserTypeChange}
+                aria-label="Platform"
+            >
+              <ToggleButton
+                  value="Individual"
+                  style={formData.userType === 'individual' ? { backgroundColor: 'rgb(30 63 233 / 8%)', color: '#1e1fe9' } : {}}
+              >Individual</ToggleButton>
+              <ToggleButton
+                  value="Enterprise"
+                  style={formData.userType === 'enterprise' ? { backgroundColor: 'rgb(30 63 233 / 8%)', color: '#1e1fe9' } : {}}
+              >Enterprise</ToggleButton>
+            </ToggleButtonGroup>
+            {/* Disabled Terms and Conditions Checkbox*/}
+            {/*<MDBox display="flex" alignItems="center" ml={-1}>*/}
+            {/*  <Checkbox />*/}
+            {/*  <MDTypography*/}
+            {/*    variant="button"*/}
+            {/*    fontWeight="regular"*/}
+            {/*    color="text"*/}
+            {/*    sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}*/}
+            {/*  >*/}
+            {/*    &nbsp;&nbsp;I agree the&nbsp;*/}
+            {/*  </MDTypography>*/}
+            {/*  <MDTypography*/}
+            {/*    component="a"*/}
+            {/*    href="#"*/}
+            {/*    variant="button"*/}
+            {/*    fontWeight="bold"*/}
+            {/*    color="info"*/}
+            {/*    textGradient*/}
+            {/*  >*/}
+            {/*    Terms and Conditions*/}
+            {/*  </MDTypography>*/}
+            {/*</MDBox>*/}
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
-                sign in
+              <MDButton type="submit" variant="gradient" color="info" fullWidth>
+                sign up
               </MDButton>
             </MDBox>
+            {feedback === "User created successfully!" && (
+                <MDBox mt={1} mb={1} textAlign="center">
+                  <MDTypography variant="button" color="text">
+                    User created successfully!{" "}
+                    <MDTypography
+                        component={Link}
+                        to="/authentication/sign-in"
+                        variant="button"
+                        color="info"
+                        fontWeight="medium"
+                        textGradient
+                    >
+                      Click here to Sign In
+                    </MDTypography>
+                  </MDTypography>
+                </MDBox>
+            )}
             <MDBox mt={3} mb={1} textAlign="center">
               <MDTypography variant="button" color="text">
                 Already have an account?{" "}

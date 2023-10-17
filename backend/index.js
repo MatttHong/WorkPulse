@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const morgan = require('morgan');
+const cors = require('cors');
+require('dotenv').config();
 
 const { PORT, MONGO } = require('./utils/environment');
 
@@ -15,7 +17,7 @@ const orgRoutes = require("./routes/organization")
 const { initializeFirebase } = require('./utils/firebase');
 
 const app = express()
-
+app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 mongoose.Promise = global.Promise;

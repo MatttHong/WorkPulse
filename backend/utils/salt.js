@@ -30,9 +30,10 @@ let hasher = (password, salt) => {
     };
 };
 
-let hash = (password, salt) => {
+let hash = (password) => {
+    let salt = generateSalt(10);
     if (password == null || salt == null) {
-        throw new Error('Must Provide Password and salt values');
+        throw new Error(`Must Provide Password and salt values: ${password} ${salt}`);
     }
     if (typeof password !== 'string' || typeof salt !== 'string') {
         throw new Error('password must be a string and salt must either be a salt string or a number of rounds');

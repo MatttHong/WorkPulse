@@ -94,4 +94,45 @@ SidenavCollapse.propTypes = {
   active: PropTypes.bool,
 };
 
+export function SignOutButton({ onClick }) {
+    const [controller] = useMaterialUIController();
+    const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
+
+    return (
+        <ListItem component="li" button onClick={onClick}>
+            <MDBox
+                sx={(theme) =>
+                    collapseItem(theme, {
+                        active: false,
+                        transparentSidenav,
+                        whiteSidenav,
+                        darkMode,
+                        sidenavColor,
+                    })
+                }
+            >
+                <ListItemIcon
+                    sx={(theme) =>
+                        collapseIconBox(theme, { transparentSidenav, whiteSidenav, darkMode, active: false })
+                    }
+                >
+                    <Icon sx={(theme) => ({ ...collapseIcon(theme, { active: false }), color: 'white' })}>logout</Icon>
+                </ListItemIcon>
+
+                <ListItemText
+                    primary="Sign Out"
+                    sx={(theme) =>
+                        collapseText(theme, {
+                            miniSidenav,
+                            transparentSidenav,
+                            whiteSidenav,
+                            active: false,
+                        })
+                    }
+                />
+            </MDBox>
+        </ListItem>
+    );
+}
+
 export default SidenavCollapse;
