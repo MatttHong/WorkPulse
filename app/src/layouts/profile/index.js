@@ -61,8 +61,9 @@ function Overview() {
         lastName: "",
         email: "",
         birthday: "",
-        bio:"",
-        employments: "",
+        bio: "",
+        organizations: "",
+        dateJoined: "",
         userType: ""
         // store more data...
     });
@@ -113,10 +114,16 @@ function Overview() {
                                 title="bio"
                                 description={userData.bio}
                                 info={{
-                                    fullName: `${userData.firstName} ${userData.lastName}`,
-                                    birthday: `${userData.birthday}`,
-                                    email: `${userData.email}`,
-                                    companies: `${userData.employments}`
+                                    // fullName: `${userData.firstName} ${userData.lastName}`,
+                                    // birthday: `${userData.birthday}`,
+                                    // email: `${userData.email}`,
+                                    // companies: `${userData.employments}`
+                                    fullName: "Randy Jackson",
+                                    birthday: "07/20/2020",
+                                    email: "a@b.com",
+                                    organizations: "Architects4Good",
+                                    dateJoined: "03/11/2021",
+
                                 }}
                                 social={[
                                     {
@@ -167,9 +174,9 @@ function Overview() {
                         <Grid item xs={12} md={6} xl={3}>
                             <DefaultProjectCard
                                 image={homeDecor1}
-                                label="project #2"
-                                title="modern"
-                                description="As Uber works through a huge amount of internal management turmoil."
+                                label="project #1"
+                                title="Living Room Design"
+                                description="Create the living room design"
                                 action={{
                                     type: "internal",
                                     route: "/pages/profile/profile-overview",
@@ -187,9 +194,9 @@ function Overview() {
                         <Grid item xs={12} md={6} xl={3}>
                             <DefaultProjectCard
                                 image={homeDecor2}
-                                label="project #1"
-                                title="scandinavian"
-                                description="Music is something that everyone has their own specific opinion about."
+                                label="project #2"
+                                title="Bed Room Design"
+                                description="Create the design for the bed room"
                                 action={{
                                     type: "internal",
                                     route: "/pages/profile/profile-overview",
@@ -208,8 +215,8 @@ function Overview() {
                             <DefaultProjectCard
                                 image={homeDecor3}
                                 label="project #3"
-                                title="minimalist"
-                                description="Different people have different taste, and various types of music."
+                                title="Furniture Selection"
+                                description="Pick what furniture must be bought for new house "
                                 action={{
                                     type: "internal",
                                     route: "/pages/profile/profile-overview",
@@ -224,26 +231,7 @@ function Overview() {
                                 ]}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6} xl={3}>
-                            <DefaultProjectCard
-                                image={homeDecor4}
-                                label="project #4"
-                                title="gothic"
-                                description="Why would anyone pick blue over pink? Pink is obviously a better color."
-                                action={{
-                                    type: "internal",
-                                    route: "/pages/profile/profile-overview",
-                                    color: "info",
-                                    label: "view project",
-                                }}
-                                authors={[
-                                    {image: team4, name: "Peterson"},
-                                    {image: team3, name: "Nick Daniel"},
-                                    {image: team2, name: "Ryan Milly"},
-                                    {image: team1, name: "Elena Morison"},
-                                ]}
-                            />
-                        </Grid>
+                        
                     </Grid>
                 </MDBox>
             </Header>
