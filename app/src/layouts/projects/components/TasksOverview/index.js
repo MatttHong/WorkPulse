@@ -35,11 +35,11 @@ import MDButton from "components/MDButton";
 import DataTable from "examples/Tables/DataTable";
 
 // Data
-import data from "layouts/dashboard/components/ProjectsOverview/data";
-import AddProjectComponent from "./addProject";
+import data from "layouts/dashboard/components/TasksOverview/data";
+import TaskForm from "./addTask"; 
 
 
-function Projects() {
+function Tasks() {
   const { columns, rows } = data();
   const [menu, setMenu] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -71,11 +71,11 @@ function Projects() {
       open={Boolean(menu)}
       onClose={closeMenu}
     >
-      <MenuItem onClick={handleOpenDialog}>New Project</MenuItem>
+      <MenuItem onClick={handleOpenDialog}>New Task</MenuItem>
     </Menu>
   );
   
-  const handleAddProject = async (projectData) => {
+  const handleAddTask = async (taskData) => {
     const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
     
     try {
@@ -84,19 +84,19 @@ function Projects() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(projectData)
+            body: JSON.stringify(taskData)
         });
   
         if (!response.ok) {
           throw new Error('Network response was not ok: ' + response.statusText);
         }
         const data = await response.json();
-        console.log('Project added:', data);
+        console.log('Task added:', data);
         // Close dialog and refresh projects list
         handleCloseDialog();
         // TODO: Refresh projects list here
     } catch (error) {
-        console.error('Error adding project:', error);
+        console.error('Error adding task:', error);
     }
   };
   
@@ -106,7 +106,7 @@ function Projects() {
       <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
         <MDBox>
           <MDTypography variant="h6" gutterBottom>
-            Projects
+            Tasks
           </MDTypography>
           <MDBox display="flex" alignItems="center" lineHeight={0}>
             <Icon
@@ -140,9 +140,9 @@ function Projects() {
         />
       </MDBox>
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Add New Project</DialogTitle>
+        <DialogTitle>Create Task</DialogTitle>
         <DialogContent>
-          <AddProjectComponent onAddProject={handleAddProject} />        
+          <TaskForm onAddTask={handleAddTask} />        
         </DialogContent>
         <MDButton onClick={handleCloseDialog} color="error">
         Cancel
@@ -156,4 +156,4 @@ function Projects() {
   );
 }
 
-export default Projects;
+export default Tasks;

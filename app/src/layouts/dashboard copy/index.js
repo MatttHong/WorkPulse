@@ -33,8 +33,9 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 // Dashboard components
 import ProjectsOverview from "layouts/dashboard/components/ProjectsOverview";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import MembersOverview from "layouts/dashboard/components/MembersOverview";
+import TasksOverview from "layouts/dashboard/components/TasksOverview";
+
 // import InviteComponent from "components/MembersOverview/invite/invite";
 
 

@@ -33,7 +33,7 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 
 // Dashboard components
 import ProjectsOverview from "layouts/dashboard/components/ProjectsOverview";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import TasksOverview from "layouts/dashboard/components/TasksOverview";
 import MembersOverview from "layouts/dashboard/components/MembersOverview";
 // import InviteComponent from "components/MembersOverview/invite/invite";
 
@@ -112,9 +112,9 @@ function Dashboard() {
             <Grid item xs={12} md={6} lg={8}>
               <ProjectsOverview />
             </Grid>
-            {/* <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
-            </Grid> */}
+            <Grid item xs={12} md={6} lg={4}>
+              <TasksOverview />
+            </Grid>
             <Grid item xs={12} md={6} lg={8}>
               <MDBox>
                 <MembersOverview />
