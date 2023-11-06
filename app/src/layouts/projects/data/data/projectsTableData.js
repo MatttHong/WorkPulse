@@ -23,7 +23,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDAvatar from "components/MDAvatar";
 import MDProgress from "components/MDProgress";
-
+import { useState } from "react";
 // Images
 import LogoAsana from "assets/images/small-logos/logo-asana.svg";
 import logoGithub from "assets/images/small-logos/github.svg";
@@ -32,9 +32,9 @@ import logoSlack from "assets/images/small-logos/logo-slack.svg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-export default function data() {
+export default function data(handleOpenProjectDetails) {
   const Project = ({ image, name }) => (
-    <MDBox display="flex" alignItems="center" lineHeight={1}>
+    <MDBox display="flex" alignItems="center" lineHeight={1} style={{ cursor: "pointer" }} onClick={() => handleOpenProjectDetails(name)}>
       <MDAvatar src={image} name={name} size="sm" variant="rounded" />
       <MDTypography display="block" variant="button" fontWeight="medium" ml={1} lineHeight={1}>
         {name}

@@ -64,7 +64,7 @@ function AddProjectComponent ({ onAddProject }) {
 const header = "test Header";
 const body = "test body";
 
-    // Add these to the state declarations within AddProjectComponent
+  // Add these to the state declarations within AddProjectComponent
 const [openTaskDialog, setOpenTaskDialog] = useState(false);
 
 // Function to open the task dialog
@@ -96,17 +96,7 @@ const handleCloseTaskDialog = () => {
     }
   };
   
-  const collectFormData = () => {
-    return {
-      businessId,
-      name,
-      status,
-      administrator,
-      employee,
-      task,
-      department,
-    };
-  };
+ 
   const handleSubmit = () => {
     if (validateFields() && tasks.length > 0) { // Ensure tasks are also added
         const formData = {
@@ -114,6 +104,8 @@ const handleCloseTaskDialog = () => {
         //   employeeEmail,
           tasks
         };
+        //close window
+        handleCloseTaskDialog();
         onAddProject(formData);
       } else {
       }
@@ -135,11 +127,11 @@ const handleCloseTaskDialog = () => {
     let isValid = true;
     let newErrors = {};
 
-    // Add similar checks for other fields
-    if (!businessId) {
-      isValid = false;
-      newErrors.businessId = 'Business ID is required';
-    }
+    // // Add similar checks for other fields
+    // if (!businessId) {
+    //   isValid = false;
+    //   newErrors.businessId = 'Business ID is required';
+    // }
     if (!name) {
         isValid = false;
         newErrors.name = 'Project Name is required';
@@ -172,28 +164,7 @@ const handleCloseTaskDialog = () => {
 
   return (
     <MDBox>
-        {tasks.map((task, index) => (
-        <div key={index}>
-          {/* Render each task details */}
-          <p>{task.taskName}</p>
-          {/* ... Render other task details ... */}
-        </div>
-      ))}
-      <MDButton onClick={handleOpenTaskDialog}>Add Task</MDButton>
-        <MDInput
-           label="Project Name"
-           value={name}
-           onChange={(e) => setName(e.target.value)}
-           error={!!errors.name}
-           helperText={errors.name || ''}
-        />
-        <MDInput
-        label="Project Status"
-        value={status}
-        onChange={(e) => setStatus(e.target.value)}
-        error={!!errors.status}
-        helperText={errors.status || ''}
-      />
+        
       <MDInput
            label="Project Name"
            value={name}
@@ -278,8 +249,15 @@ const handleCloseTaskDialog = () => {
           onChange={(e) => setTaskName(e.target.value)}
         />
       </MDBox>
-      //submit form data
       <MDButton onClick={handleSubmit}>Add</MDButton>
+      {tasks.map((task, index) => (
+        <div key={index}>
+          {/* Render each task details */}
+          <p>{task.taskName}</p>
+          {/* ... Render other task details ... */}
+        </div>
+      ))}
+      <MDButton onClick={handleOpenTaskDialog}>Add Task</MDButton>
       <Dialog open={openTaskDialog} onClose={handleCloseTaskDialog}>
   <DialogTitle>Add New Task</DialogTitle>
   {/* <DialogContent>

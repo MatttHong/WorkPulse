@@ -25,7 +25,7 @@ const TaskForm = ({ addTask }) => {
     }
     if (!taskAdministratorsEmail) {
         isValid = false;
-        newErrors.taskAdministrators = 'Adminisrator Email is required';
+        newErrors.taskAdministrators = 'Administrator Email is required';
     }
     if (!taskEmployeeEmail) {
         isValid = false;
