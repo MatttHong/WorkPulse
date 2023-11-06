@@ -38,6 +38,7 @@ import team2 from "assets/images/team-2.jpg";
 import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
 
+
 function InviteComponent () {
 
   const [email, setEmail] = useState('');

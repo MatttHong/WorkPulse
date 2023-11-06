@@ -45,136 +45,33 @@ import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
 
 
-function EditProjectComponent () {
+const EditProjectComponent = ({ project, onSave }) => {
+  // Use state hooks to manage form inputs, similar to AddProjectComponent
 
-//   const [name, setName] = useState('');
-//   const [status, setStatus] = useState('');
-//   const [administrator, setAdministrator] = useState([]);
-//   const [administratorEmail, setAdministratorEmail] = useState('');
-//   const [employee, setEmployee] = useState([]);
-//   const [employeeEmail, setEmployeeEmail] = useState('');
-//   const [task, setTask] = useState([]);
-//   const [taskName, setTaskName] = useState('');
-//   const [department, setDepartment] = useState([]);
-//   const [departmentName, setDepartmentName] = useState('');
+  const handleSave = async () => {
+    // Validate input data
 
-// const header = "test Header";
-// const body = "test body";
+    // Send the updated project data to the backend
+    const BACKEND_ENDPOINT = `http://localhost:3000/api/projects/${project.id}`;
+    try {
+      const response = await fetch(BACKEND_ENDPOINT, {
+        method: 'PUT', // or 'PATCH'
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(/* updated project data */)
+      });
 
-//   // Add these to the state declarations within AddProjectComponent
-// const [openTaskDialog, setOpenTaskDialog] = useState(false);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const updatedProject = await response.json();
+      onSave(updatedProject); // Pass the updated project back up to refresh the list
+    } catch (error) {
+      console.error('Error updating project:', error);
+    }
+  };
 
-// // Function to open the task dialog
-// const handleOpenTaskDialog = () => {
-//   setOpenTaskDialog(true);
-// };
-
-// // Function to close the task dialog
-// const handleCloseTaskDialog = () => {
-//   setOpenTaskDialog(false);
-// };
-
-// const handleAddAdministrator = () => {
-//     if (administratorEmail) {
-//       setAdministrator([...administrator, administratorEmail]);
-//       setAdministratorEmail(''); 
-//     }
-//   };
-// const handleAddEmployee = () => {
-//     if (employeeEmail) {
-//       setEmployee([...employee, employeeEmail]);
-//       setEmployeeEmail(''); 
-//     }
-//   };
-// const handleAddDepartment = () => {
-//     if (departmentName) {
-//       setDepartment([...department, departmentName]);
-//       setDepartmentName(''); 
-//     }
-//   };
-  
-  // const collectFormData = () => {
-  //   return {
-  //     businessId,
-  //     name,
-  //     status,
-  //     administrator,
-  //     employee,
-  //     task,
-  //     department,
-  //   };
-  // };
- 
-  // const handleSubmit = () => {
-    // if (validateFields() && tasks.length > 0) { // Ensure tasks are also added
-    //     const formData = {
-    //     //   administratorEmail,
-    //     //   employeeEmail,
-          
-    //     };
-    //     onEditProject(formData);
-    //     // onAddProject(formData);
-    //   } else {
-    //   }
-  // };
-
-
-  // State for error messages
-  // const [errors, setErrors] = useState({});
-
-    // State for tasks
-  // const [tasks, setTasks] = useState([]);
-
-  // const handleAddTask = (task) => {
-  //   setTasks([...tasks, task]);
-  // };
-
-  // Validate input fields and update the errors state
-  // const validateFields = () => {
-  //   let isValid = true;
-  //   let newErrors = {};
-
-  //   // // Add similar checks for other fields
-  //   // if (!businessId) {
-  //   //   isValid = false;
-  //   //   newErrors.businessId = 'Business ID is required';
-  //   // }
-  //   if (!name) {
-  //       isValid = false;
-  //       newErrors.name = 'Project Name is required';
-  //   }
-  //   if (!status) {
-  //       isValid = false;
-  //       newErrors.status = 'Project Status is required';
-  //   }
-  //   if (!administratorEmail) {
-  //       isValid = false;
-  //       newErrors.administrator = 'Adminisrator is required';
-  //   }
-  //   if (!employeeEmail) {
-  //       isValid = false;
-  //       newErrors.employee = 'Employee is required';
-  //   }
-  //   if (!departmentName) {
-  //       isValid = false;
-  //       newErrors.department = 'Department is required';
-  //   }
-  //   if (!taskName) {
-  //       isValid = false;
-  //       newErrors.task = 'Task is required';
-  //   }
-
-  //   setErrors(newErrors);
-  //   return isValid;
-  // };
-
-
-  return (
-    <MDBox>
-        
-    </MDBox>
-  );
+  // Render form with project data and save button
 };
-
 export default EditProjectComponent;
-

@@ -37,6 +37,7 @@ import membersTableData from "layouts/dashboard/components/MembersOverview/data/
 import InviteComponent from "./invite";
 
 
+
 function MembersOverview() {
   const { columns, rows } = membersTableData();
   const [menu, setMenu] = useState(null);

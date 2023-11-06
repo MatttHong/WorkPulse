@@ -16,7 +16,7 @@ copies or substantial portions of the Software.
 
 // @mui material components
 import Grid from "@mui/material/Grid";
-import {useState } from "react";
+import {useState, useEffect } from "react";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 
@@ -53,7 +53,25 @@ function ProjectsPage() {
   const [currentProject, setCurrentProject] = useState(null);
   const [menu, setMenu] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [projects, setProjects] = useState([]);
 
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
+    try {
+      const response = await fetch(BACKEND_ENDPOINT);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setProjects(data); // Assuming the backend returns an array of projects
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
 
   const openMenu = ({ currentTarget }) => setMenu(currentTarget);
   const closeMenu = () => setMenu(null);
@@ -65,16 +83,14 @@ function ProjectsPage() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-  // Define openProjectDetails function before its first use
+
   const openProjectDetails = (project) => {
-    // Logic to fetch project details based on projectName
-    const projectData = {}; // Replace with actual data retrieval logic
-    setCurrentProject(projectData);
+    setCurrentProject(project);
     setOpen(true);
   };
 
   // Now you can use openProjectDetails since it has been defined
-  const { columns, rows } = data(openProjectDetails);
+  // const { columns, rows } = data(openProjectDetails);
   
   const handleClose = () => {
     setOpen(false);
@@ -124,6 +140,31 @@ function ProjectsPage() {
     }
   };
 
+  const columns = [
+    { Header: "Name", accessor: "name" },
+    { Header: "Status", accessor: "status" },
+    // ... other column definitions ...
+  ];
+
+  const rows = projects.map((project) => {
+    return {
+      // Assuming your project object has 'name', 'status', and 'tasks' keys
+      name: project.name,
+      status: project.status,
+      tasks: project.tasks.length, // If you want to show the number of tasks
+      // Include other project details that correspond to your columns
+      // You can also add actions like edit or delete buttons
+      actions: (
+        <MDButton
+          variant="outlined"
+          color="info"
+          onClick={() => openProjectDetails(project)}
+        >
+          View Details
+        </MDButton>
+      ),
+    };
+  });
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -170,6 +211,15 @@ function ProjectsPage() {
           noEndBorder
           entriesPerPage={false}
         />
+      <MDBox>
+      <DataTable
+  table={{
+    columns: columns,
+    rows: rows
+  }}
+  // ... other props ...
+/>
+      </MDBox>
       </MDBox>
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Add New Project</DialogTitle>

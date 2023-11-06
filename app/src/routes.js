@@ -23,21 +23,21 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import ProjecsPage from "layouts/projects"
 
-import { Navigate, Route } from "react-router-dom";
+import { BrowserRoute, Switch, Route } from "react-router-dom";
 // import { useUser } from "context";
 // @mui icons
 import Icon from "@mui/material/Icon";
+import AcceptInvitation from "layouts/dashboard/components/MembersOverview/acceptInvite"; // This is the component you will create
 
-
-// const ProtectedRoute = ({allowedRoles, path, component: Component}) => {
-//   const { user } = useUser();
-
-//   if (!user || !allowedRoles.includes(user.role)) {
-//     // Redirect to a login page or unauthorized page
-//     return <Navigate to="/login" />;
-//   }
-//   return <Route path={path} element={<Component />} />;
-// };
+const acceptInvitationRoute = {
+  type: "collapse",
+  name: "Accept Invitation",
+  key: "accept-invitation",
+  icon: <Icon fontSize="small">email</Icon>, // Choose an appropriate icon
+  route: "/accept-invitation",
+  component: <AcceptInvitation />,
+  // allowedRoles: ["guest"], // Uncomment and set appropriate roles if needed
+};
 
 const routes = [
   {
@@ -58,15 +58,7 @@ const routes = [
       component: <ProjecsPage />,
       // allowedRoles: ["admin"],
     },
-  // {
-  //   type: "collapse",
-  //   name: "Dashboard",
-  //   key: "dashboard",
-  //   icon: <Icon fontSize="small">dashboard</Icon>,
-  //   route: "/dashboard2",
-  //   component: <Dashboard2 />,
-  //   // allowedRoles: ["admin"],
-  // },
+  
   // {
   //   type: "collapse",
   //   name: "Tables",
@@ -117,5 +109,6 @@ const routes = [
     component: <SignUp />,
   },
 ];
+// routes.push(acceptInvitationRoute);
 
 export default routes;
