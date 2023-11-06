@@ -30,6 +30,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import TaskForm from "../TasksOverview/addTask";
 
 
 // Images
@@ -105,7 +106,7 @@ const handleCloseTaskDialog = () => {
           tasks
         };
         //close window
-        handleCloseTaskDialog();
+        // handleCloseTaskDialog();
         onAddProject(formData);
       } else {
       }
@@ -140,27 +141,15 @@ const handleCloseTaskDialog = () => {
         isValid = false;
         newErrors.status = 'Project Status is required';
     }
-    if (!administratorEmail) {
-        isValid = false;
-        newErrors.administrator = 'Adminisrator is required';
-    }
-    if (!employeeEmail) {
-        isValid = false;
-        newErrors.employee = 'Employee is required';
-    }
-    if (!departmentName) {
-        isValid = false;
-        newErrors.department = 'Department is required';
-    }
-    if (!taskName) {
-        isValid = false;
-        newErrors.task = 'Task is required';
-    }
 
     setErrors(newErrors);
     return isValid;
   };
 
+  const handleCreateTask = (newTask) => {
+    setTasks([...tasks, newTask]); 
+    handleCloseTaskDialog();
+  };
 
   return (
     <MDBox>
@@ -172,34 +161,13 @@ const handleCloseTaskDialog = () => {
            error={!!errors.name}
            helperText={errors.name || ''}
         />
+      
         <MDInput
-        label="Business ID"
-        value={businessId}
-        onChange={(e) => setBusinessId(e.target.value)}
-        error={!!errors.businessId}
-        helperText={errors.businessId || ''}
-      />
-      <MDInput
-           label="Project Name"
-           value={name}
-           onChange={(e) => setName(e.target.value)}
-           error={!!errors.name}
-           helperText={errors.name || ''}
-        />
-        <MDInput
-        label="Business ID"
-        value={businessId}
-        onChange={(e) => setBusinessId(e.target.value)}
-        error={!!errors.businessId}
-        helperText={errors.businessId || ''}
-      />
-
-
-        <MDInput
-            type="text"
-            placeholder="Project Status"
-            value={status}
-            onChange={(e) => setEmail(e.target.value)}
+        label="Project Status"
+          type="text"
+          placeholder="Project Status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
         />
         <MDBox>
         {administrator.map((email, index) => (
@@ -207,7 +175,7 @@ const handleCloseTaskDialog = () => {
         ))}
          <MDInput
           type="text"
-          placeholder="Add Administrator Email"
+          placeholder="Administrator Email"
           value={administratorEmail}
           onChange={(e) => setAdministratorEmail(e.target.value)}
         />
@@ -219,11 +187,11 @@ const handleCloseTaskDialog = () => {
         ))}
          <MDInput
           type="text"
-          placeholder="Add Department"
+          placeholder="Department"
           value={departmentName}
           onChange={(e) => setDepartmentName(e.target.value)}
         />
-        <MDButton onClick={handleAddDepartment}>Add Email</MDButton>
+        <MDButton onClick={handleAddDepartment}>Add Department</MDButton>
       </MDBox>
       
       <MDBox>
@@ -232,41 +200,35 @@ const handleCloseTaskDialog = () => {
         ))}
          <MDInput
           type="text"
-          placeholder="Add Employee Email"
+          placeholder="Employee Email"
           value={employeeEmail}
           onChange={(e) => setEmployeeEmail(e.target.value)}
         />
         <MDButton onClick={handleAddEmployee}>Add Employee</MDButton>
       </MDBox>
-      <MDBox>
-        {task.map((email, index) => (
-          <MDTypography key={index}>{email}</MDTypography>
-        ))}
-         <MDInput
-          type="text"
-          placeholder="Add Task"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-        />
-      </MDBox>
-      <MDButton onClick={handleSubmit}>Add</MDButton>
-      {tasks.map((task, index) => (
-        <div key={index}>
-          {/* Render each task details */}
-          <p>{task.taskName}</p>
-          {/* ... Render other task details ... */}
-        </div>
-      ))}
+    
+      <MDButton onClick={handleSubmit} color="success">Submit Project</MDButton>
       <MDButton onClick={handleOpenTaskDialog}>Add Task</MDButton>
-      <Dialog open={openTaskDialog} onClose={handleCloseTaskDialog}>
-  <DialogTitle>Add New Task</DialogTitle>
-  {/* <DialogContent>
-    <TaskForm addTask={handleAddTask} />
-  </DialogContent> */}
+
+<Dialog open={openTaskDialog} onClose={handleCloseTaskDialog}>
+  <DialogTitle>Create New Task</DialogTitle>
+  <DialogContent>
+    {/* Pass the handleCreateTask function to the TaskForm */}
+    <TaskForm onCreateTask={handleCreateTask} />
+  </DialogContent>
   <DialogActions>
     <MDButton onClick={handleCloseTaskDialog} color="error">
       Cancel
     </MDButton>
+
+    {tasks.map((task, index) => (
+  <div key={index}>
+    <p>{task.name}</p> 
+    <p>Status: {task.status}</p> 
+    {/* ... Render other task details ... */}
+  </div>
+))}
+
   </DialogActions>
 </Dialog>
     </MDBox>
@@ -274,4 +236,5 @@ const handleCloseTaskDialog = () => {
 };
 
 export default AddProjectComponent;
+
 

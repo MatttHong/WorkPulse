@@ -36,7 +36,7 @@ import DataTable from "examples/Tables/DataTable";
 
 // Data
 import data from "layouts/dashboard/components/TasksOverview/data";
-import TaskForm from "./addTask"; 
+import addTask from "layouts/dashboard/components/TasksOverview/addTask";
 
 
 function Tasks() {
