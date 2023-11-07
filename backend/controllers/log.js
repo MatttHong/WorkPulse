@@ -2,6 +2,7 @@ const Log = require("../models/logs");
 
 // Create a new log
 exports.createLog = (req, res, next) => {
+    console.log('here')
     const newLog = new Log({
         employee: req.body.employee,
         task: req.body.task,

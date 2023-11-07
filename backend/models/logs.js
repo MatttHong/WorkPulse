@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const logSchema = mongoose.Schema({
 
     employee : { type: String, required: true },
-    task : { type: String, required: true },
-    department : { type: [String], default: [], required: true},
-    project : {type: [String], default: [], required: true},
+    task : { type: String, required: false },
+    department : { type: [String], default: [], required: false},
+    project : {type: [String], default: [], required: false},
     startTimestamp : { type: Date, default: Date.now(), required: true },
     endTimestamp : { type: Date, required: false },
-    status : { type: String, default: [], required: true },
+    status : { type: String, default: [], required: false },
     log : [{
       type: mongoose.Schema.Types.Mixed 
     }] 
