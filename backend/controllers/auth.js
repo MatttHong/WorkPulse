@@ -4,7 +4,7 @@ const { createSession } = require('../controllers/session')
 const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res, next) => {
-    console.log("passed")
+    // console.log("passed")
     try {
         // let { email, password } = req.body;
         // let email = "gabe@denton";
@@ -14,7 +14,7 @@ exports.login = async (req, res, next) => {
         // console.log(email);
         // console.log(password);
         // console.log("a");
-        console.log('here')
+        // console.log('here')
         let user = await User.findOne({ email: email });
         console.log(user)
         if (!user) {
