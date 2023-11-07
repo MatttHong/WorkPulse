@@ -2,7 +2,6 @@ const User = require("../models/user");
 const { generateSalt, hash, compare } = require('../utils/salt.js');
 const { createSession } = require('../controllers/session')
 const jwt = require('jsonwebtoken');
-const {createSession} = require("./session");
 
 exports.login = async (req, res, next) => {
     console.log("passed")
@@ -51,9 +50,9 @@ exports.login = async (req, res, next) => {
                     status: "Success",
                     message: "Correct Details",
                     token: token,
-                    data: user,
-                    email: email,
-                    id: user._id
+                    data: user
+                    // email: email,
+                    // id: user._id
                 });
             } else {
                 res.status(400).json({
