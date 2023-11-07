@@ -8,12 +8,17 @@ require('dotenv').config();
 
 const { PORT, MONGO } = require('./utils/environment');
 
-
-const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
+const depRoutes = require("./routes/department");
+const empRoutes = require("./routes/employee");
 const inviteRoutes =  require("./routes/invite");
+const logRoutes = require("./routes/log");
 const orgRoutes = require("./routes/organization");
+const projRoutes = require("./routes/project");
 const taskRoutes = require("./routes/task");
+const userRoutes = require("./routes/user");
+
+
 
 const { initializeFirebase } = require('./utils/firebase');
 
@@ -49,6 +54,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api/invite", inviteRoutes);
 app.use("/api/org", orgRoutes);
 app.use("/api/task", taskRoutes);
+app.use("/api/dep", depRoutes);
+app.use("/api/employee", empRoutes);
+app.use("/api/log", logRoutes);
+app.use("/api/proj", projRoutes);
+
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);

@@ -10,9 +10,7 @@ const logSchema = mongoose.Schema({
     endTimestamp : { type: Date, required: false },
     status : { type: String, default: [], required: true },
     log : [{
-        string: { type: String, required: true },
-        timestamp: { type: Date, required: true },
-        int: { type: Number, required: true }
+      type: mongoose.Schema.Types.Mixed 
     }] 
 
 });
