@@ -3,6 +3,7 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res, next) => {
+    console.log("passed")
     try {
         // let { email, password } = req.body;
         // let email = "gabe@denton";
@@ -12,8 +13,9 @@ exports.login = async (req, res, next) => {
         // console.log(email);
         // console.log(password);
         // console.log("a");
+        console.log('here')
         let user = await User.findOne({ email: email });
-        // print(user)
+        console.log(user)
         if (!user) {
             return res.status(400).json({
                 type: "Not Found",
@@ -23,24 +25,25 @@ exports.login = async (req, res, next) => {
 
         // Use try-catch block to handle errors from the compare function
         try {
+            console.log(user.password)
             let match = await compare(password, user.password);
-            const token = await createSession(user._id.toString());
             if (match) {
-                if(!process.env.JWT_SECRET) {
-                    return res.status(500).json({
-                        type: "Internal Server Error",
-                        msg: "JWT_SECRET is not set in the environment."
-                    });
-                }
-
-                const token = jwt.sign({
-                        userId: user._id,
-                        email: user.email
-                    },
-                    process.env.JWT_SECRET,
-                    {
-                        expiresIn: '1h'  // Token expires in 1 hour
-                    });
+                const token = await createSession(user._id.toString());
+                // if(!process.env.JWT_SECRET) {
+                //     return res.status(500).json({
+                //         type: "Internal Server Error",
+                //         msg: "JWT_SECRET is not set in the environment."
+                //     });
+                // }
+// IDK Where this came from but its really bad
+                // const token = jwt.sign({
+                //         userId: user._id,
+                //         email: user.email
+                //     },
+                //     process.env.JWT_SECRET,
+                //     {
+                //         expiresIn: '8h'
+                //     });
 
                 res.status(200).json({
                     status: "Success",
