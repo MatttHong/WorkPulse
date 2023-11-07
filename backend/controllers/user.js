@@ -49,7 +49,7 @@ exports.createUser = (req, res, next) => {
     });
 };
 
-// Update a user by ID (makes a hash if the password is new)
+// Update a user by email (makes a hash if the password is new)
 exports.updateUser = async (req, res, next) => {
     const userId = req.params.id;
 
@@ -57,19 +57,19 @@ exports.updateUser = async (req, res, next) => {
         const user = await User.findById(userId);
 
         if (!user) {
-            throw new Error("User not found");
+            throw new Error(`User not found, id:${userId}`);
         }
 
         // Update user properties as needed
-        user.userName = req.body.userName;
-        user.firstName = req.body.firstName;
-        user.lastName = req.body.lastName;
-        user.email = req.body.email;
-        user.birthday = req.body.birthday;
-        user.bio = req.body.bio;
-        user.userType = req.body.userType;
-        user.employments = req.body.employments;
-        user.reviews = req.body.reviews;
+        if (req.body.userName !== undefined) user.userName = req.body.userName;
+        if (req.body.firstName !== undefined) user.firstName = req.body.firstName;
+        if (req.body.lastName !== undefined) user.lastName = req.body.lastName;
+        if (req.body.email !== undefined) user.email = req.body.email;
+        if (req.body.birthday !== undefined) user.birthday = req.body.birthday;
+        if (req.body.bio !== undefined) user.bio = req.body.bio;
+        if (req.body.userType !== undefined) user.userType = req.body.userType;
+        if (req.body.employments !== undefined) user.employments = req.body.employments;
+        if (req.body.reviews !== undefined) user.reviews = req.body.reviews;
 
         // Check if a new password is provided and it's different from the existing one
         if (req.body.password && req.body.password !== user.password) {
@@ -84,7 +84,7 @@ exports.updateUser = async (req, res, next) => {
 
         await user.save();
 
-        return res.json({
+        return res.status(200).json({
             message: "User updated successfully",
             user: user.toObject(),
         });

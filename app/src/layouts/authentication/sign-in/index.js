@@ -61,7 +61,8 @@ function Basic() {
             if (response.data.status === "Success") {
                 console.log("Received response:", response);
                 localStorage.setItem('token', response.data.token);
-                localStorage.setItem('email', response.data.data.email);
+                localStorage.setItem('email', response.data.email);
+                localStorage.setItem('id', response.data.id);
                 // Assuming that the backend returns userType in the response
                 const userType = response.data.userType;
 

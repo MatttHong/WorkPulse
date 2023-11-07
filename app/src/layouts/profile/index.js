@@ -26,6 +26,11 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import SaveIcon from '@mui/icons-material/Save';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
@@ -51,11 +56,16 @@ import team1 from "assets/images/team-1.jpg";
 import team2 from "assets/images/team-2.jpg";
 import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
+
+// React components
 import {useEffect, useState} from "react";
 import axios from "axios";
 
-function Overview() {
 
+// Date Formatting
+import {isValid, parseISO, format} from 'date-fns';
+
+function Overview() {
     const [userData, setUserData] = useState({
         firstName: "",
         lastName: "",
@@ -68,38 +78,57 @@ function Overview() {
         // store more data...
     });
 
-    const fetchUserData = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const userEmail = localStorage.getItem("email");
-            const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
-                headers: {
-                    Authorization: "Bearer " + token,
-                }
-            });
+    const [editMode, setEditMode] = useState(false);
+    const [firstName, setFirstName] = useState(userData.firstName);
+    console.log("PRINT1: ", firstName);
+    const [lastName, setLastName] = useState(userData.lastName);
+    const [birthday, setBirthday] = useState(userData.birthday);
 
-
-            if (response.data.status === "Success") {
-                const user = response.data.user;
-                setUserData({
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    birthday: user.birthday,
-                    bio: user.bio,
-                    employments: user.employments,
-                    userType: user.userType
-                    // get more data...
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch user data:", error);
-        }
+    const handleToggleEditMode = () => {
+        setEditMode(!editMode);
     };
 
+    const handleSave = (updatedUserInfo) => {
+        if (updatedUserInfo) {
+            userData.firstName = updatedUserInfo.firstName;
+            userData.lastName = updatedUserInfo.lastName;
+            userData.birthday = updatedUserInfo.birthday;
+        }
+        setEditMode(false); // Exit edit mode after saving
+    };
+
+
     useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const userEmail = localStorage.getItem("email");
+                const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    }
+                });
+
+                if (response.data.status === "Success") {
+                    const user = response.data.user;
+
+                    // Set the userData state
+                    setUserData(user);
+
+                    // Also update the individual state variables for firstName, lastName, and birthday
+                    setFirstName(user.firstName);
+                    setLastName(user.lastName);
+                    setBirthday(user.birthday);
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+
         fetchUserData();
-    }, []);
+    }, []); // The empty array means this effect will only run once, similar to componentDidMount
+
+    console.log("USER: ", userData);
 
     return (
         <DashboardLayout>
@@ -113,18 +142,15 @@ function Overview() {
                             <ProfileInfoCard
                                 title="bio"
                                 description={userData.bio}
-                                info={{
-                                    // fullName: `${userData.firstName} ${userData.lastName}`,
-                                    // birthday: `${userData.birthday}`,
-                                    // email: `${userData.email}`,
-                                    // companies: `${userData.employments}`
-                                    fullName: "Randy Jackson",
-                                    birthday: "07/20/2020",
-                                    email: "a@b.com",
-                                    organizations: "Architects4Good",
-                                    dateJoined: "03/11/2021",
-
-                                }}
+                                firstNameProp={firstName}// Pass the firstName as a string
+                                lastNameProp={lastName} // Pass the lastName as a string
+                                birthdayProp={birthday} // Pass the birthday as a string or "Unknown"
+                                editMode={editMode} // Pass the editMode flag
+                                onToggleEditMode={handleToggleEditMode}
+                                onSave={handleSave}
+                                onFirstNameChange={(e) => setFirstName(e.target.value)} // Pass the handler for firstName
+                                onLastNameChange={(e) => setLastName(e.target.value)} // Pass the handler for lastName
+                                onBirthdayChange={(e) => setBirthday(e.target.value)} // Pass the handler for birthday
                                 social={[
                                     {
                                         link: "https://linkedin.com",
@@ -142,7 +168,6 @@ function Overview() {
                                     //     color: "instagram",
                                     // },
                                 ]}
-                                action={{route: "", tooltip: "Edit Profile"}}
                                 shadow={false}
                             />
                             <Divider orientation="vertical" sx={{mx: 0}}/>
@@ -231,11 +256,11 @@ function Overview() {
                                 ]}
                             />
                         </Grid>
-                        
+
                     </Grid>
                 </MDBox>
             </Header>
-            <Footer/>
+            {/*<Footer/>*/}
         </DashboardLayout>
     );
 }
