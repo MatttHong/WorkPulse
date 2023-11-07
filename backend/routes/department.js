@@ -5,14 +5,14 @@ const { validateSession } = require('../controllers/session');
 
 router.use(validateSession);
 
-router.post('', depController.createDep);
+router.post('', depController.createDept);
 
-router.put('/:id', depController.updateDep);
+router.put('/:id', depController.updateDept);
 
-router.get('/:id', depController.getDepById);
+router.get('/:id', depController.getDeptById);
 
-router.get('', depController.getDeps);
+router.get('', depController.getDepts);
 
-router.delete('/:id', depController.deleteDep);
+router.delete('/:id', depController.deleteDept);
 
 module.exports = router;

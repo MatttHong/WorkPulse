@@ -1,5 +1,6 @@
 const Status = Object.freeze({
 
+    undefined: 'Undefined',
     vacation: 'Vacation',
     away: 'Away',
     inactive: 'Inactive',

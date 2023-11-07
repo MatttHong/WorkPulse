@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Status = require('../utils/status'); 
 
 const logSchema = mongoose.Schema({
 
@@ -8,7 +9,11 @@ const logSchema = mongoose.Schema({
     project : {type: [String], default: [], required: false},
     startTimestamp : { type: Date, default: Date.now(), required: true },
     endTimestamp : { type: Date, required: false },
-    status : { type: String, default: [], required: false },
+    status: {
+      type: String,
+      enum: Object.values(Status),
+      default: Status.undefined
+    },
     log : [{
       type: mongoose.Schema.Types.Mixed 
     }] 

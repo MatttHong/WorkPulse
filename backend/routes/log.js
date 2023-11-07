@@ -24,6 +24,6 @@ router.patch('/:id/end', logController.endLogSession);
 router.get('/employee/:employeeId', logController.getLogsByEmployeeId);
 
 // Route to add a log entry to an existing log
-router.put('/log/:id/entry', logController.addLogEntry);
+router.put('/:id/entry', logController.addLogEntry);
 
 module.exports = router;
