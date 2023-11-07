@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const { generateSalt, hash, compare } = require('../utils/salt.js');
+const { createSession } = require('../controllers/session')
 const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res, next) => {
