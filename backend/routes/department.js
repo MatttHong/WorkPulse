@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const depController = require("../controllers/department");
+const { validateSession } = require('../controllers/session'); 
+
+router.use(validateSession);
 
 router.post('', depController.createDep);
 

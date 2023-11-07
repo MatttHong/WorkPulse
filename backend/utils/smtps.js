@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const mailTransporter = require('../secret/secret');
+const { mailTransporter } = require('../secret/secret');
 
 function emailNewUser(emailAddress, subject, body) {
 

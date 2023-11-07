@@ -5,6 +5,7 @@ const logSchema = mongoose.Schema({
     employee : { type: String, required: true },
     task : { type: String, required: true },
     department : { type: [String], default: [], required: true},
+    project : {type: [String], default: [], required: true},
     startTimestamp : { type: Date, default: Date.now(), required: true },
     endTimestamp : { type: Date, required: false },
     status : { type: String, default: [], required: true },

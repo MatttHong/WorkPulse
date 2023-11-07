@@ -24,7 +24,7 @@ exports.login = async (req, res, next) => {
         // Use try-catch block to handle errors from the compare function
         try {
             let match = await compare(password, user.password);
-
+            const token = await createSession(user._id.toString());
             if (match) {
                 if(!process.env.JWT_SECRET) {
                     return res.status(500).json({

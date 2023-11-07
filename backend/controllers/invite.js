@@ -106,25 +106,33 @@ exports.acceptInvite = async (req, res, next) => {
   
       // Find the user by their email
       let user = await User.findOne({ email });
-  
+      
       // If the user does not exist, create a new user
       if (!user) {
         user = new User({ email });
         await user.save();
       }
-  
       // Update the employee object with the new userId and status
       employee.userId = user._id; // Use the user's ID
       employee.status = Status.onboarding;
   
       // Save the updated employee object in the database
       await employee.save();
-  
+      if (user.password === 'fillthisin') {
+        const token = await createSession(user._id.toString());
+        return res.status(200).json({
+          message: 'Employee updated successfully',
+          token: token,
+          userId: employee.userId
+        });
+      } else {
+        return res.status(200).json({
+          message: 'Employee updated successfully',
+          userId: employee.userId
+        });
+      }
       // Respond with a success message
-      return res.status(200).json({
-        message: 'Employee updated successfully',
-        userId: employee.userId
-      });
+     
     } catch (error) {
       // Handle any errors that occur during the process
       console.error(error);

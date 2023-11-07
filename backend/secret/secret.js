@@ -9,4 +9,9 @@ let mailTransporter = nodemailer.createTransport({
     }
 });
 
-module.exports = mailTransporter;
+let JWT_SECRET = "Ydwgiq3Lpz19OUNaKTFipkypE4WmVC82"
+
+module.exports = {
+    JWT_SECRET,
+    mailTransporter
+};

@@ -12,7 +12,8 @@ const { PORT, MONGO } = require('./utils/environment');
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
 const inviteRoutes =  require("./routes/invite");
-const orgRoutes = require("./routes/organization")
+const orgRoutes = require("./routes/organization");
+const taskRoutes = require("./routes/task");
 
 const { initializeFirebase } = require('./utils/firebase');
 
@@ -47,6 +48,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/invite", inviteRoutes);
 app.use("/api/org", orgRoutes);
+app.use("/api/task", taskRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
