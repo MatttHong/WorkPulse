@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const logController = require('../controllers/logController');
+const logController = require('../controllers/log');
 
 // Route to create a new log
 router.post('/logs', logController.createLog);

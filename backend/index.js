@@ -9,7 +9,7 @@ require('dotenv').config();
 const { PORT, MONGO } = require('./utils/environment');
 
 const authRoutes = require("./routes/auth");
-const depRoutes = require("./routes/department");
+// const depRoutes = require("./routes/department");
 const empRoutes = require("./routes/employee");
 const inviteRoutes =  require("./routes/invite");
 const logRoutes = require("./routes/log");
@@ -54,7 +54,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/invite", inviteRoutes);
 app.use("/api/org", orgRoutes);
 app.use("/api/task", taskRoutes);
-app.use("/api/dep", depRoutes);
+// app.use("/api/dep", depRoutes);
 app.use("/api/employee", empRoutes);
 app.use("/api/log", logRoutes);
 app.use("/api/proj", projRoutes);
