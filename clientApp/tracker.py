@@ -1,154 +1,87 @@
-import sys
+from pynput import mouse, keyboard
 import requests
-import pynput
-import logging
 from datetime import datetime
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
 
-# Custom formatter class
-class MyFormatter(logging.Formatter):
-    def formatTime(self, record, datefmt=None):
-        if not datefmt:
-            return super().formatTime(record, datefmt=datefmt)
-        return datetime.fromtimestamp(record.created).astimezone().strftime(datefmt)
 
-# Set up logging with the custom formatter
-def setup_logging():
-    formatter = MyFormatter('%(asctime)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S.%f %Z')
+# Replace with the actual base URL of your API
+API_BASE_URL = 'http://localhost:3000/api/log'
 
-    # Mouse Movements Logger
-    movement_logger = logging.getLogger('mouse_movement')
-    movement_logger.setLevel(logging.INFO)
-    file_handler_movement = logging.FileHandler('mouse_movements.log')
-    file_handler_movement.setFormatter(formatter)
-    movement_logger.addHandler(file_handler_movement)
+# Replace with the actual log ID you receive after starting a logging session
+LOG_ID = 'your-log-id-here'
 
-    # Mouse Clicks Logger
-    click_logger = logging.getLogger('mouse_click')
-    click_logger.setLevel(logging.INFO)
-    file_handler_click = logging.FileHandler('mouse_clicks.log')
-    file_handler_click.setFormatter(formatter)
-    click_logger.addHandler(file_handler_click)
-
-    # Keyboard Logger
-    keyboard_logger = logging.getLogger('keyboard')
-    keyboard_logger.setLevel(logging.INFO)
-    file_handler_keyboard = logging.FileHandler('keyboard_inputs.log')
-    file_handler_keyboard.setFormatter(formatter)
-    keyboard_logger.addHandler(file_handler_keyboard)
-
-    return movement_logger, click_logger, keyboard_logger
-
-# PyQt5 UI Class
-class LoggerUI(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.current_log_id = None  # This will store the ID of the current log
-        self.movement_logger, self.click_logger, self.keyboard_logger = setup_logging()
-        self.init_ui()
-
-    def init_ui(self):
-        self.setWindowTitle('Tracker App')
-        self.setGeometry(100, 100, 200, 100)
-
-        layout = QVBoxLayout()
-
-        self.start_button = QPushButton('Start Logging')
-        self.start_button.clicked.connect(self.start_logging)
-        layout.addWidget(self.start_button)
-
-        self.stop_button = QPushButton('Stop Logging')
-        self.stop_button.clicked.connect(self.stop_logging)
-        self.stop_button.setEnabled(False)
-        layout.addWidget(self.stop_button)
-
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
-
-    def start_logging(self):
-        # Add your API URL here
-        api_url = 'http://localhost:3000/logs'
-        log_data = {
-            'employee': '654467918111a89f6cdd9546',  # Replace with the actual employee ID
-            'task': 'Start of logging session',
-            'department': 'Department Name',
-            'project': 'Project Name',
-            'status': 'In Progress',
-            'log': 'Log session started'
+# This function will send a POST request to start logging
+def start_logging():
+    url = f'{API_BASE_URL}'
+    log_data = {
+        'employee': '654467918111a89f6cdd9546'
         }
-        response = requests.post(api_url, json=log_data)
-        if response.status_code == 201:
-            self.current_log_id = response.json()['log']['_id']
-            self.start_button.setEnabled(False)
-            self.stop_button.setEnabled(True)
-            # Start listeners
-            self.mouse_listener = pynput.mouse.Listener(on_move=self.on_move, on_click=self.on_click, on_scroll=self.on_scroll)
-            self.keyboard_listener = pynput.keyboard.Listener(on_press=self.on_key_press, on_release=self.on_key_release)
-            self.mouse_listener.start()
-            self.keyboard_listener.start()
-        else:
-            print("Failed to start log session:", response.text)
+    response = requests.post(url, json=log_data)
+    if response.ok:
+        global LOG_ID
+        LOG_ID = response.json().get('id')  # Assuming the response contains the log ID
+        print(f'Logging started with ID: {LOG_ID}')
+    else:
+        print('Failed to start logging')
 
-    def stop_logging(self):
-        if self.current_log_id:
-            # Add your API URL here
-            api_url = f'http://localhost:3000/logs/{self.current_log_id}/end'
-            response = requests.patch(api_url)
-            if response.status_code == 200:
-                print("Log session ended successfully.")
-                self.current_log_id = None
-            else:
-                print("Failed to end log session:", response.text)
-        self.start_button.setEnabled(True)
-        self.stop_button.setEnabled(False)
-        # Stop listeners
-        if hasattr(self, 'mouse_listener'):
-            self.mouse_listener.stop()
-        if hasattr(self, 'keyboard_listener'):
-            self.keyboard_listener.stop()
+# This function will send a PATCH request to stop logging
+def stop_logging():
+    url = f'{API_BASE_URL}/{LOG_ID}/end'
+    response = requests.patch(url)
+    if response.ok:
+        print('Logging stopped successfully')
+    else:
+        print('Failed to stop logging')
 
-    def add_log_entry(self):
-        if self.current_log_id:
-            # Add your API URL here
-            api_url = f'http://localhost:3000/logs/{self.current_log_id}/entry'
-            log_entry_data = {
-                'log': 'Periodic log entry'  # Replace with actual log entry content
-            }
-            response = requests.put(api_url, json=log_entry_data)
-            if response.status_code == 200:
-                print("Log entry added successfully.")
-            else:
-                print("Failed to add log entry:", response.text)
+def add_log_entry(action, x=None, y=None):
+    # Get the current date and time with milliseconds
+    timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]  # Truncate microseconds to milliseconds
+    entry = {
+        'action': action,
+        'timestamp': timestamp,
+        'x': x,
+        'y': y
+    }
+    url = f'{API_BASE_URL}/{LOG_ID}/entry'
+    response = requests.put(url, json=entry)
+    if response.ok:
+        print('Log entry added successfully:', entry)
+    else:
+        print('Failed to add log entry:', entry)
 
-    # Mouse and keyboard event handlers
-    def on_move(self, x, y):
-        self.movement_logger.info(f"Mouse moved to ({x}, {y})")
 
-    def on_click(self, x, y, button, pressed):
-        if pressed:
-            self.click_logger.info(f"Mouse clicked at ({x}, {y}) with {button}")
-        else:
-            self.click_logger.info(f"Mouse released at ({x}, {y}) with {button}")
+# This function will be called when a mouse click event occurs
+def on_click(x, y, button, pressed):
+    if pressed:
+        add_log_entry(f'Mouse clicked with {button}', x, y)
 
-    def on_scroll(self, x, y, dx, dy):
-        self.movement_logger.info(f"Mouse scrolled at ({x}, {y}) by {dx}, {dy}")
+# This function will be called when a mouse scroll event occurs
+def on_scroll(x, y, dx, dy):
+    add_log_entry(f'Mouse scrolled with delta ({dx}, {dy})', x, y)
 
-    def on_key_press(self, key):
-        try:
-            self.keyboard_logger.info(f"Key {key.char} pressed")
-        except AttributeError:
-            self.keyboard_logger.info(f"Special key {key} pressed")
+# This function will be called when a keyboard event occurs
+def on_press(key):
+    try:
+        add_log_entry(f'Key pressed: {key.char}')
+    except AttributeError:
+        add_log_entry(f'Special key pressed: {key}')
 
-    def on_key_release(self, key):
-        self.keyboard_logger.info(f"Key {key} released")
-        if key == pynput.keyboard.Key.esc:
-            # Stop the log session if the escape key is pressed
-            self.stop_logging()
+# Start logging when the script runs
+start_logging()
 
-# PyQt5 Application Execution
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    logger_ui = LoggerUI()
-    logger_ui.show()
-    sys.exit(app.exec_())
+# Start the mouse listener in a non-blocking fashion
+mouse_listener = mouse.Listener(on_click=on_click, on_scroll=on_scroll)
+mouse_listener.start()
+
+# Start the keyboard listener in a non-blocking fashion
+keyboard_listener = keyboard.Listener(on_press=on_press)
+keyboard_listener.start()
+
+# Keep the script running
+try:
+    while True:
+        pass
+except KeyboardInterrupt:
+    # Stop logging when you press Ctrl+C
+    stop_logging()
+    mouse_listener.stop()
+    keyboard_listener.stop()
