@@ -4,6 +4,8 @@ from pynput import mouse, keyboard
 import requests
 from datetime import datetime
 from unittest.mock import Mock
+import threading
+import time
 
 # Set this to True when testing without a server
 TESTING_WITHOUT_SERVER = True
@@ -96,6 +98,45 @@ class LoggingApp(tk.Tk):
         # Set up listeners
         self.mouse_listener = mouse.Listener(on_click=self.on_click, on_scroll=self.on_scroll)
         self.keyboard_listener = keyboard.Listener(on_press=self.on_press)
+
+        self.track_intervals = [10, 30, 50]  # Seconds after the minute to start tracking
+        self.track_duration = 5  # Duration of tracking in seconds
+        self.tracking = False  # Flag to indicate if tracking is active
+        self.start_track_timers()
+
+    def start_track_timers(self):
+        """Start timers to trigger mouse movement tracking."""
+        current_time = datetime.now()
+        for interval in self.track_intervals:
+            # Calculate the time until the next interval
+            delta_seconds = interval - current_time.second
+            if delta_seconds < 0:
+                delta_seconds += 60
+            # Set a timer to start tracking
+            threading.Timer(delta_seconds, self.start_mouse_tracking).start()
+
+    def start_mouse_tracking(self):
+        """Start tracking mouse movement for a set duration."""
+        if not self.tracking:
+            self.tracking = True
+            self.mouse_listener = mouse.Listener(on_move=self.on_move)
+            self.mouse_listener.start()
+            # Set a timer to stop tracking after the duration
+            threading.Timer(self.track_duration, self.stop_mouse_tracking).start()
+
+    def stop_mouse_tracking(self):
+        """Stop tracking mouse movement."""
+        if self.tracking:
+            self.mouse_listener.stop()
+            self.tracking = False
+            # Restart the tracking timers for the next minute
+            self.start_track_timers()
+
+    def on_move(self, x, y):
+        """Handle mouse movement event."""
+        if self.tracking and self.logged_in:  # Only track movements if logged in and tracking is active
+            timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+            print(f'Mouse moved at {timestamp} to position ({x}, {y})')
 
     def update_login_state(self):
         if self.logged_in:
