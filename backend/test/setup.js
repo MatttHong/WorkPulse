@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const { apiUrl, MONGO, } = require('./utils/environment');
+const axios = require('axios');
+const { apiUrl, testMongo, } = require('../utils/environment');
 
 // const { initializeFirebase } = require('./utils/firebase');
 
@@ -11,13 +12,25 @@ module.exports = async () => {
 //   await initializeFirebase();
 
   // Connect to the MongoDB test database
-  await mongoose.connect("mongodb://" + MONGO);
-
-  const mongoURI = process.env.MONGO_URI_TEST || 'mongodb://localhost:27017/testDatabase';
-  await mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  await mongoose.connect(testMongo);
+  const userResponse = await axios.post(`${apiUrl}/api/users`, {
+    "username" : "abcd",
+    "password" : "abcd",
+    "firstName" : "tester1",
+    "lastName" : "IBeTesting",
+    "email" : "gabe2002denton@gmail.com"
   });
+  
+  // Save the user _id to a global variable
+  global.__USER_ID__ = userResponse.data._id;
+  console.log("I am here")
+  // Authenticate the user
+  const authResponse = await axios.post(`${apiUrl}/api/auth`, {
+    // ... credentials
+  });
+
+  // Save the token to a global variable
+  global.__AUTH_TOKEN__ = authResponse.data.token;
 
   // Other global setup can go here...
 };
