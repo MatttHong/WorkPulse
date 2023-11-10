@@ -5,7 +5,7 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 exports.createUser = (req, res, next) => {
     console.log("create user");
     // console.log('got createUser req');
-    console.error(req.body);
+    // console.error(req.body);
     console.log(req.body.password);
     let hashedpassword = hash(req.body.password)
         
@@ -30,7 +30,10 @@ exports.createUser = (req, res, next) => {
         if (!foundUser) {
             return user.save();
         } else {
-            throw new Error("User already exists.");
+            res.status(500).header('Content-Type', 'application/json').json({
+                message: "User already exists.",
+            });
+            // throw new Error("User already exists.");
         }
     })
     .then((result) => {

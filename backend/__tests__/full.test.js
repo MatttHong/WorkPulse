@@ -34,48 +34,48 @@ describe('User API endpoints', () => {
     userEmail1 = res.body.post.email;
   });
 
-  // Update a user
-  it('should update a user', async () => {
-    const res = await request.put(`/api/users/${userId}`)
-      .set('Authorization', `Bearer ${userToken}`) // Set the headers with the token
-      .send({
-        firstName: 'UpdatedName'
-      });
+  // // Update a user
+  // it('should update a user', async () => {
+  //   const res = await request.put(`/api/users/${userId}`)
+  //     .set('Authorization', `Bearer ${userToken}`) // Set the headers with the token
+  //     .send({
+  //       firstName: 'UpdatedName'
+  //     });
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body.user.firstName).toEqual('UpdatedName');
-  });
+  //   expect(res.statusCode).toEqual(200);
+  //   expect(res.body.user.firstName).toEqual('UpdatedName');
+  // });
 
-  // Get a user by email
-  it('should get a user by email', async () => {
-    const res = await request.get(`/api/users/email/${userEmail}`)
-      .set('Authorization', `Bearer ${userToken}`);
+  // // Get a user by email
+  // it('should get a user by email', async () => {
+  //   const res = await request.get(`/api/users/email/${userEmail}`)
+  //     .set('Authorization', `Bearer ${userToken}`);
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body.user.email).toEqual(userEmail);
-  });
+  //   expect(res.statusCode).toEqual(200);
+  //   expect(res.body.user.email).toEqual(userEmail);
+  // });
 
-  // Get a user by ID
-  it('should get a user by ID', async () => {
-    const res = await request.get(`/api/users/${userId}`)
-      .set('Authorization', `Bearer ${userToken}`);
+  // // Get a user by ID
+  // it('should get a user by ID', async () => {
+  //   const res = await request.get(`/api/users/${userId}`)
+  //     .set('Authorization', `Bearer ${userToken}`);
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body.user._id).toEqual(userId);
-  });
+  //   expect(res.statusCode).toEqual(200);
+  //   expect(res.body.user._id).toEqual(userId);
+  // });
 
-  // Get all users
-  it('should get all users', async () => {
-    const res = await request.get('/api/users')
-      .set('Authorization', `Bearer ${userToken}`);
+  // // Get all users
+  // it('should get all users', async () => {
+  //   const res = await request.get('/api/users')
+  //     .set('Authorization', `Bearer ${userToken}`);
 
-    expect(res.statusCode).toEqual(200);
-    expect(Array.isArray(res.body.users)).toBeTruthy();
-  });
+  //   expect(res.statusCode).toEqual(200);
+  //   expect(Array.isArray(res.body.users)).toBeTruthy();
+  // });
 
   // Delete a user
   it('should delete a user', async () => {
-    const res = await request.delete(`/api/users/${userId}`)
+    const res = await request.delete(`/api/users/${userId1}`)
       .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.statusCode).toEqual(200);

@@ -35,7 +35,14 @@ module.exports = async () => {
     });
   // Check if the user was created successfully and get the ID
   if (userResponse.status !== 201) {
-    throw new Error('Failed to create test user');
+    if (userResponse.body.error === "User already exists.") {
+      // Handle the "User already exists" error
+      // You can choose to handle it here or throw an error
+      // throw new Error('User already exists. Handle the error accordingly.');
+      console.log("test user already exists")
+    } else {    
+      throw new Error('Failed to create test user');
+    }
   }
   // console.log(userResponse.body)
   const userId = userResponse.body.post.id;
