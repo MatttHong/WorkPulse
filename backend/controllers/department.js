@@ -41,7 +41,7 @@ exports.updateDept = (req, res, next) => {
         }
 
         dept.departmentName = req.body.departmentName;
-        dept.departmentAdminstrators = req.body.departmentAdminstrators;
+        dept.departmentAdministrators = req.body.departmentAdministrators;
         dept.employees = req.body.employees;
         dept.projects = req.body.projects;
 

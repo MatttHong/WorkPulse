@@ -31,7 +31,7 @@ exports.updateTask = (req, res, next) => {
 
         // Add fields that are allowed to be updated
         task.taskName = req.body.taskName;
-        task.taskAdminstrators = req.body.taskAdminstrators;
+        task.taskAdministrators = req.body.taskAdministrators;
         task.employees = req.body.employees;
         task.status = req.body.status;
         // ...other fields you might want to update

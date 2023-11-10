@@ -31,7 +31,7 @@ exports.updateProject = (req, res, next) => {
 
         // Update fields of the project
         project.projectName = req.body.projectName;
-        project.projectAdminstrators = req.body.projectAdminstrators;
+        project.projectAdministrators = req.body.projectAdministrators;
         project.employees = req.body.employees;
         project.tasks = req.body.tasks;
         project.departments = req.body.departments;
