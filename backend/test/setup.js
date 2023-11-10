@@ -4,6 +4,8 @@ const supertest = require('supertest');
 const app = require('../app');
 const fs = require('fs');
 const dotenv = require('dotenv');
+// const { popFromList, isListPopulated, removeFromList, appendToList } = require('../utils/moduleForTestingSupport');
+
 
 const envPath = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env.test';
 
@@ -12,12 +14,16 @@ if (fs.existsSync(envPath)) {
   } else {
     dotenv.config();
   }
+  
 module.exports = async () => {
+  global.__TEST_STATE__ = {
+    usersToDelete: []
+  };
   // Connect to the test database
   await mongoose.connect(`mongodb://${process.env.MONGO}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
   const email = "gabe2002denton@gmail.com";
-  const password = "asdf";
+  const password = "A1!BcDsdf";
   // Use supertest to create a new user
   let userId;
   const userResponse = await supertest(app)
@@ -45,6 +51,9 @@ module.exports = async () => {
     }
   } else {
     userId = userResponse.body.post.id;
+    if (userId){
+      global.__TEST_STATE__.usersToDelete.push(['users', userId]);
+    }
   }
   // Use supertest to log in the user and get the auth token
   const authResponse = await supertest(app)
@@ -60,13 +69,18 @@ module.exports = async () => {
   }
   const authToken = authResponse.body.token;
   if (!userId){
-    userId = authResponse.body.data.id
+    userId = authResponse.body.data._id;
+    if (userId){
+      global.__TEST_STATE__.usersToDelete.push(['users', userId]);
+    }
   }
   // Set the user ID and auth token as global variables
   process.env.USER_ID = userId;
   process.env.AUTH_TOKEN = authToken;
   process.env.EMAIL = email;
   process.env.PASSWORD = password;
+  // prcoess.env.LIST = []
+  
     // Close the MongoDB connection after all tests have run
   await mongoose.connection.close();
 };

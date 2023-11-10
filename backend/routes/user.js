@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user");
 const { validateSession } = require('../controllers/session'); 
-const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
+const { checkBodyForLongValues, validateAndFormatEmailParams, validatePasswordForm } = require('../controllers/filter'); 
 
 router.use(checkBodyForLongValues, validateAndFormatEmailParams);
 // router.use(validateSession);
 
-router.post('', userController.createUser);
+router.post('', validatePasswordForm, userController.createUser);
 
 router.put('/:id', validateSession, userController.updateUser);
 

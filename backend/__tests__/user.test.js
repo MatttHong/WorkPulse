@@ -2,6 +2,7 @@
 const supertest = require('supertest');
 const app = require('../app'); // Adjust the path to your app entry point
 const mongoose = require('mongoose');
+const { popFromList, isListPopulated, removeFromList, appendToList, getList, listLength } = require('../utils/moduleForTestingSupport');
 
 const request = supertest(app);
 beforeAll(async () => {
@@ -23,6 +24,11 @@ describe('User API endpoints', () => {
   let userEmail = process.env.EMAIL;
   let password = process.env.PASSWORD;
   let userToken = process.env.AUTH_TOKEN;
+  // console.log(userId);
+  // console.log(userEmail);
+  // console.log(password);
+  // console.log(userToken);
+
   let userId1;
   let userEmail1;
 
@@ -32,7 +38,7 @@ describe('User API endpoints', () => {
       .post('/api/users')
       .send({
           userName: 'testuser',
-          password: 'password',
+          password: 'password1!D',
           userType: 'test',
           firstName: 'Test',
           lastName: 'User',
@@ -44,6 +50,18 @@ describe('User API endpoints', () => {
         });
       expect(userResponse.statusCode).toEqual(201);
       expect(userResponse.body).toHaveProperty('post');
+      if (userResponse.statusCode === 201){
+        console.log(listLength())
+        console.log(process.env.LIST)
+        console.log(getList())
+
+        appendToList(['users', userResponse.body.post._id])
+
+        // console.log(process.env.LIST)
+        console.log(getList())
+        console.log(listLength())
+        // console.log(['users', userResponse.body.post._id])
+      }
       userId1 = userResponse.body.post._id;
       userEmail1 = userResponse.body.post.email;
   });
@@ -53,7 +71,7 @@ describe('User API endpoints', () => {
     .post('/api/users')
     .send({
         userName: 'testuser',
-        password: '12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890',
+        password: '12!A345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890',
         userType: 'test',
         firstName: 'Test',
         lastName: 'User',
@@ -64,7 +82,11 @@ describe('User API endpoints', () => {
         logs: []
       });
     expect(userResponse.statusCode).toEqual(400);
-    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.')
+    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.');
+    if (userResponse.statusCode === 201){
+      appendToList(['users', userResponse.body.post._id])
+    }
+
     // expect(userResponse.body)
   });
 
@@ -73,7 +95,7 @@ describe('User API endpoints', () => {
     .post('/api/users')
     .send({
         userName: 'testuser',
-        password: '141234567890',
+        password: '141234!aA567890',
         userType: 'test',
         firstName: 'Test',
         lastName: 'User',
@@ -84,7 +106,10 @@ describe('User API endpoints', () => {
         logs: []
       });
     expect(userResponse.statusCode).toEqual(400);
-    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.')
+    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.');
+    if (userResponse.statusCode === 201){
+      appendToList(['users', userResponse.body.post._id]);
+    }
     // expect(userResponse.body)
   });
 
@@ -93,7 +118,7 @@ describe('User API endpoints', () => {
     .post('/api/users')
     .send({
         userName: 'testuser',
-        password: '123457890',
+        password: '123457aA1!890',
         userType: 'test',
         firstName: 'Test',
         lastName: 'User',
@@ -104,7 +129,10 @@ describe('User API endpoints', () => {
         logs: ['this can be anything']
       });
     expect(userResponse.statusCode).toEqual(500);
-    expect(userResponse.body.message).toEqual('User already exists.')
+    expect(userResponse.body.message).toEqual('User already exists.');
+    if (userResponse.statusCode === 201){
+      appendToList(['users', userResponse.body.post._id]);
+    }
     // expect(userResponse.body)
   });
 
@@ -113,7 +141,7 @@ describe('User API endpoints', () => {
     .post('/api/users')
     .send({
         userName: 'testuser',
-        password: '123457890',
+        password: '123457!aA1890',
         userType: 'test',
         firstName: 'Test',
         lastName: 'User',
@@ -123,19 +151,48 @@ describe('User API endpoints', () => {
         employments: [],
         logs: ['this can be anything']
       });
-    expect(userResponse.statusCode).toEqual(500);
+    console.log(userResponse)
+    expect(userResponse.statusCode).toEqual(400);
+    expect(userResponse.body.message).toEqual('Invalid email format.');
+    if (userResponse.statusCode === 201){
+      appendToList(['users', userResponse.body.post._id]);
+    }
+    // expect(userResponse.body.message).toEqual('User already exists.')
+    // expect(userResponse.body)
+  });
+
+  it('should fail to bad password', async () => {
+    const userResponse = await supertest(app)
+    .post('/api/users')
+    .send({
+        userName: 'testuser',
+        password: '1234',
+        userType: 'test',
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        birthday: '1990-01-01',
+        bio: 'A test bio',
+        employments: [],
+        logs: ['this can be anything']
+      });
+    expect(userResponse.body.message).toEqual('Invalid password format.');
+    expect(userResponse.statusCode).toEqual(400);
+    if (userResponse.statusCode === 201){
+      appendToList(['users', userResponse.body.post._id]);
+    }
     // expect(userResponse.body.message).toEqual('User already exists.')
     // expect(userResponse.body)
   });
 
   // Update a user
   it('should update a user', async () => {
-    const res = await request.put(`/api/users/${userId}`)
+    const res = await request.put(`/api/users/${userId1}`)
       .set('Authorization', `Bearer ${userToken}`) // Set the headers with the token
       .send({
         firstName: 'UpdatedName'
       });
-
+    console.log(res.body.message);
     expect(res.statusCode).toEqual(200);
     expect(res.body.user.firstName).toEqual('UpdatedName');
     expect(res.body.user.lastName).toEqual('User');
@@ -143,30 +200,31 @@ describe('User API endpoints', () => {
 
   // Get a user by email
   it('should get a user by email', async () => {
-    const res = await request.get(`/api/users/email/${userEmail}`)
+    const res = await request.get(`/api/users/email/${userEmail1}`)
       .set('Authorization', `Bearer ${userToken}`);
     console.log(userEmail)
     expect(res.statusCode).toEqual(200);
-    expect(res.body.user.email).toEqual(userEmail);
+    expect(res.body.user.email).toEqual(userEmail1);
+    expect(res.body.user._id).toEqual(userId1);
   });
 
-  // // Get a user by ID
-  // it('should get a user by ID', async () => {
-  //   const res = await request.get(`/api/users/${userId}`)
-  //     .set('Authorization', `Bearer ${userToken}`);
+  // Get a user by ID
+  it('should get a user by ID', async () => {
+    const res = await request.get(`/api/users/${userId}`)
+      .set('Authorization', `Bearer ${userToken}`);
 
-  //   expect(res.statusCode).toEqual(200);
-  //   expect(res.body.user._id).toEqual(userId);
-  // });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.user._id).toEqual(userId);
+  });
 
-  // // Get all users
-  // it('should get all users', async () => {
-  //   const res = await request.get('/api/users')
-  //     .set('Authorization', `Bearer ${userToken}`);
+  // Get all users
+  it('should get all users', async () => {
+    const res = await request.get('/api/users')
+      .set('Authorization', `Bearer ${userToken}`);
 
-  //   expect(res.statusCode).toEqual(200);
-  //   expect(Array.isArray(res.body.users)).toBeTruthy();
-  // });
+    expect(res.statusCode).toEqual(200);
+    expect(Array.isArray(res.body.users)).toBeTruthy();
+  });
 
   // Delete a user
   it('should delete a user', async () => {
@@ -175,5 +233,10 @@ describe('User API endpoints', () => {
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('message', 'User deleted successfully');
+    // console.log(res.body.user._id)
+    expect(res.body.user._id).toEqual(userId1);
+    if (res.statusCode === 200){
+      removeFromList(['users', res.body.user._id]);
+    }
   });
 });

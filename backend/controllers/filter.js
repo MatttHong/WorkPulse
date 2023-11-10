@@ -1,4 +1,8 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple regex for email validation
+// requires form __@__.___
+
+const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{8,}$/; // Simple regex for password verification
+// requires password to have atleast 1 special character, 1 number, and one uppercase letter (must be longer than 8 chars)
 
 const limits = {
 
@@ -103,7 +107,9 @@ const validateAndFormatEmailParams = (req, res, next) => {
     
           // Validate the email format
           if (!emailRegex.test(req.body[key])) {
-            badEmail.append(req.params[key]) 
+            let temp = req.params[key]
+            console.log(temp)
+            badEmail.push(temp) 
 
             // return res.status(400).json({
             //   message: 'Invalid email format.',
@@ -117,13 +123,27 @@ const validateAndFormatEmailParams = (req, res, next) => {
           message: 'Invalid email format.',
           email: badEmail
         });
+    } else {
+      next(); // Proceed to the next middleware if all checks pass
     }
-    next(); // Proceed to the next middleware if all checks pass
+}
+
+const validatePasswordForm = (req, res, next) => {
+  if ((!req.body.password || passwordRegex.test(req.body.password)) && 
+     (!req.params.password || passwordRegex.test(req.params.password))) {
+    next();
+  } else {
+    return res.status(400).json({
+      message: 'Invalid password format.'
+    });
+  }
 }
 
 module.exports = {
     checkBodyForLongValues,
     validateAndFormatEmailParams,
+    validatePasswordForm,
+    passwordRegex, // Exporting if I want to check it somewhere else
     emailRegex // Exporting the regex in case it's needed elsewhere
   };
   

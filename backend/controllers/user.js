@@ -4,12 +4,10 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 // Create a new user (makes a hash for the password)
 exports.createUser = async (req, res, next) => {
     console.log("create user");
-    // console.log(req.body.password);
     let hashedPassword = hash(req.body.password);
     
     try {
         const foundUser = await User.findOne({ email: req.body.email });
-        // console.log("here")
         if (foundUser) {
             return res.status(500).json({
                 message: "User already exists.",
@@ -27,12 +25,10 @@ exports.createUser = async (req, res, next) => {
             employments: req.body.employments,
             logs: req.body.logs,
         });
-        // console.log(user)
 
         const result = await user.save();
 
         // Send a single response here
-        // console.log(user._id)
         return res.status(201).json({
             message: "User added successfully",
             post: {
