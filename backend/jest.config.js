@@ -9,7 +9,7 @@ module.exports = {
   // coveragePathIgnorePatterns: [
   //   "/node_modules/"
   // ],
-
+  // testTimeout: 10000, // 10 seconds in milliseconds
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: ["json", "text", "lcov", "clover"],
 
@@ -40,5 +40,5 @@ module.exports = {
   globalTeardown: "<rootDir>/test/teardown.js", // Path to your teardown file
 
   // Setup files before the tests are run
-  setupFilesAfterEnv: ["<rootDir>/test/setEnvVars.js"] // If you need to set environment variables
+  // setupFilesAfterEnv: ["<rootDir>/test/setEnvVars.js"] // If you need to set environment variables
 };

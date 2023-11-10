@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 
 module.exports = async () => {
   // Use supertest to delete the user created in setup.js
+  await mongoose.connect(`mongodb://${process.env.MONGO}`, { useNewUrlParser: true, useUnifiedTopology: true });
+
   await supertest(app)
     .delete(`/api/users/${global.__USER_ID__}`)
     .set('Authorization', `Bearer ${global.__AUTH_TOKEN__}`);

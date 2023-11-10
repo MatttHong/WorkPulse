@@ -18,8 +18,8 @@ const userSchema = mongoose.Schema({
     email : { type: String, required: true },
     birthday : {type: String, required: false },
     bio : {type: String, required: false },
-    userType: {type: String, required:true},
-    employments : {type: [String], default: ["Company X"], required: true },
+    userType: {type: String, required: false},
+    employments : {type: [String], default: [""], required: false },
     dateJoined: { type: String, required: true, default: getCurrentDateFormatted },
     reviews : {type: [Object], default: [], required: true}
 });

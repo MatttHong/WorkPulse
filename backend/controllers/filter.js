@@ -17,6 +17,7 @@ const limits = {
     employeeId : { min: 24, max: 24 },
     inviteToken : { min: 33, max: 37 },
     log : { max: -1 },
+    logs : { max: -1 },
     employee : { min: 24, max: 24 },
     department : { min: 24, max: 24 },
     project : { min: 24, max: 24 },
@@ -49,10 +50,10 @@ const checkBodyForLongValues = (req, res, next) => {
         // Use specific limit if exists, otherwise use default
         const min = limits[key]?.min || 0;
         const max = limits[key]?.max || defaultMaxLength;
-        if (max != -1 || value){
-            if (checkLength(key, value, min, max)) {
-                keysWithInvalidLength.push(key);
-            }
+        if (max !== -1 && value){
+          if (checkLength(key, value, min, max)) {
+              keysWithInvalidLength.push(key);
+          }
         }
     }
     for (const [key, value] of Object.entries(req.params)) {
@@ -79,6 +80,7 @@ const checkBodyForLongValues = (req, res, next) => {
   };
 
 const validateAndFormatEmailParams = (req, res, next) => {
+  let badEmail = [];
     Object.keys(req.params).forEach(key => {
         if (key.toLowerCase().includes('email')) {
           // Replace %40 with @
@@ -86,14 +88,36 @@ const validateAndFormatEmailParams = (req, res, next) => {
     
           // Validate the email format
           if (!emailRegex.test(req.params[key])) {
-            return res.status(400).json({
-              message: 'Invalid email format.',
-              email: req.params[key]
-            });
+            badEmail.append(req.params[key])
+            // return res.status(400).json({
+            //   message: 'Invalid email format.',
+            //   email: req.params[key]
+            // });
           }
         }
       });
+      Object.keys(req.body).forEach(key => {
+        if (key.toLowerCase().includes('email')) {
+          // Replace %40 with @
+          req.body[key] = req.body[key].replace(/%40/gi, '@');
     
+          // Validate the email format
+          if (!emailRegex.test(req.body[key])) {
+            badEmail.append(req.params[key]) 
+
+            // return res.status(400).json({
+            //   message: 'Invalid email format.',
+            //   email: req.body[key]
+            // });
+          }
+        }
+      });
+    if (badEmail.length > 0){
+      return res.status(400).json({
+          message: 'Invalid email format.',
+          email: badEmail
+        });
+    }
     next(); // Proceed to the next middleware if all checks pass
 }
 

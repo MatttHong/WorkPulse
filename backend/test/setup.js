@@ -19,6 +19,7 @@ module.exports = async () => {
   const email = "gabe2002denton@gmail.com";
   const password = "asdf";
   // Use supertest to create a new user
+  let userId;
   const userResponse = await supertest(app)
     .post('/api/users')
     .send({
@@ -31,21 +32,20 @@ module.exports = async () => {
       birthday: '1990-01-01',
       bio: 'A test bio',
       employments: [],
-      logs: []
+      logs: [],
     });
   // Check if the user was created successfully and get the ID
   if (userResponse.status !== 201) {
-    if (userResponse.body.error === "User already exists.") {
+    if (userResponse.body.error === "User already exists." || userResponse.body.message === "User already exists.") {
       // Handle the "User already exists" error
       // You can choose to handle it here or throw an error
       // throw new Error('User already exists. Handle the error accordingly.');
-      console.log("test user already exists")
     } else {    
       throw new Error('Failed to create test user');
     }
+  } else {
+    userId = userResponse.body.post.id;
   }
-  // console.log(userResponse.body)
-  const userId = userResponse.body.post.id;
   // Use supertest to log in the user and get the auth token
   const authResponse = await supertest(app)
     .post('/api/auth')
@@ -59,10 +59,14 @@ module.exports = async () => {
     throw new Error('Failed to log in test user');
   }
   const authToken = authResponse.body.token;
-
+  if (!userId){
+    userId = authResponse.body.data.id
+  }
   // Set the user ID and auth token as global variables
-  global.__USER_ID__ = userId;
-  global.__EMAIL__ = email;
-  global.__PASSWORD__ = password;
-  global.__AUTH_TOKEN__ = authToken;
+  process.env.USER_ID = userId;
+  process.env.AUTH_TOKEN = authToken;
+  process.env.EMAIL = email;
+  process.env.PASSWORD = password;
+    // Close the MongoDB connection after all tests have run
+  await mongoose.connection.close();
 };

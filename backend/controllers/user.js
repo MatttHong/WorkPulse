@@ -2,56 +2,55 @@ const User = require("../models/user");
 const { generateSalt, hash, compare } = require('../utils/salt.js');
 
 // Create a new user (makes a hash for the password)
-exports.createUser = (req, res, next) => {
+exports.createUser = async (req, res, next) => {
     console.log("create user");
-    // console.log('got createUser req');
-    // console.error(req.body);
-    console.log(req.body.password);
-    let hashedpassword = hash(req.body.password)
-        
-    const user = new User({
-        userName: req.body.userName,
-        // salt: salt,
-        password: hashedpassword,
-        userType: req.body.userType,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        birthday: req.body.birthday,
-        bio: req.body.bio,
-        employments: req.body.employments,
-        logs: req.body.logs,
-    });
-    console.log(user);
-    User.findOne({
-        email: user.email 
-    })
-    .then(foundUser => {
-        if (!foundUser) {
-            return user.save();
-        } else {
-            res.status(500).header('Content-Type', 'application/json').json({
+    // console.log(req.body.password);
+    let hashedPassword = hash(req.body.password);
+    
+    try {
+        const foundUser = await User.findOne({ email: req.body.email });
+        // console.log("here")
+        if (foundUser) {
+            return res.status(500).json({
                 message: "User already exists.",
             });
-            // throw new Error("User already exists.");
         }
-    })
-    .then((result) => {
-        res.status(201).header('Content-Type', 'application/json').json({
+        const user = new User({
+            userName: req.body.userName,
+            password: hashedPassword,
+            userType: req.body.userType,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            birthday: req.body.birthday,
+            bio: req.body.bio,
+            employments: req.body.employments,
+            logs: req.body.logs,
+        });
+        // console.log(user)
+
+        const result = await user.save();
+
+        // Send a single response here
+        // console.log(user._id)
+        return res.status(201).json({
             message: "User added successfully",
             post: {
                 ...result.toObject(),
                 id: result._id,
             },
         });
-    })
-    .catch((err) => {
-        console.log(err);
-        res.status(500).header('Content-Type', 'application/json').json({
-            message: err.message || "Fail to create user!",
+    } catch (err) {
+        console.error(err);
+
+        // Send a single error response here
+        return res.status(500).json({
+            message: "Failed to create user!",
+            error: err.message,
         });
-    });
+    }
 };
+
 
 // Update a user by email (makes a hash if the password is new)
 exports.updateUser = async (req, res, next) => {
