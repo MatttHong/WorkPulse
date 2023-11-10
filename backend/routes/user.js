@@ -7,14 +7,14 @@ const { validateSession } = require('../controllers/session');
 
 router.post('', userController.createUser);
 
-router.put('/:id', validateSession, userController.updateUser);
+router.put('/:id', userController.updateUser);
 
-router.get('/email/:email', validateSession, userController.getUserByEmail);
+router.get('/email/:email', userController.getUserByEmail);
 
-router.get('/:id', validateSession, userController.getUserById);
+router.get('/:id', userController.getUserById);
 
-router.get('', validateSession, userController.getUsers);
+router.get('', userController.getUsers);
 
-router.delete('/:id', validateSession, userController.deleteUser);
+router.delete('/:id', userController.deleteUser);
 
 module.exports = router;

@@ -2,7 +2,8 @@ const emailNewUser = require('../utils/smtps.js');
 const Employee = require('../models/employee'); // Import your Mongoose model for employees
 const Status = require('../utils/status'); // Import your Mongoose model for employees
 const User = require('../models/user')
-const { REACTURL } = require('../utils/environment');
+// const { REACTURL } = require('../utils/environment');
+const REACTURL = process.env.REACTURL || 'http://localhost:3001'
 
 exports.inviteUser = async (req, res) => {
   try {
@@ -146,7 +147,6 @@ function CreateEmailInvite(email, employeeId, invited, token) {
     } else {
         header = "Invitation To Join Pulse"
     }
-
     const urlWithParameters = `${REACTURL}?token=${encodeURIComponent(token)}&employeeId=${encodeURIComponent(employeeId)}`;
 
     const body = `

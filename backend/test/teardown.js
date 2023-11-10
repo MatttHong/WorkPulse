@@ -1,16 +1,14 @@
 // test/teardown.js
-const axios = require('axios');
+const supertest = require('supertest');
+const app = require('../app');
 const mongoose = require('mongoose');
-const { apiUrl } = require('./utils/environment');
 
 module.exports = async () => {
-  // Delete the user using the API
-  await axios.delete(`${apiUrl}/api/users/${global.__USER_ID__}`, {
-    headers: {
-      Authorization: `Bearer ${global.__AUTH_TOKEN__}`,
-    },
-  });
+  // Use supertest to delete the user created in setup.js
+  await supertest(app)
+    .delete(`/api/users/${global.__USER_ID__}`)
+    .set('Authorization', `Bearer ${global.__AUTH_TOKEN__}`);
 
-  // Close the mongoose connection
-  await mongoose.connection.close();
+  // Disconnect from the test database
+  await mongoose.disconnect();
 };
