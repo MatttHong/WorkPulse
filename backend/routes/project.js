@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const projectController = require("../controllers/project"); 
 const { validateSession } = require('../controllers/session'); 
+const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
 
-router.use(validateSession);
+router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams);
 
 router.post('', projectController.createProject);
 

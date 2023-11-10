@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const employeeController = require('../controllers/employee');
 const { validateSession } = require('../controllers/session'); 
+const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
 
-router.use(validateSession);
+router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams);
 
 router.get('/:id', employeeController.getEmployeeById);
 

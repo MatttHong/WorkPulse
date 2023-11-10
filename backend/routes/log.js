@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const logController = require('../controllers/log');
+const { validateSession } = require('../controllers/session'); 
+const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
+
+router.use(checkBodyForLongValues, validateAndFormatEmailParams);
 
 // Route to create a new log
 router.post('', logController.createLog);

@@ -2,19 +2,21 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user");
 const { validateSession } = require('../controllers/session'); 
+const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
 
+router.use(checkBodyForLongValues, validateAndFormatEmailParams);
 // router.use(validateSession);
 
 router.post('', userController.createUser);
 
-router.put('/:id', userController.updateUser);
+router.put('/:id', validateSession, userController.updateUser);
 
-router.get('/email/:email', userController.getUserByEmail);
+router.get('/email/:email', validateSession, userController.getUserByEmail);
 
-router.get('/:id', userController.getUserById);
+router.get('/:id', validateSession, userController.getUserById);
 
-router.get('', userController.getUsers);
+router.get('', validateSession, userController.getUsers);
 
-router.delete('/:id', userController.deleteUser);
+router.delete('/:id', validateSession, userController.deleteUser);
 
 module.exports = router;
