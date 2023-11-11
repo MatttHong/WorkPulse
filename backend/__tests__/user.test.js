@@ -16,7 +16,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  let userToken = process.env.AUTH_TOKEN;
+  if(!userToken){
+    userToken = process.env.AUTH_TOKEN;
+  }
   await clean(userToken);  
   // Close the MongoDB connection after all tests have run
   await mongoose.connection.close();

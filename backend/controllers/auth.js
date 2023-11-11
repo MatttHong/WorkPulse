@@ -5,12 +5,11 @@ const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res, next) => {
     try {
-       
+        
         let email = req.body.email;
         let password = req.body.password;
         
         let user = await User.findOne({ email: email });
-        console.log(user)
         if (!user) {
             return res.status(400).json({
                 type: "Not Found",
@@ -20,7 +19,6 @@ exports.login = async (req, res, next) => {
 
         // Use try-catch block to handle errors from the compare function
         try {
-            console.log(user.password)
             let match = await compare(password, user.password);
             if (match) {
                 const token = await createSession(user._id.toString());

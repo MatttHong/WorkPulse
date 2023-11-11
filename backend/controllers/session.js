@@ -4,11 +4,11 @@ const { JWT_SECRET } = require('../secret/secret');
 
 // Create a new session token for a user
 exports.createSession = async (userId) => {
-  await Session.deleteMany({ userId });
+  await Session.deleteMany({ userId: userId });
   const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '8h' });
-
+  
   const session = new Session({ token, userId });
-
+  
   await session.save();
 
   return token;

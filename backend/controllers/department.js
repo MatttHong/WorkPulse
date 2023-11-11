@@ -3,7 +3,9 @@ const Department = require("../models/department");
 // Create a new department
 exports.createDept = (req, res, next) => {
     const dept = new Department(req.body);
-    
+    if (req.TokenUserId && !dept.departmentAdministrators.includes(req.TokenUserId)){
+        dept.departmentAdministrators.push(req.TokenUserId);
+    }
     // Assuming you want to check for an existing department by its name
     Department.findOne({ departmentName: dept.departmentName })
     .then(foundDept => {
@@ -39,11 +41,14 @@ exports.updateDept = (req, res, next) => {
         if (!dept) {
             throw new Error("Department not found");
         }
-
-        dept.departmentName = req.body.departmentName;
-        dept.departmentAdministrators = req.body.departmentAdministrators;
-        dept.employees = req.body.employees;
-        dept.projects = req.body.projects;
+        if(req.TokenUserId && !dept.departmentAdministrators.includes(req.TokenUserId)) {
+            throw new Error("Invalid Credentials");
+        }
+        
+        if (req.body.departmentName !== undefined) dept.departmentName = req.body.departmentName;
+        if (req.body.departmentAdministrators !== undefined && req.body.departmentAdministrators !== []) dept.departmentAdministrators = req.body.departmentAdministrators;
+        if (req.body.employees !== undefined) dept.employees = req.body.employees;
+        if (req.body.projects !== undefined) dept.projects = req.body.projects;
 
         return dept.save();
     })
@@ -103,21 +108,29 @@ exports.getDeptById = (req, res, next) => {
 exports.deleteDept = (req, res, next) => {
     const deptId = req.params.id;
 
-    Department.findByIdAndRemove(deptId)
+    Department.findById(deptId)
     .then((dept) => {
         if (!dept) {
             throw new Error("Department not found");
         }
 
+        // Check if the user has the necessary credentials to delete the department
+        if (req.TokenUserId && !dept.departmentAdministrators.includes(req.TokenUserId)) {
+            throw new Error("Invalid Credentials");
+        }
+
+        // If the user has the credentials, proceed with department deletion
+        return Department.findByIdAndRemove(deptId);
+    })
+    .then(() => {
         res.json({
             message: "Department deleted successfully",
-            dept: dept.toObject(),
         });
     })
     .catch((err) => {
-        console.log(err);
+        console.error(err);
         res.status(404).json({
-            message: err.message || "Department not found!",
+            message: err.message || "Department not found or invalid credentials!",
         });
     });
 };

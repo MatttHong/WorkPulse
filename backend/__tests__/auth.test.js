@@ -4,6 +4,11 @@ const mongoose = require('mongoose');
 const { popFromList, isListPopulated, removeFromList, clean, appendToList, listLength } = require('../utils/moduleForTestingSupport');
 
 const request = supertest(app);
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 beforeAll(async () => {
   await mongoose.connect(`mongodb://${process.env.MONGO}`, {
     useNewUrlParser: true,
@@ -22,7 +27,7 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-describe('User API endpoints', () => {
+describe('Auth API endpoints', () => {
     let userId = process.env.USER_ID;
     let userEmail = process.env.EMAIL;
     let password = process.env.PASSWORD;
@@ -30,7 +35,7 @@ describe('User API endpoints', () => {
     let userpas = 'password1!D';
     let userem = 'testtest@example.com';
     let id;
-    let token;
+    let firstToken;
     let newToken;
     // test('should always pass', () => {
     //     expect(true).toBeTruthy();
@@ -73,13 +78,13 @@ describe('User API endpoints', () => {
             password: userpas
             })
       expect(res.statusCode).toEqual(200);
-      token = res.body.token;
+      firstToken = res.body.token;
       // expect(res.body.message).toEqual('Wrong Login Details');
     });
 
     it('should get a user by ID with new Token', async () => {
       const res = await request.get(`/api/users/${id}`)
-        .set('Authorization', `Bearer ${token}`);
+        .set('Authorization', `Bearer ${firstToken}`);
   
       expect(res.statusCode).toEqual(200);
       expect(res.body.user._id).toEqual(id);
@@ -95,6 +100,10 @@ describe('User API endpoints', () => {
       expect(res.body.message).toEqual('Wrong Login Details');
     })
   
+    it('waiting for 500ms', async () => {
+      await sleep(1000); // Sleep for 500 ms
+    });
+
     it('should successfully log in and get a new token', async () => {
         const res = await request.post('/api/auth')
             .send({
@@ -104,23 +113,16 @@ describe('User API endpoints', () => {
         expect(res.statusCode).toEqual(200);
         newToken = res.body.token;
         expect(newToken).toBeTruthy();
+        expect(newToken).not.toEqual(firstToken);
         expect(res.body.message).toEqual('Correct Details');
         expect()
     })
 
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-  
-    it('waiting for 500ms', async () => {
-        await sleep(500); // Sleep for 500 ms
-    });
-
     it('should fail to get a user by ID with invalid Token', async () => {
         const res = await request.get(`/api/users/${id}`)
-          .set('Authorization', `Bearer ${token}`);
+          .set('Authorization', `Bearer ${firstToken}`);
     
-        expect(token).not.toEqual(newToken);
+        expect(newToken).not.toEqual(firstToken);
         expect(res.statusCode).toEqual(401);
         expect(res.body.message).toEqual('Session expired or invalid');
     });
@@ -128,13 +130,9 @@ describe('User API endpoints', () => {
     it('should get a user by ID with new Token', async () => {
         const res = await request.get(`/api/users/${id}`)
           .set('Authorization', `Bearer ${newToken}`);
-    
-        // if(res.statusCode === 200){
-        //   token = newToken;
-        // }
+        
         expect(res.statusCode).toEqual(200);
         expect(res.body.user._id).toEqual(id);
-        // expect(token).toEqual(newToken)
     });
 
 });
