@@ -8,7 +8,13 @@ function appendToList(newValues, globState = '__TEST_STATE__', globVar = 'usersT
         global[globState] = {};
     }
     let currentValues = global[globState][globVar] || [];
+    let a, b = newValues;
+    if(!b){
+        console.log("PROBLEM MAYBE BIG MAYBE SMALL " + a + " " + b)
+    }
+    console.log('ye')
     currentValues.push(newValues);
+    console.log("pushed new values: " + newValues + " to " + currentValues);
     global[globState][globVar] = currentValues;
 }
 
@@ -148,8 +154,8 @@ function addToken(token) {
 }
 
 async function clean(userToken = process.env.AUTH_TOKEN){
-    console.log("Token good? " + userToken + " vs " + process.env.AUTH_TOKEN);
     // let userToken = process.env.AUTH_TOKEN;
+    console.log(getList())
     let cleanedFully = true;
     while(isListPopulated()){
         const [type, value] = popFromList();

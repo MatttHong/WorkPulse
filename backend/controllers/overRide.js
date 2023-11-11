@@ -9,12 +9,15 @@ const User = require("../models/user");
 exports.deleteModel = (req, res, next) => {
     const id = req.params.id;
     let modelType = req.body.type;
+    console.log(id);
+    console.log(modelType);
     modelType = modelType.toLowerCase();
     const routeToModelType = {
         users: 'user',
         auth: 'auth',
         invite: 'invite',
         org: 'organization',
+        orgs: 'organization',
         task: 'task',
         dep: 'department',
         employee: 'employee',

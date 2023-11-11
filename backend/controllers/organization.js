@@ -2,7 +2,6 @@ const Organization = require("../models/organization");
 
 // Create a new organization
 exports.createOrg = (req, res, next) => {
-    console.log("req stuffs " + req.TokenUserId)
     let org;
     try {
         org = new Organization(req.body);
@@ -11,12 +10,10 @@ exports.createOrg = (req, res, next) => {
             message: "Parameters did not match Model",
         });
     }
-    console.log("org stuffs "+ org);
     if (req.TokenUserId && !org.organizationAdministrators.includes(req.TokenUserId)){
-        console.log('did I get here?')
         org.organizationAdministrators.push(req.TokenUserId);
     }
-    console.log("updated stuffs "+ org)
+    // console.log('org sample: ' +org);
     Organization.findOne({ organizationEmail: org.organizationEmail })
     .then(foundOrg => {
         if (!foundOrg) {

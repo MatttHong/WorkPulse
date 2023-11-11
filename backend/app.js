@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const envPath = `.env.${process.env.NODE_ENV}`;
 
-const overRideRoutes = require("./routes/overRide");
+const overRideRoutes = require("./routes/override");
 
 const authRoutes = require("./routes/auth");
 const depRoutes = require("./routes/department");

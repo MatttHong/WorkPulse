@@ -46,14 +46,15 @@ describe('Department API endpoints', () => {
           employments: [],
           logs: ['anything can go here no matter how long it is and this is proof of this concept, literally anything even above the character max for the default']
         });
-      expect(userResponse.statusCode).toEqual(201);
-      expect(userResponse.body).toHaveProperty('post');
       if (userResponse.statusCode === 201){
 
         id = userResponse.body.post._id
         appendToList(['users', userResponse.body.post._id]);
         expect(listLength()).toBeGreaterThan(0);
       }
+      expect(userResponse.statusCode).toEqual(201);
+      expect(userResponse.body).toHaveProperty('post');
+      
       const res = await request.post('/api/auth')
         .send({
             email: userem,
@@ -76,16 +77,16 @@ describe('Department API endpoints', () => {
       const response = await request.post('/api/dep')
         .set('Authorization', `Bearer ${userToken}`)
         .send(newDepartment);
-
+      if(response.status === 201){
+        appendToList(['dep', response.body.dept.id]);
+      }
       expect(response.status).toBe(201);
       expect(response.body.message).toEqual("Department added successfully")
       departmentId = response.body.dept._id
       expect(departmentId).toBeTruthy();
       expect(response.body.dept).toBeDefined();
       expect(response.body.dept.departmentAdministrators).toContain(userId);
-      if(response.status === 201){
-        appendToList(['dep', response.body.dept.id]);
-      }
+      
     });
   });
 

@@ -64,14 +64,15 @@ describe('Auth API endpoints', () => {
           employments: [],
           logs: ['anything can go here no matter how long it is and this is proof of this concept, literally anything even above the character max for the default']
         });
-      expect(userResponse.statusCode).toEqual(201);
-      expect(userResponse.body).toHaveProperty('post');
       if (userResponse.statusCode === 201){
 
         id = userResponse.body.post._id
         appendToList(['users', userResponse.body.post._id]);
         expect(listLength()).toBeGreaterThan(0);
       }
+      expect(userResponse.statusCode).toEqual(201);
+      expect(userResponse.body).toHaveProperty('post');
+     
       const res = await request.post('/api/auth')
         .send({
             email: userem,

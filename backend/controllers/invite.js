@@ -27,7 +27,14 @@ exports.inviteUser = async (req, res) => {
         .then((inviteEmail) => {
             if (inviteEmail) {
                 console.log('win');
-                return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
+                if(process.env.NODE_ENV === 'test'){
+                  return res.status(200).json({ message: 'Invitation email sent successfully.', 
+                                             employeeId: existingEmployee._id,
+                                            inviteToken: existingEmployee.inviteToken,
+                                                  email: email });
+                } else {
+                  return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
+                }
             } else {
                 console.log('loss');
                 return res.status(500).json({ error: 'Internal server error' });

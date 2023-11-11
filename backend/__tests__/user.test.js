@@ -55,15 +55,16 @@ describe('User API endpoints', () => {
           employments: [],
           logs: ['anything can go here no matter how long it is and this is proof of this concept, literally anything even above the character max for the default']
         });
-      expect(userResponse.statusCode).toEqual(201);
-      expect(userResponse.body).toHaveProperty('post');
-      if (userResponse.statusCode === 201){
+        if (userResponse.statusCode === 201){
 
-        appendToList(['users', userResponse.body.post._id])
-
-      }
-      userId1 = userResponse.body.post._id;
-      userEmail1 = userResponse.body.post.email;
+          appendToList(['users', userResponse.body.post._id])
+  
+        }
+        expect(userResponse.statusCode).toEqual(201);
+        expect(userResponse.body).toHaveProperty('post');
+        
+        userId1 = userResponse.body.post._id;
+        userEmail1 = userResponse.body.post.email;
   });
   
   it('should login with new user', async () => {
@@ -91,11 +92,12 @@ describe('User API endpoints', () => {
         employments: [],
         logs: []
       });
-    expect(userResponse.statusCode).toEqual(400);
-    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.');
     if (userResponse.statusCode === 201){
       appendToList(['users', userResponse.body.post._id])
     }
+    expect(userResponse.statusCode).toEqual(400);
+    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.');
+    
 
     // expect(userResponse.body)
   });
@@ -115,11 +117,12 @@ describe('User API endpoints', () => {
         employments: ['123'],
         logs: []
       });
-    expect(userResponse.statusCode).toEqual(400);
-    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.');
     if (userResponse.statusCode === 201){
       appendToList(['users', userResponse.body.post._id]);
     }
+    expect(userResponse.statusCode).toEqual(400);
+    expect(userResponse.body.message).toEqual('Request body contains values with invalid lengths.');
+    
     // expect(userResponse.body)
   });
 
@@ -138,11 +141,12 @@ describe('User API endpoints', () => {
         employments: [],
         logs: ['this can be anything']
       });
-    expect(userResponse.statusCode).toEqual(500);
-    expect(userResponse.body.message).toEqual('User already exists.');
     if (userResponse.statusCode === 201){
       appendToList(['users', userResponse.body.post._id]);
     }
+    expect(userResponse.statusCode).toEqual(500);
+    expect(userResponse.body.message).toEqual('User already exists.');
+    
     // expect(userResponse.body)
   });
 
@@ -161,11 +165,12 @@ describe('User API endpoints', () => {
         employments: [],
         logs: ['this can be anything']
       });
-    expect(userResponse.statusCode).toEqual(400);
-    expect(userResponse.body.message).toEqual('Invalid email format.');
     if (userResponse.statusCode === 201){
       appendToList(['users', userResponse.body.post._id]);
     }
+    expect(userResponse.statusCode).toEqual(400);
+    expect(userResponse.body.message).toEqual('Invalid email format.');
+    
     // expect(userResponse.body.message).toEqual('User already exists.')
     // expect(userResponse.body)
   });
@@ -185,11 +190,12 @@ describe('User API endpoints', () => {
         employments: [],
         logs: ['this can be anything']
       });
-    expect(userResponse.body.message).toEqual('Invalid password format.');
-    expect(userResponse.statusCode).toEqual(400);
-    if (userResponse.statusCode === 201){
-      appendToList(['users', userResponse.body.post._id]);
-    }
+      if (userResponse.statusCode === 201){
+        appendToList(['users', userResponse.body.post._id]);
+      }  
+      expect(userResponse.body.message).toEqual('Invalid password format.');
+      expect(userResponse.statusCode).toEqual(400);
+    
     // expect(userResponse.body.message).toEqual('User already exists.')
     // expect(userResponse.body)
   });
