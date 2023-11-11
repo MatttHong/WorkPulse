@@ -9,7 +9,7 @@ module.exports = {
   // coveragePathIgnorePatterns: [
   //   "/node_modules/"
   // ],
-  // testTimeout: 10000, // 10 seconds in milliseconds
+  testTimeout: 10000, // 10 seconds in milliseconds
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: ["json", "text", "lcov", "clover"],
 

@@ -2,9 +2,11 @@
 const supertest = require('supertest');
 const app = require('../app'); // Adjust the path to your app entry point
 const mongoose = require('mongoose');
-const { popFromList, isListPopulated, removeFromList, appendToList, getList, listLength } = require('../utils/moduleForTestingSupport');
+const { popFromList, isListPopulated, removeFromList, appendToList, clean, getList, listLength, getToken } = require('../utils/moduleForTestingSupport');
 
 const request = supertest(app);
+let userToken;
+
 beforeAll(async () => {
   await mongoose.connect(`mongodb://${process.env.MONGO}`, {
     useNewUrlParser: true,
@@ -14,6 +16,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  let userToken = process.env.AUTH_TOKEN;
+  await clean(userToken);  
   // Close the MongoDB connection after all tests have run
   await mongoose.connection.close();
 });
@@ -23,7 +27,7 @@ describe('User API endpoints', () => {
   let userId = process.env.USER_ID;
   let userEmail = process.env.EMAIL;
   let password = process.env.PASSWORD;
-  let userToken = process.env.AUTH_TOKEN;
+  userToken = process.env.AUTH_TOKEN;
   // console.log(userId);
   // console.log(userEmail);
   // console.log(password);
@@ -51,16 +55,9 @@ describe('User API endpoints', () => {
       expect(userResponse.statusCode).toEqual(201);
       expect(userResponse.body).toHaveProperty('post');
       if (userResponse.statusCode === 201){
-        console.log(listLength())
-        console.log(process.env.LIST)
-        console.log(getList())
 
         appendToList(['users', userResponse.body.post._id])
 
-        // console.log(process.env.LIST)
-        console.log(getList())
-        console.log(listLength())
-        // console.log(['users', userResponse.body.post._id])
       }
       userId1 = userResponse.body.post._id;
       userEmail1 = userResponse.body.post.email;
@@ -151,7 +148,6 @@ describe('User API endpoints', () => {
         employments: [],
         logs: ['this can be anything']
       });
-    console.log(userResponse)
     expect(userResponse.statusCode).toEqual(400);
     expect(userResponse.body.message).toEqual('Invalid email format.');
     if (userResponse.statusCode === 201){
@@ -192,7 +188,6 @@ describe('User API endpoints', () => {
       .send({
         firstName: 'UpdatedName'
       });
-    console.log(res.body.message);
     expect(res.statusCode).toEqual(200);
     expect(res.body.user.firstName).toEqual('UpdatedName');
     expect(res.body.user.lastName).toEqual('User');
@@ -202,7 +197,6 @@ describe('User API endpoints', () => {
   it('should get a user by email', async () => {
     const res = await request.get(`/api/users/email/${userEmail1}`)
       .set('Authorization', `Bearer ${userToken}`);
-    console.log(userEmail)
     expect(res.statusCode).toEqual(200);
     expect(res.body.user.email).toEqual(userEmail1);
     expect(res.body.user._id).toEqual(userId1);
@@ -233,7 +227,6 @@ describe('User API endpoints', () => {
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('message', 'User deleted successfully');
-    // console.log(res.body.user._id)
     expect(res.body.user._id).toEqual(userId1);
     if (res.statusCode === 200){
       removeFromList(['users', res.body.user._id]);

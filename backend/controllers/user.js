@@ -3,7 +3,6 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 
 // Create a new user (makes a hash for the password)
 exports.createUser = async (req, res, next) => {
-    console.log("create user");
     let hashedPassword = hash(req.body.password);
     
     try {
@@ -50,7 +49,6 @@ exports.createUser = async (req, res, next) => {
 
 // Update a user by email (makes a hash if the password is new)
 exports.updateUser = async (req, res, next) => {
-    console.log("update user");
     const userId = req.params.id;
 
     try {
@@ -92,13 +90,13 @@ exports.updateUser = async (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             message: err.message || "Failed to update user!",
+            id: userId
         });
     }
 };
 
 //get all users 
 exports.getUsers = (req, res, next) => {
-    console.log("get users");
     User.find()
     .then((users) => {
         res.json({
@@ -115,7 +113,6 @@ exports.getUsers = (req, res, next) => {
 
 // Get a user by ID
 exports.getUserById = (req, res, next) => {
-    console.log(" get user by id");
     const userId = req.params.id;
 
     User.findById(userId)
@@ -126,19 +123,20 @@ exports.getUserById = (req, res, next) => {
 
         res.json({
             user: user.toObject(),
+            id: userId
         });
     })
     .catch((err) => {
         console.log(err);
         res.status(404).json({
             message: err.message || "User not found!",
+            id: userId
         });
     });
 };
 
 // Delete a user by ID
 exports.deleteUser = (req, res, next) => {
-    console.log("delete user")
     const userId = req.params.id;
 
     User.findByIdAndRemove(userId)
@@ -162,9 +160,7 @@ exports.deleteUser = (req, res, next) => {
 
 // Get a user by email (using a query parameter)
 exports.getUserByEmail = (req, res, next) => {
-    console.log("get user by email")
     const email = req.params.email;
-    console.log("email: ", email);
     User.findOne({ email })
     .then((user) => {
         if (!user) {

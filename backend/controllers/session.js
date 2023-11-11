@@ -4,13 +4,14 @@ const { JWT_SECRET } = require('../secret/secret');
 
 // Create a new session token for a user
 exports.createSession = async (userId) => {
-    await Session.deleteMany({ userId });
-    const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '8h' });
+  await Session.deleteMany({ userId });
+  const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '8h' });
 
-    const session = new Session({ token, userId });
-    await session.save();
+  const session = new Session({ token, userId });
 
-    return token;
+  await session.save();
+
+  return token;
 };
 // Middleware to validate session token
 exports.validateSession = async (req, res, next) => {
