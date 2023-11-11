@@ -6,7 +6,7 @@ const Department = require("../models/department");
 
 
 const employeeSchema = new Schema({
-  userid: { type: String, default: "" },
+  userId: { type: String, default: "" },
   email: { type: String, required: true },
   logs: { type: [String], default: [], required: true },
   employees: { type: [String], default: [], required: true },

@@ -39,12 +39,12 @@ exports.updateLog = (req, res, next) => {
             throw new Error("Log not found");
         }
 
-        log.employee = req.body.employee;
-        log.task = req.body.task;
-        log.department = req.body.department;
-        log.project = req.body.project;
-        log.status = req.body.status;
-        log.log = req.body.log;
+        if (req.body.employee !== undefined) log.employee = req.body.employee;
+        if (req.body.task !== undefined) log.task = req.body.task;
+        if (req.body.department !== undefined) log.department = req.body.department;
+        if (req.body.project !== undefined) log.project = req.body.project;
+        if (req.body.status !== undefined) log.status = req.body.status;
+        if (req.body.log !== undefined) log.log = req.body.log;
 
         return log.save();
     })

@@ -1,6 +1,6 @@
 // tests/user.test.js
 const supertest = require('supertest');
-const app = require('../app'); // Adjust the path to your app entry point
+const app = require('../app'); 
 const mongoose = require('mongoose');
 const { popFromList, isListPopulated, removeFromList, appendToList, clean, getList, listLength, getToken } = require('../utils/moduleForTestingSupport');
 
@@ -37,14 +37,15 @@ describe('User API endpoints', () => {
 
   let userId1;
   let userEmail1;
-
+  let userPassword = 'password1!D';
+  let ogAuth;
   // Create a new user
   it('should create a new user', async () => {
       const userResponse = await supertest(app)
       .post('/api/users')
       .send({
           userName: 'testuser',
-          password: 'password1!D',
+          password: password,
           userType: 'test',
           firstName: 'Test',
           lastName: 'User',
@@ -63,6 +64,16 @@ describe('User API endpoints', () => {
       }
       userId1 = userResponse.body.post._id;
       userEmail1 = userResponse.body.post.email;
+  });
+  
+  it('should login with new user', async () => {
+    const res = await request.post('/api/auth')
+    .send({
+        email: userEmail1,
+        password: password
+        })
+    expect(res.statusCode).toEqual(200);
+    ogAuth = res.body.token;
   });
 
   it('should fail due to create a new user due to inputs being too long', async () => {
@@ -186,13 +197,25 @@ describe('User API endpoints', () => {
   // Update a user
   it('should update a user', async () => {
     const res = await request.put(`/api/users/${userId1}`)
-      .set('Authorization', `Bearer ${userToken}`) // Set the headers with the token
+      .set('Authorization', `Bearer ${ogAuth}`) // Set the headers with the token
       .send({
         firstName: 'UpdatedName'
       });
     expect(res.statusCode).toEqual(200);
     expect(res.body.user.firstName).toEqual('UpdatedName');
     expect(res.body.user.lastName).toEqual('User');
+  });
+
+  it('should fail to update a user', async () => {
+    const res = await request.put(`/api/users/${userId1}`)
+      .set('Authorization', `Bearer ${userToken}`) // Set the headers with the token
+      .send({
+        firstName: 'UpdatedName1'
+      });
+    expect(res.statusCode).toEqual(500);
+    expect(res.body.message).toEqual("Invalid Credentials")
+    // expect(res.body.user.firstName).toEqual('UpdatedName1');
+    // expect(res.body.user.lastName).toEqual('User');
   });
 
   // Get a user by email
@@ -223,10 +246,21 @@ describe('User API endpoints', () => {
   });
 
   // Delete a user
-  it('should delete a user', async () => {
+  it('should fail to bad permissions while trying to delete a user', async () => {
     const res = await request.delete(`/api/users/${userId1}`)
       .set('Authorization', `Bearer ${userToken}`);
+    
+    expect(res.statusCode).toEqual(404);
+    expect(res.body).toHaveProperty('message', "Invalid Credentials");
+    if (res.statusCode === 200){
+      removeFromList(['users', res.body.user._id]);
+    }
+  });
 
+  it('should delete a user', async () => {
+    const res = await request.delete(`/api/users/${userId1}`)
+      .set('Authorization', `Bearer ${ogAuth}`);
+    
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('message', 'User deleted successfully');
     expect(res.body.user._id).toEqual(userId1);
@@ -234,4 +268,17 @@ describe('User API endpoints', () => {
       removeFromList(['users', res.body.user._id]);
     }
   });
+
+  it('should fail to find a user', async () => {
+    const res = await request.delete(`/api/users/${userId1}`)
+      .set('Authorization', `Bearer ${userToken}`);
+    
+    expect(res.statusCode).toEqual(404);
+    expect(res.body).toHaveProperty('message', "User not found");
+    if (res.statusCode === 200){
+      removeFromList(['users', res.body.user._id]);
+    }
+
+  });
+
 });

@@ -1,4 +1,5 @@
 const EmployeeModel = require('../models/employee')
+const OrgModel = require('../models/organization')
 
 // Get a Employee by MongoDB _id
 exports.getEmployeeById = (req, res, next) => {
@@ -56,19 +57,42 @@ exports.updateEmployee = (req, res, next) => {
             throw new Error("Employee not found");
         }
 
-        // Update fields of the employee
-        
-        employee.email = req.body.email;
-        employee.logs = req.body.logs;
-        employee.employees = req.body.employees;
-        employee.businessId = req.body.businessId;
-        employee.status = req.body.status;
+        // Check if the user is either the employee or an organization admin
+        const checkOrgAdmin = () => {
+            if (employee.businessId) {
+                return OrgModel.findById(employee.businessId)  // Ensure you use 'employee.businessId' not 'businessId'
+                    .then(org => {
+                        if (!org || !org.organizationAdministrators.includes(req.TokenUserId)) {
+                            throw new Error("Invalid Credentials");
+                        }
+                        return employee; // Return employee to chain the promise
+                    });
+            } else {
+                throw new Error("Invalid Credentials");
+            }
+        }
 
-        return employee.save();
+        // If the user is the employee or the check passes, update the employee
+        const updateEmployee = (employee) => {
+            if (req.body.email !== undefined) employee.email = req.body.email;
+            if (req.body.logs !== undefined) employee.logs = req.body.logs;
+            if (req.body.employees !== undefined) employee.employees = req.body.employees;
+            if (req.body.businessId !== undefined) employee.businessId = req.body.businessId;
+            if (req.body.status !== undefined) employee.status = req.body.status;
+
+            return employee.save();
+        };
+
+        // Run the check for authorization
+        if (employee.userId != req.TokenUserId) {
+            return checkOrgAdmin().then(updateEmployee);
+        } else {
+            return updateEmployee(employee);
+        }
     })
     .then((result) => {
         res.json({
-            message: "employee updated successfully",
+            message: "Employee updated successfully",
             employee: result.toObject(),
         });
     })
@@ -84,21 +108,44 @@ exports.updateEmployee = (req, res, next) => {
 exports.deleteEmployeeModel = (req, res, next) => {
     const id = req.params.id;
 
-    EmployeeModel.findByIdAndRemove(id)
+    EmployeeModel.findById(id)
     .then((employee) => {
         if (!employee) {
             throw new Error("Employee not found");
         }
 
+        // Check if the user has the necessary credentials to delete the employee
+        if (employee.userId != req.TokenUserId) {
+            throw new Error("Invalid Credentials");
+        }
+
+        // If the user has the credentials, proceed with employee deletion
+        return EmployeeModel.findByIdAndRemove(id);
+    })
+    .then(() => {
         res.json({
             message: "Employee deleted successfully",
-            employee: employee.toObject(),
         });
     })
     .catch((err) => {
         console.log(err);
         res.status(404).json({
-            message: err.message || "Employee not found!",
+            message: err.message || "Employee not found or invalid credentials!",
+        });
+    });
+};
+
+exports.getEmployees = (req, res, next) => {
+    EmployeeModel.find()
+    .then((emp) => {
+        res.json({
+            employees: emp.map(emp => emp.toObject()),
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+            message: err.message || "Failed to fetch departments!",
         });
     });
 };

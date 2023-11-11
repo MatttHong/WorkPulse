@@ -2,8 +2,21 @@ const Organization = require("../models/organization");
 
 // Create a new organization
 exports.createOrg = (req, res, next) => {
-    const org = new Organization(req.body);
-    
+    console.log("req stuffs " + req.TokenUserId)
+    let org;
+    try {
+        org = new Organization(req.body);
+    } catch (err) {
+        res.status(400).json({
+            message: "Parameters did not match Model",
+        });
+    }
+    console.log("org stuffs "+ org);
+    if (req.TokenUserId && !org.organizationAdministrators.includes(req.TokenUserId)){
+        console.log('did I get here?')
+        org.organizationAdministrators.push(req.TokenUserId);
+    }
+    console.log("updated stuffs "+ org)
     Organization.findOne({ organizationEmail: org.organizationEmail })
     .then(foundOrg => {
         if (!foundOrg) {
@@ -22,6 +35,7 @@ exports.createOrg = (req, res, next) => {
         });
     })
     .catch((err) => {
+        console.log('org error')
         console.log(err);
         res.status(500).json({
             message: err.message || "Failed to create organization!",
@@ -39,15 +53,18 @@ exports.updateOrg = (req, res, next) => {
             throw new Error("Organization not found");
         }
 
-        // Here you can add all the fields you want to update
-        org.organizationName = req.body.organizationName;
-        org.organizationEmail = req.body.organizationEmail;
-        org.organizationAdministrators = req.body.organizationAdministrators;
-        org.employees = req.body.employees;
-        org.imageLink = req.body.imageLink;
-        org.industry = req.body.industry;
-        org.projects = req.body.projects;
-        org.departments = req.body.departments;
+        if(req.TokenUserId && !org.organizationAdministrators.includes(req.TokenUserId)) {
+            throw new Error("Invalid Credentials");
+        }
+
+        if (req.body.organizationName !== undefined) org.organizationName = req.body.organizationName;
+        if (req.body.organizationEmail !== undefined) org.organizationEmail = req.body.organizationEmail;
+        if (req.body.organizationAdministrators !== undefined) org.organizationAdministrators = req.body.organizationAdministrators;
+        if (req.body.employees !== undefined) org.employees = req.body.employees;
+        if (req.body.imageLink !== undefined) org.imageLink = req.body.imageLink;
+        if (req.body.industry !== undefined) org.industry = req.body.industry;
+        if (req.body.projects !== undefined) org.projects = req.body.projects;
+        if (req.body.departments !== undefined) org.departments = req.body.departments;
 
         return org.save();
     })
@@ -107,21 +124,29 @@ exports.getOrgById = (req, res, next) => {
 exports.deleteOrg = (req, res, next) => {
     const orgId = req.params.id;
 
-    Organization.findByIdAndRemove(orgId)
+    Organization.findById(orgId)
     .then((org) => {
         if (!org) {
             throw new Error("Organization not found");
         }
 
+        // Check if the user has the necessary credentials to delete the organization
+        if (req.TokenUserId && !org.organizationAdministrators.includes(req.TokenUserId)) {
+            throw new Error("Invalid Credentials");
+        }
+
+        // If the user has the credentials, proceed with organization deletion
+        return Organization.findByIdAndRemove(orgId);
+    })
+    .then(() => {
         res.json({
             message: "Organization deleted successfully",
-            org: org.toObject(),
         });
     })
     .catch((err) => {
         console.log(err);
         res.status(404).json({
-            message: err.message || "Organization not found!",
+            message: err.message || "Organization not found or invalid credentials!",
         });
     });
 };

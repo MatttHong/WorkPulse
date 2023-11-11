@@ -13,6 +13,9 @@ function appendToList(newValues, globState = '__TEST_STATE__', globVar = 'usersT
 }
 
 function getList(globState = '__TEST_STATE__', globVar = 'usersToDelete') {
+    if (!global[globState]) {
+        global[globState] = {};
+    }
     if (!global[globState][globVar]){
         initList(globState, globVar);
     }
@@ -20,6 +23,9 @@ function getList(globState = '__TEST_STATE__', globVar = 'usersToDelete') {
 }
 
 function removeFromList(valuesToRemove, globState = '__TEST_STATE__', globVar = 'usersToDelete') {
+    if (!global[globState]) {
+        global[globState] = {};
+    }
     let currentValues = global[globState][globVar] || [];
 
     const indexToRemove = currentValues.findIndex(([type, value]) => 
@@ -34,6 +40,9 @@ function removeFromList(valuesToRemove, globState = '__TEST_STATE__', globVar = 
 }
 
 function isListPopulated(globState = '__TEST_STATE__', globVar = 'usersToDelete') {
+    if (!global[globState]) {
+        global[globState] = {};
+    }
     if (!global[globState][globVar]){
         initList(globState, globVar);
     }
@@ -42,11 +51,17 @@ function isListPopulated(globState = '__TEST_STATE__', globVar = 'usersToDelete'
 }
 
 function listLength(globState = '__TEST_STATE__', globVar = 'usersToDelete') {
+    if (!global[globState]) {
+        global[globState] = {};
+    }
     const currentValues = global[globState][globVar] || [];
     return currentValues.length;
 }
 
 function popFromList(globState = '__TEST_STATE__', globVar = 'usersToDelete') {
+    if (!global[globState]) {
+        global[globState] = {};
+    }
     if(global[globState][globVar]){
         let currentValues = global[globState][globVar] || [];
         let poppedValue = null;
@@ -63,6 +78,9 @@ function popFromList(globState = '__TEST_STATE__', globVar = 'usersToDelete') {
 }
 
 function initList(globState = '__TEST_STATE__', globVar = 'usersToDelete'){
+    if (!global[globState]) {
+        global[globState] = {};
+    }
     if (!global[globState]) {
         global[globState] = {};
     }
@@ -102,7 +120,7 @@ async function getToken() {
         const token = await waitForToken();
         return token;
     } catch (error) {
-        console.error('Error getting token:', error);
+        console.log('Error getting token:', error);
         throw error;
     }
 }
@@ -139,16 +157,17 @@ async function clean(userToken = process.env.AUTH_TOKEN){
         try {
             console.log(`cleaning ${type}/${value}`);
             const response = await supertest(app)
-                .delete(`/api/${type}/${value}`)
-                .set('Authorization', `Bearer ${userToken}`);
+                .delete(`/api/override/${value}`)
+                .send({ type: type });
+                // .set('Authorization', `Bearer ${userToken}`);
             
             // Handle response or log for debugging
             if(response.statusCode != 200){
-                console.error('Failed due to: \n' + response.body.message + response.body.error)
+                console.log('Failed due to: \n' + response.body.message + response.body.error)
             }
         } catch (error) {
             // Handle or log error
-            console.error(`Error for type: ${type}, value: ${value}`, error);
+            console.log(`Error for type: ${type}, value: ${value}`, error);
             cleanedFully = false;
         }
     }

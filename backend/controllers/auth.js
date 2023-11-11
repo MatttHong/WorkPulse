@@ -39,7 +39,7 @@ exports.login = async (req, res, next) => {
             }
         } catch (error) {
             // Handle errors from the compare function here
-            console.error(error);
+            console.log(error);
             res.status(500).json({
                 type: "Internal Server Error",
                 message: "An error occurred during password comparison."
@@ -47,7 +47,7 @@ exports.login = async (req, res, next) => {
         }
     } catch (err) {
         // Handle errors from the User.findOne function here
-        console.error(err);
+        console.log(err);
         res.status(500).json({
             type: "Internal Server Error",
             message: "An error occurred during user lookup."

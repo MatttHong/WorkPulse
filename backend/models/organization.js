@@ -4,7 +4,7 @@ const organizationSchema = mongoose.Schema({
 
     organizationName : { type: String, required: true },
     organizationEmail : { type: String, required: true },
-    organizationAdministrator: { type: String, required: true},
+    organizationAdministrators: { type: [String], default: [], required: true},
     employees : { type: [String], default: [], required: true},
     imageLink: { type: String, required: false },
     industry : { type: [String], default: [], required: true},

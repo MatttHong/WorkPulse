@@ -2,7 +2,14 @@ const Department = require("../models/department");
 
 // Create a new department
 exports.createDept = (req, res, next) => {
-    const dept = new Department(req.body);
+    let dept;
+    try {
+        dept = new Department(req.body);
+    } catch (err) {
+        res.status(400).json({
+            message: "Parameters did not match Model",
+        });
+    }
     if (req.TokenUserId && !dept.departmentAdministrators.includes(req.TokenUserId)){
         dept.departmentAdministrators.push(req.TokenUserId);
     }
@@ -128,7 +135,7 @@ exports.deleteDept = (req, res, next) => {
         });
     })
     .catch((err) => {
-        console.error(err);
+        console.log(err);
         res.status(404).json({
             message: err.message || "Department not found or invalid credentials!",
         });

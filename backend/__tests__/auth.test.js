@@ -1,5 +1,5 @@
 const supertest = require('supertest');
-const app = require('../app'); // Adjust the path to your app entry point
+const app = require('../app');
 const mongoose = require('mongoose');
 const { popFromList, isListPopulated, removeFromList, clean, appendToList, listLength } = require('../utils/moduleForTestingSupport');
 

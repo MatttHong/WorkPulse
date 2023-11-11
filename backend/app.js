@@ -6,6 +6,8 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const envPath = `.env.${process.env.NODE_ENV}`;
 
+const overRideRoutes = require("./routes/overRide");
+
 const authRoutes = require("./routes/auth");
 const depRoutes = require("./routes/department");
 const empRoutes = require("./routes/employee");
@@ -42,6 +44,13 @@ app.use("/api/dep", depRoutes);
 app.use("/api/employee", empRoutes);
 app.use("/api/log", logRoutes);
 app.use("/api/proj", projRoutes);
+// console.log("before if condition");
+// console.log('NODE_ENV:', process.env.NODE_ENV);
+
+if(process.env.NODE_ENV === 'test'){
+    console.log("adding override")
+    app.use("/api/override", overRideRoutes)
+}
 
 // Export the app for testing purposes
 module.exports = app;

@@ -36,7 +36,7 @@ exports.createUser = async (req, res, next) => {
             },
         });
     } catch (err) {
-        console.error(err);
+        console.log(err);
 
         // Send a single error response here
         return res.status(500).json({
@@ -57,7 +57,9 @@ exports.updateUser = async (req, res, next) => {
         if (!user) {
             throw new Error(`User not found, id:${userId}`);
         }
-
+        if (user._id.toString() != req.TokenUserId){
+            throw new Error("Invalid Credentials");
+        }
         // Update user properties as needed
         if (req.body.userName !== undefined) user.userName = req.body.userName;
         if (req.body.firstName !== undefined) user.firstName = req.body.firstName;
@@ -138,25 +140,35 @@ exports.getUserById = (req, res, next) => {
 // Delete a user by ID
 exports.deleteUser = (req, res, next) => {
     const userId = req.params.id;
-
-    User.findByIdAndRemove(userId)
+    let userSave;
+    User.findById(userId)
     .then((user) => {
         if (!user) {
             throw new Error("User not found");
         }
 
+        // Check if the user has the necessary credentials to delete the user
+        if (user._id.toString() !== req.TokenUserId) {
+            throw new Error("Invalid Credentials");
+        }
+        userSave = user;
+        // If the user has the credentials, proceed with user deletion
+        return User.findByIdAndRemove(userId);
+    })
+    .then(() => {
         res.json({
             message: "User deleted successfully",
-            user: user.toObject(),
+            user: userSave
         });
     })
     .catch((err) => {
         console.log(err);
         res.status(404).json({
-            message: err.message || "User not found!",
+            message: err.message || "User not found or invalid credentials!",
         });
     });
 };
+
 
 // Get a user by email (using a query parameter)
 exports.getUserByEmail = (req, res, next) => {

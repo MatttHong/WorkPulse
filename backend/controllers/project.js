@@ -2,8 +2,19 @@ const Project = require("../models/project"); // Ensure this points to your Proj
 
 // Create a new project
 exports.createProject = (req, res, next) => {
-    const project = new Project(req.body);
-    
+    let project;
+    try {
+        project = new Project(req.body);
+    } catch (err) {
+        res.status(400).json({
+            message: "Parameters did not match Model",
+        });
+    }
+
+    if(req.TokenUserId && !project.projectAdministrators.includes(req.TokenUserId)) {
+        project.projectAdministrators.push(req.TokenUserId);
+    }
+
     project.save()
     .then((result) => {
         res.status(201).json({
@@ -29,14 +40,16 @@ exports.updateProject = (req, res, next) => {
             throw new Error("Project not found");
         }
 
-        // Update fields of the project
-        project.projectName = req.body.projectName;
-        project.projectAdministrators = req.body.projectAdministrators;
-        project.employees = req.body.employees;
-        project.tasks = req.body.tasks;
-        project.departments = req.body.departments;
-        project.status = req.body.status;
-        // ...other fields you might want to update
+        if(req.TokenUserId && !project.projectAdministrators.includes(req.TokenUserId)) {
+            throw new Error("Invalid Credentials");
+        }
+
+        if (req.body.projectName !== undefined) project.projectName = req.body.projectName;
+        if (req.body.projectAdministrators !== undefined) project.projectAdministrators = req.body.projectAdministrators;
+        if (req.body.employees !== undefined) project.employees = req.body.employees;
+        if (req.body.tasks !== undefined) project.tasks = req.body.tasks;
+        if (req.body.departments !== undefined) project.departments = req.body.departments;
+        if (req.body.status !== undefined) project.status = req.body.status;
 
         return project.save();
     })
@@ -96,21 +109,29 @@ exports.getProjectById = (req, res, next) => {
 exports.deleteProject = (req, res, next) => {
     const projectId = req.params.id;
 
-    Project.findByIdAndRemove(projectId)
+    Project.findById(projectId)
     .then((project) => {
         if (!project) {
             throw new Error("Project not found");
         }
 
+        // Check if the user has the necessary credentials to delete the project
+        if (req.TokenUserId && !project.projectAdministrators.includes(req.TokenUserId)) {
+            throw new Error("Invalid Credentials");
+        }
+
+        // If the user has the credentials, proceed with project deletion
+        return Project.findByIdAndRemove(projectId);
+    })
+    .then(() => {
         res.json({
             message: "Project deleted successfully",
-            project: project.toObject(),
         });
     })
     .catch((err) => {
         console.log(err);
         res.status(404).json({
-            message: err.message || "Project not found!",
+            message: err.message || "Project not found or invalid credentials!",
         });
     });
 };

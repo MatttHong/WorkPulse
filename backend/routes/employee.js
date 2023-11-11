@@ -8,6 +8,8 @@ router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams
 
 router.get('/:id', employeeController.getEmployeeById);
 
+router.get('', employeeController.getEmployees);
+
 router.get('/byUserId/:userId', employeeController.getEmployeesByUserId);
 
 router.put('/:id', employeeController.updateEmployee);

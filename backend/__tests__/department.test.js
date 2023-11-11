@@ -1,33 +1,7 @@
 const supertest = require('supertest');
-const app = require('../app'); // Adjust the path to your app entry point
+const app = require('../app');
 const mongoose = require('mongoose');
 const { popFromList, isListPopulated, removeFromList, appendToList, clean, getList, listLength, getToken } = require('../utils/moduleForTestingSupport');
-
-function randomlyIncreaseDigit(departmentId) {
-  // Convert the departmentId to a string to manipulate individual digits
-  const idString = departmentId.toString();
-
-  // Generate a random index to choose which digit to increase
-  const randomIndex = Math.floor(Math.random() * idString.length);
-
-  // Get the digit at the random index
-  const digit = parseInt(idString[randomIndex]);
-
-  // Generate a random number (between 1 and 9) to add to the digit
-  const randomIncrement = Math.floor(Math.random() * 9) + 1;
-
-  // Increase the chosen digit by the random increment
-  const newDigit = (digit + randomIncrement) % 10;
-
-  // Replace the digit in the string with the new digit
-  const newIdString = idString.slice(0, randomIndex) + newDigit.toString() + idString.slice(randomIndex + 1);
-
-  // Convert the modified string back to a number
-  const newDepartmentId = parseInt(newIdString);
-
-  return newDepartmentId;
-}
-
 
 const request = supertest(app);
 let userToken;
@@ -51,8 +25,6 @@ afterAll(async () => {
 
 describe('Department API endpoints', () => {
   let userId = process.env.USER_ID;
-  let userEmail = process.env.EMAIL;
-  let password = process.env.PASSWORD;
   userToken = process.env.AUTH_TOKEN;
   let departmentId;
   let token;
@@ -158,8 +130,6 @@ describe('Department API endpoints', () => {
 
       expect(response.status).toBe(500);
       expect(response.body.message).toEqual("Department not found");
-      // expect(response.body.dept).toBeDefined();
-      // expect(response.body.dept.employees).toBe([]);
     });
   });
 
