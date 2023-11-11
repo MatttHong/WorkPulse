@@ -127,10 +127,11 @@ class LoggingApp(tk.Tk):
     def stop_mouse_tracking(self):
         """Stop tracking mouse movement."""
         if self.tracking:
-            self.mouse_listener.stop()
-            self.tracking = False
-            # Restart the tracking timers for the next minute
-            self.start_track_timers()
+                if self.mouse_listener.is_alive():
+                    self.mouse_listener.stop()
+                self.tracking = False
+                # Restart the tracking timers for the next minute
+                self.start_track_timers()
 
     def on_move(self, x, y):
         """Handle mouse movement event."""
@@ -165,7 +166,15 @@ class LoggingApp(tk.Tk):
             print(f'Logging started with ID: {LOG_ID}')
             self.start_button['state'] = tk.DISABLED
             self.stop_button['state'] = tk.NORMAL
-            self.mouse_listener.start()
+
+            # Start the mouse listener if it's not already running
+            if not self.mouse_listener.is_alive():
+                self.mouse_listener.start()
+
+            # Start tracking timers
+            self.start_track_timers()
+
+            # Uncomment the following line if you want to start the keyboard listener
             # self.keyboard_listener.start()
         except requests.exceptions.RequestException as e:
             print(f'Failed to start logging: {e}')
@@ -185,6 +194,11 @@ class LoggingApp(tk.Tk):
                 LOG_ID = None
             except requests.exceptions.RequestException as e:
                 print(f'Failed to stop logging: {e}')
+        if self.mouse_listener.is_alive():
+            self.mouse_listener.stop()
+
+        # Reset the mouse listener
+        self.mouse_listener = mouse.Listener(on_click=self.on_click, on_scroll=self.on_scroll)
 
     def add_log_entry(self, action, x=None, y=None):
         global LOG_ID
