@@ -44,11 +44,12 @@ import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 
 // Material Dashboard 2 React routes
-import routes from "routes";
+import employeeRoutes from "employeeRoutes";
+import adminRoutes from "adminRoutes";
+import guestRoutes from "guestRoutes";
 
 // Material Dashboard 2 React contexts
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
-import ProtectedRoute from "routes"
 
 // Images
 import brandWhite from "assets/images/logo-ct.png";
@@ -72,18 +73,6 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  // const { setUser } = useUser();
-
-
-  // // Cache for the rtl
-  // useMemo(() => {
-  //   const cacheRtl = createCache({
-  //     key: "rtl",
-  //     stylisPlugins: [rtlPlugin],
-  //   });
-
-  //   setRtlCache(cacheRtl);
-  // }, []);
 
   // Open sidenav when mouse enter on mini sidenav
   const handleOnMouseEnter = () => {
@@ -115,35 +104,80 @@ export default function App() {
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
+// const getUserRole = () => {
+//     // logic to determine user role
+//     // return 'admin', 'employee', or 'guest'
+//   };
+
+  // const [userRole, setUserRole] = useState(getUserRole());
 
   // useEffect(() => {
-  //   // Example function that checks user authentication and returns user data
-  //   const authenticateUser = async () => {
-  //     try {
-  //       // const userData = await checkUserAuthentication();
-  //       // setUser(userData);
-  //     } catch (error) {
-  //       console.error("User authentication failed", error);
-  //       setUser(null);
+  //   // Update the user role on authentication change
+  //   // This could be tied to a context or authentication state
+  //   setUserRole(getUserRole());
+  // }, [/* dependencies related to authentication state */]);
+
+  // const getRoutes = (allRoutes) => {
+  //   return allRoutes.map((route) => {
+  //     if (route.collapse) {
+  //       return getRoutes(route.collapse);
   //     }
-  //   };
+  //     if (route.route) {
+  //       return <Route exact path={route.route} element={route.component} key={route.key} />;
+  //     }
+  //     return null;
+  //   });
+  // };
 
-  //   authenticateUser();
-  // }, [setUser]);
+  // // Determine which routes to render based on user role
+  // let routes;
+  // switch (userRole) {
+  //   case 'admin':
+  //     routes = adminRoutes;
+  //     break;
+  //   case 'employee':
+  //     routes = employeeRoutes;
+  //     break;
+  //   default:
+  //     routes = guestRoutes;
+  // }
 
+  // const getUserRole = () => {
+    
+  // };
 
-  const getRoutes = (allRoutes) =>
-  allRoutes.map((route) => {
-    if (route.collapse) {
-      return getRoutes(route.collapse);
-    }
+  const [userRole, setUserRole] = useState('admin');
 
-    if (route.route) {
-      return <Route exact path={route.route} element={route.component} key={route.key} />;
-    }
+  // useEffect(() => {
+  //   // Update the user role on authentication change
+  //   // This could be tied to a context or authentication state
+  //   setUserRole(getUserRole());
+  // }, [/* dependencies related to authentication state */]);
 
-    return null;
-  });
+  const getRoutes = (allRoutes) => {
+    return allRoutes.map((route) => {
+      if (route.collapse) {
+        return getRoutes(route.collapse);
+      }
+      if (route.route) {
+        return <Route exact path={route.route} element={route.component} key={route.key} />;
+      }
+      return null;
+    });
+  };
+
+  // Determine which routes to render based on user role
+  let routes;
+  switch (userRole) {
+    case 'admin':
+      routes = adminRoutes;
+      break;
+    case 'employee':
+      routes = employeeRoutes;
+      break;
+    default:
+      routes = guestRoutes;
+  }
 
   const configsButton = (
     <MDBox
@@ -191,6 +225,7 @@ export default function App() {
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+      
     </ThemeProvider>
   );
 }
