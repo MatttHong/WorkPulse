@@ -122,7 +122,6 @@ class LoggingApp(tk.Tk):
         self.track_intervals = [10, 30, 50]  # Seconds after the minute to start tracking
         self.track_duration = 5  # Duration of tracking in seconds
         self.tracking = False  # Flag to indicate if tracking is active
-        self.start_track_timers()
 
     def start_track_timers(self):
         """Start timers to trigger mouse movement tracking."""
@@ -244,8 +243,6 @@ class LoggingApp(tk.Tk):
         # Reset the mouse listener
         self.mouse_listener = mouse.Listener(on_click=self.on_click, on_scroll=self.on_scroll)
 
-        # Restart the tracking timers for the next minute
-        self.start_track_timers()
     def add_log_entry(self, action, x=None, y=None):
         global LOG_ID
         if LOG_ID:
