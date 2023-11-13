@@ -34,6 +34,7 @@ import OrgForm from "./orgForm"
 import axios from "axios"
 
 
+
 // Images
 import logoXD from "assets/images/small-logos/logo-xd.svg";
 import logoAtlassian from "assets/images/small-logos/logo-atlassian.svg";
@@ -72,6 +73,8 @@ function AddOrganizationComponent ({ onAddOrg }) {
   // Add these to the state declarations within AddProjectComponent
 const [openProjectDialog, setOpenProjectDialog] = useState(false);
 
+const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);
+const [emailToInvite, setEmailToInvite] = useState('');
 // State for error messages
 const [errors, setErrors] = useState({});
 const [addedProjects, setAddedProjects] = useState([]);
@@ -93,11 +96,26 @@ const handleAddAdmin = () => {
   }
 };
 
-const handleAddEmployee = () => {
+
+const handleAddEmployee = async () => {
   if (employeeEmail) {
-    setEmployee([...employee, employeeEmail]);
-    setEmployeeEmail(''); 
+    const userExists = await checkUserExists(employeeEmail);
+    if (userExists) {
+      setEmployee([...employee, employeeEmail]);
+    } else {
+      // Open confirmation dialog
+      setEmailToInvite(employeeEmail);
+      setOpenConfirmationDialog(true);
+    }
+    setEmployeeEmail('');
   }
+};
+
+const handleSendInvitation = () => {
+  sendInvitationEmail(emailToInvite);
+  setOpenConfirmationDialog(false);
+  setEmailToInvite('');
+  // Add the email to the appropriate list (employee or admin)
 };
 
 const handleAddDepartment = () => {
@@ -145,7 +163,7 @@ const handleSubmit = (event) => {
 //no duplicatge
 const createOrganization = async (organizationData) => {
   try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4OTc5OTcsImV4cCI6MTY5OTkyNjc5N30.gDZeCQlHxDltQCORQ26pR9OtC3ABv-5mtlxA9Svy9RE";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
       const response = await axios.post('http://localhost:3000/api/org', organizationData, {
           headers: {
               Authorization: "Bearer " + token,
@@ -164,24 +182,109 @@ const createOrganization = async (organizationData) => {
 };
 
 
-  // Validate input fields and update the errors state
-  const validateFields = () => {
-    let isValid = true;
-    let newErrors = {};
+// Validate input fields and update the errors state
+const validateFields = async () => {
+  let isValid = true;
+  let newErrors = {};
 
-    if (!orgName) {
-        isValid = false;
-        newErrors.orgName = 'Organization Name is required';
-    }
-    if (!orgEmail) {
-      isValid = false;
-      newErrors.orgEmail = 'Organization Email is required';
+  if (!orgName) {
+    isValid = false;
+    newErrors.orgName = 'Organization Name is required';
   }
-   
+  if (!orgEmail) {
+    isValid = false;
+    newErrors.orgEmail = 'Organization Email is required';
+  }
 
-    setErrors(newErrors);
-    return isValid;
-  };
+  // Validate Admin Emails
+  for (const email of admin) {
+    const userExists = await checkUserExists(email);
+    if (!userExists) {
+      isValid = false;
+      newErrors.adminEmail = `Admin email ${email} does not exist`;
+      // Optionally trigger invitation email
+      sendInvitationEmail(email);
+    }
+  }
+
+  // Validate Employee Emails
+  for (const email of employee) {
+    const userExists = await checkUserExists(email);
+    if (!userExists) {
+      isValid = false;
+      newErrors.employeeEmail = `Employee email ${email} does not exist`;
+      // Optionally trigger invitation email
+      sendInvitationEmail(email);
+    }
+  }
+
+  setErrors(newErrors);
+  return isValid;
+};
+const ConfirmationDialog = () => (
+  <Dialog open={openConfirmationDialog} onClose={() => setOpenConfirmationDialog(false)}>
+    <DialogTitle>Confirm Invitation</DialogTitle>
+    <DialogContent>
+      <MDTypography>
+        The email {emailToInvite} does not exist. Do you want to send an invitation?
+      </MDTypography>
+    </DialogContent>
+    <DialogActions>
+      <MDButton onClick={() => setOpenConfirmationDialog(false)} color="error">
+        Cancel
+      </MDButton>
+      <MDButton onClick={() => handleSendInvitation()} color="success">
+        Send Invitation
+      </MDButton>
+    </DialogActions>
+  </Dialog>
+);
+const checkUserExists = async (email) => {
+  try {
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
+    const response = await axios.get(`http://localhost:3000/api/users/email/${email}`, {
+    headers: {
+      Authorization: "Bearer " + token
+    }
+      
+    });
+    if (response.status === 404) {
+      return false; // User does not exist
+    }
+    return true; // User exists
+  } catch (error) {
+    console.error('Error checking user:', error);
+    return false;
+  }
+};
+
+// Function to send invitation email
+const sendInvitationEmail = async (email) => {
+  const invitationData = {
+    businessId: "1010101010",
+    email: email,
+    header: "header",
+    body: "body",
+};
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
+const BACKEND_ENDPOINT = 'http://localhost:3000/api/invite';
+try {
+  const response = await fetch(BACKEND_ENDPOINT, {
+    method: 'POST',
+    headers: {
+        Authorization: "Bearer " + token,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(invitationData)
+});
+    const data = await response.json();
+    console.log('Response:', data);
+    // Handle the response: e.g., showing a success message
+} catch (error) {
+    // Log the error or display a message to the user
+    console.error('Error sending invitation:', error);
+}
+};
 
 
   const handleCreateProject = (newProject) => {
@@ -193,6 +296,9 @@ const createOrganization = async (organizationData) => {
   return (
 
     <form onSubmit={handleSubmit}>
+      {Object.values(errors).map((error, index) => (
+        <MDTypography key={index} color="error">{error}</MDTypography>
+      ))}
         <MDBox>
         
       <MDInput
@@ -228,6 +334,7 @@ const createOrganization = async (organizationData) => {
         />
         <MDButton onClick={handleAddAdmin}>Add Admin</MDButton>
       </MDBox> 
+      
       <MDBox>
         {employee.map((email, index) => (
           <MDTypography key={index}>{email}</MDTypography>
@@ -305,6 +412,7 @@ const createOrganization = async (organizationData) => {
 
   </DialogActions>
 </Dialog>
+<ConfirmationDialog />
     </MDBox>
     </form>
 

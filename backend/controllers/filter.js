@@ -11,17 +11,17 @@ const limits = {
     firstName: { min: 0, max: 50 },
     lastName: { min: 0, max: 50 },
     bio: { min: 0, max: 300 },
-    email : { min: 3, max: 75 },
-    id : { min: 24, max: 24 },
+    email : { min: 0, max: 75 },
+    id : { min: 0, max: 24 },
     departmentAdministrators : { min: 0, max: 24 },
     departmentAdministrator : { min: 0, max: 24 },
     tasks : { min: 0, max: 24 },
-    userId : { min: 24, max: 24 },
-    businessId : { min: 24, max: 24 },
-    employeeId : { min: 24, max: 24 },
-    inviteToken : { min: 33, max: 37 },
+    userId : { min: 0, max: 24 },
+    businessId : { min: 0, max: 24 },
+    employeeId : { min: 0, max: 24 },
+    inviteToken : { min: 0, max: 37 },
     log : { max: -1 },
-    logs : { max: -1 },
+    logs : { max: 30 },
     employee : { min: 0, max: 24 },
     department : { min: 0, max: 24 },
     project : { min: 0, max: 24 },
@@ -30,10 +30,10 @@ const limits = {
     projects : { min: 0, max: 24 },
     departments : { min: 0, max: 24 },
     organizationEmail : { min: 0, max: 75 },
-    organizationAdministrators : { min: 24, max: 24 },
-    organizationAdministrator : { min: 24, max: 24 },
+    organizationAdministrators : { min: 0, max: 24 },
+    organizationAdministrator : { min: 0, max: 24 },
     employments : { min: 0, max: 24 },
-    imageLink : { min: -1, max: -1 }
+    imageLink : { min: 0, max: 24 }
 
   };
 

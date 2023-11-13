@@ -68,7 +68,7 @@ function OrgsPage() {
   const fetchOrgs = async () => {
     const BACKEND_ENDPOINT = 'http://localhost:3000/api/org';
     try {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4OTc5OTcsImV4cCI6MTY5OTkyNjc5N30.gDZeCQlHxDltQCORQ26pR9OtC3ABv-5mtlxA9Svy9RE";
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
         const response = await axios.get(BACKEND_ENDPOINT, {
             headers: {
                 Authorization: "Bearer " + token,
@@ -106,7 +106,7 @@ function OrgsPage() {
   const handleSaveEdit = async (updatedOrg) => {
     // ... close modal logic ...
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4OTc5OTcsImV4cCI6MTY5OTkyNjc5N30.gDZeCQlHxDltQCORQ26pR9OtC3ABv-5mtlxA9Svy9RE";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
       const response = await axios.put(`http://localhost:3000/api/org/${updatedOrg._id}`, updatedOrg, {
         headers: {
             Authorization: "Bearer " + token,
@@ -124,7 +124,7 @@ function OrgsPage() {
 
   const handleDelete = (orgId) => {
     if (window.confirm("Are you sure you want to delete this organization?")) {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4OTc5OTcsImV4cCI6MTY5OTkyNjc5N30.gDZeCQlHxDltQCORQ26pR9OtC3ABv-5mtlxA9Svy9RE";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
       axios.delete(`http://localhost:3000 /api/org/${orgId}`, {
         headers: {
             Authorization: "Bearer " + token,
