@@ -55,6 +55,7 @@ function AddOrganizationComponent ({ onAddOrg }) {
   const [orgName, setOrgName] = useState('');
   const [orgEmail, setOrgEmail] = useState('');
   const [imageLink, setImageLink] = useState('');
+
   const [employeeEmail, setEmployeeEmail] = useState([]);
   const [employee, setEmployee] = useState([]);
   const [admin, setAdmin] = useState([]);
@@ -121,30 +122,30 @@ const handleAddProject = () => {
 };
   
 
-
-// Form submission handler
 const handleSubmit = (event) => {
-  event.preventDefault();
+ // event.preventDefault();
   const orgData = {
-    orgName,
-    orgEmail,
-    employee,
-    admin,
-    department,
-    project,
-    industry,
-};
+    organizationName: orgName,
+    organizationEmail: orgEmail,
+    organizationAdministrators: admin, // Assuming 'admin' is an array of administrator emails
+    employees: employee, // Assuming 'employee' is an array of employee emails
+    imageLink: imageLink, // Assuming 'imageLink' is a string or an array of image links
+    industry: industry, // Assuming 'industry' is an array of industry names
+    projects: project, // Assuming 'project' is an array of project names
+    departments: department, // Assuming 'department' is an array of department names
+  };
   createOrganization(orgData);
 };
-
+//no duplicatge
 const createOrganization = async (organizationData) => {
   try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost/api/organizations', organizationData, {
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4NDY4OTIsImV4cCI6MTY5OTg3NTY5Mn0.dOI0HJED9DSzK2yrbREMKrU5DFFxR2oCqYrY6qLLSyQ";
+      const response = await axios.post('http://localhost:3000/api/org', organizationData, {
           headers: {
-              Authorization: `Bearer ${token}`
+              Authorization: "Bearer " + token,
           }
       });
+      const data = response.data;
       console.log('Organization created:', response.data);
       // Additional logic like redirecting the user
   } catch (error) {
@@ -202,6 +203,13 @@ const createOrganization = async (organizationData) => {
            onChange={(e) => setOrgEmail(e.target.value)}
            error={!!errors.orgEmail}
            helperText={errors.orgEmail || ''}
+        />
+        <MDInput
+           label="Image Link"
+           value={imageLink}
+           onChange={(e) => setImageLink(e.target.value)}
+           error={!!errors.imageLink}
+           helperText={errors.imageLink || ''}
         />
       <MDBox>
         {admin.map((email, index) => (

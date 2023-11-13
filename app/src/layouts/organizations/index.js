@@ -44,6 +44,7 @@ import data from "layouts/projects/data/data/projectsTableData"
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
 import AddOrganizationComponent from "./components/addOrganization";
+import axios from "axios";
 
 // Custom components for Projects Page
 // import ProjectsComponent from "layouts/projects/components/ProjectsComponent";
@@ -63,19 +64,20 @@ function OrgsPage() {
   }, []);
 
   const fetchOrgs = async () => {
-    const BACKEND_ENDPOINT = 'http://localhost:3000/api/organization';
-        try {
-            const token = localStorage.getItem(token);
-            const response = await fetch(BACKEND_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    Authorization: "Bearer " + token,
-                },
-            });
-      const data = await response.json();
-      setProjects(data); // Assuming the backend returns an array of projects
+    const BACKEND_ENDPOINT = 'http://localhost:3000/api/org';
+    try {
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4NDY4OTIsImV4cCI6MTY5OTg3NTY5Mn0.dOI0HJED9DSzK2yrbREMKrU5DFFxR2oCqYrY6qLLSyQ";
+        const response = await axios.get(BACKEND_ENDPOINT, {
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        });
+        // Directly use response.data instead of response.json()
+        const data = response.data;
+        console.log("got orgs", data);
+        setProjects(data.orgs); // Assuming the backend returns an object with an 'orgs' property
     } catch (error) {
-      console.error('Error fetching projects:', error);
+        console.error('Error fetching organizations:', error);
     }
   };
 

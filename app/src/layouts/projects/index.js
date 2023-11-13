@@ -31,6 +31,7 @@ import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import axios from "axios"
 
 // Material Dashboard 2 React components
 import MDTypography from "components/MDTypography";
@@ -60,13 +61,21 @@ function ProjectsPage() {
   }, []);
 
   const fetchProjects = async () => {
-    const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
+    
     try {
-      const response = await fetch(BACKEND_ENDPOINT);
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4NDMyOTEsImV4cCI6MTY5OTg3MjA5MX0.refMWOUKBdRHyLUqi0l8NuGKj5Du_dmiFkEXya4DuRU";
+      const BACKEND_ENDPOINT = 'http://localhost:3000/api/proj';
+      const response = await axios.get(BACKEND_ENDPOINT, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+        });
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+
       const data = await response.json();
+      console.log("TEST WORKS");
       setProjects(data); // Assuming the backend returns an array of projects
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -116,27 +125,21 @@ function ProjectsPage() {
   );
 
   const handleAddProject = async (projectData) => {
-    const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
-    
     try {
-        const response = await fetch(BACKEND_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(projectData)
-        });
-  
-        if (!response.ok) {
-          throw new Error('Network response was not ok: ' + response.statusText);
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4NDMyOTEsImV4cCI6MTY5OTg3MjA5MX0.refMWOUKBdRHyLUqi0l8NuGKj5Du_dmiFkEXya4DuRU";
+      const BACKEND_ENDPOINT = 'http://localhost:3000/api/proj';
+      const response = await axios.post(BACKEND_ENDPOINT, data, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-        const data = await response.json();
-        console.log('Project added:', data);
+        });
+
+      const data = await response.json();
+      console.log('Project added:', data);
         // Close dialog and refresh projects list
-        handleCloseDialog();
-        // TODO: Refresh projects list here
+        handleCloseDialog();// Assuming the backend returns an array of projects
     } catch (error) {
-        console.error('Error adding project:', error);
+      console.error('Error fetching projects:', error);
     }
   };
 
