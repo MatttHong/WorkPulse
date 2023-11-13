@@ -66,7 +66,7 @@ function Basic() {
                 // Assuming that the backend returns userType in the response
                 const userType = response.data.userType;
 
-                if (userType === "individual") {
+                if (userType === "Individual") {
                     navigation("/dashboard");
                 } else {
                     // Redirect to a different dashboard if needed
