@@ -109,6 +109,7 @@ const handleCloseTaskDialog = () => {
         // handleCloseTaskDialog();
         onAddProject(formData);
       } else {
+        //console.log(newErrors);
       }
   };
 

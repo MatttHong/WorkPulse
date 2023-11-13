@@ -124,6 +124,7 @@ const handleAddProject = () => {
 
 const handleSubmit = (event) => {
  // event.preventDefault();
+ if(validateFields){
   const orgData = {
     organizationName: orgName,
     organizationEmail: orgEmail,
@@ -135,11 +136,16 @@ const handleSubmit = (event) => {
     departments: department, // Assuming 'department' is an array of department names
   };
   createOrganization(orgData);
+  
+ }else{
+  //console.log("Incorreect Field");
+ }
+  
 };
 //no duplicatge
 const createOrganization = async (organizationData) => {
   try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4NDY4OTIsImV4cCI6MTY5OTg3NTY5Mn0.dOI0HJED9DSzK2yrbREMKrU5DFFxR2oCqYrY6qLLSyQ";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4OTc5OTcsImV4cCI6MTY5OTkyNjc5N30.gDZeCQlHxDltQCORQ26pR9OtC3ABv-5mtlxA9Svy9RE";
       const response = await axios.post('http://localhost:3000/api/org', organizationData, {
           headers: {
               Authorization: "Bearer " + token,
@@ -147,6 +153,10 @@ const createOrganization = async (organizationData) => {
       });
       const data = response.data;
       console.log('Organization created:', response.data);
+
+      if (onAddOrg && typeof onAddOrg === 'function') {
+        onAddOrg(data); // Assuming data contains the new organization details
+      }
       // Additional logic like redirecting the user
   } catch (error) {
       console.error('Error creating organization:', error);
@@ -159,25 +169,20 @@ const createOrganization = async (organizationData) => {
     let isValid = true;
     let newErrors = {};
 
-    // // Add similar checks for other fields
-    // if (!businessId) {
-    //   isValid = false;
-    //   newErrors.businessId = 'Business ID is required';
-    // }
     if (!orgName) {
         isValid = false;
         newErrors.orgName = 'Organization Name is required';
     }
+    if (!orgEmail) {
+      isValid = false;
+      newErrors.orgEmail = 'Organization Email is required';
+  }
    
 
     setErrors(newErrors);
     return isValid;
   };
 
-
-  // const handleAddProject = (project) => {
-  //   setAddedProjects([...addedProjects, project]);
-  // };
 
   const handleCreateProject = (newProject) => {
     setAddedProjects([...addedProjects, newProject]); 
