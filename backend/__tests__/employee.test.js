@@ -16,7 +16,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    console.log("test State: " + global.__TEST_STATE__)
     if(!userToken){
         userToken = process.env.AUTH_TOKEN;
       }
@@ -132,7 +131,6 @@ describe('Employee API endpoints', () => {
             expect(orgId).toBeTruthy();
             
         });
-        console.log('doodoo')
         it('should create an employee', async () => {
             const newEmployee = new Employee({
                 email : "poopscoop@gmail.com",
@@ -142,7 +140,6 @@ describe('Employee API endpoints', () => {
             });
             await newEmployee.save()
             employeeId = newEmployee.id
-            console.log("FUCK SHIT BITCH "+ employeeId)
             appendToList(['employee', employeeId])
         });
 
@@ -150,7 +147,6 @@ describe('Employee API endpoints', () => {
 
     describe('GET /api/employee/:id', () => {
         it('should get an employee by ID', async () => {
-            console.log('id + ' + employeeId);
             const response = await request.get(`/api/employee/${employeeId}`)
                 .set('Authorization', `Bearer ${userToken}`);
 

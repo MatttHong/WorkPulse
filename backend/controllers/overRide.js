@@ -9,8 +9,6 @@ const User = require("../models/user");
 exports.deleteModel = (req, res, next) => {
     const id = req.params.id;
     let modelType = req.body.type;
-    console.log(id);
-    console.log(modelType);
     modelType = modelType.toLowerCase();
     const routeToModelType = {
         users: 'user',
@@ -27,7 +25,7 @@ exports.deleteModel = (req, res, next) => {
     if(routeToModelType[modelType]){
         modelType = routeToModelType[modelType];
     }
-    console.log('here with ' + modelType);
+
     // Check the value of modelType and delete the corresponding model
     switch (modelType) {
       case 'department':

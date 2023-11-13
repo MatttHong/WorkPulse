@@ -87,7 +87,7 @@ describe('Organization API endpoints', () => {
                 .set('Authorization', `Bearer ${userToken}`)
                 .send(newOrg);
             if (response.status === 201) {
-                appendToList(['org', orgId]);
+                appendToList(['org', response.body.org.id]);
             }
             expect(response.body.message).toEqual("Organization added successfully");
             expect(response.status).toBe(201);

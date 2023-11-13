@@ -13,7 +13,7 @@ exports.createOrg = (req, res, next) => {
     if (req.TokenUserId && !org.organizationAdministrators.includes(req.TokenUserId)){
         org.organizationAdministrators.push(req.TokenUserId);
     }
-    // console.log('org sample: ' +org);
+
     Organization.findOne({ organizationEmail: org.organizationEmail })
     .then(foundOrg => {
         if (!foundOrg) {
@@ -32,7 +32,6 @@ exports.createOrg = (req, res, next) => {
         });
     })
     .catch((err) => {
-        console.log('org error')
         console.log(err);
         res.status(500).json({
             message: err.message || "Failed to create organization!",
