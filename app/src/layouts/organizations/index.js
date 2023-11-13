@@ -63,12 +63,15 @@ function OrgsPage() {
   }, []);
 
   const fetchOrgs = async () => {
-    const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
-    try {
-      const response = await fetch(BACKEND_ENDPOINT);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+    const BACKEND_ENDPOINT = 'http://localhost:3000/api/organization';
+        try {
+            const token = localStorage.getItem(token);
+            const response = await fetch(BACKEND_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    Authorization: "Bearer " + token,
+                },
+            });
       const data = await response.json();
       setProjects(data); // Assuming the backend returns an array of projects
     } catch (error) {
@@ -118,34 +121,11 @@ function OrgsPage() {
     </Menu>
   );
 
-  const handleAddOrg = async (organizationData) => {
-    const BACKEND_ENDPOINT = 'http://localhost:3000/api/organizations';
-    
-    try {
-        const response = await fetch(BACKEND_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(organizationData)
-        });
-  
-        if (!response.ok) {
-          throw new Error('Network response was not ok: ' + response.statusText);
-        }
-        const data = await response.json();
-        console.log('Project added:', data);
-        // Close dialog and refresh projects list
-        handleCloseDialog();
-        // TODO: Refresh projects list here
-    } catch (error) {
-        console.error('Error adding project:', error);
-    }
-  };
+
 
   const columns = [
     { Header: "Name", accessor: "name" },
-    { Header: "Status", accessor: "status" },
+   
     // ... other column definitions ...
   ];
 
@@ -225,7 +205,7 @@ function OrgsPage() {
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Add New Organization</DialogTitle>
         <DialogContent>
-          <AddOrganizationComponent onAddOrg={handleAddOrg} />        
+          <AddOrganizationComponent/>        
         </DialogContent>
         <MDButton onClick={handleCloseDialog} color="error">
         Cancel

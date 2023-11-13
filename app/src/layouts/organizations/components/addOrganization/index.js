@@ -31,6 +31,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import OrgForm from "./orgForm"
+import axios from "axios"
 
 
 // Images
@@ -112,30 +113,44 @@ const handleAddIndustry = () => {
   }
 };
 
-// const handleAddProject = () => {
-//   if (projectName) {
-//     setProject([...project, projectName]);
-//     setProjectName(''); 
-//   }
-// };
+const handleAddProject = () => {
+  if (projectName) {
+    setProject([...project, projectName]);
+    setProjectName(''); 
+  }
+};
   
- 
-  const handleSubmit = () => {
-    
-        const formData = {
-          orgName,
-          orgEmail,
-          employee,
-          admin,
-          department,
-          project,
-          industry,
-      };
-      onAddOrg(formData);
-  };
 
 
-  
+// Form submission handler
+const handleSubmit = (event) => {
+  event.preventDefault();
+  const orgData = {
+    orgName,
+    orgEmail,
+    employee,
+    admin,
+    department,
+    project,
+    industry,
+};
+  createOrganization(orgData);
+};
+
+const createOrganization = async (organizationData) => {
+  try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost/api/organizations', organizationData, {
+          headers: {
+              Authorization: `Bearer ${token}`
+          }
+      });
+      console.log('Organization created:', response.data);
+      // Additional logic like redirecting the user
+  } catch (error) {
+      console.error('Error creating organization:', error);
+  }
+};
 
 
   // Validate input fields and update the errors state
@@ -159,9 +174,9 @@ const handleAddIndustry = () => {
   };
 
 
-  const handleAddProject = (project) => {
-    setAddedProjects([...addedProjects, project]);
-  };
+  // const handleAddProject = (project) => {
+  //   setAddedProjects([...addedProjects, project]);
+  // };
 
   const handleCreateProject = (newProject) => {
     setAddedProjects([...addedProjects, newProject]); 
@@ -170,7 +185,9 @@ const handleAddIndustry = () => {
 
 
   return (
-    <MDBox>
+
+    <form onSubmit={handleSubmit}>
+        <MDBox>
         
       <MDInput
            label="Organization Name"
@@ -237,6 +254,19 @@ const handleAddIndustry = () => {
         <MDButton onClick={handleAddIndustry}>Add Industry</MDButton>
       </MDBox> 
 
+      <MDBox>
+        {project.map((email, index) => (
+          <MDTypography key={index}>{email}</MDTypography>
+        ))}
+         <MDInput
+          type="text"
+          placeholder="project"
+          value={projectName}
+          onChange={(e) => setProjectName(e.target.value)}
+        />
+        <MDButton onClick={handleAddProject}>Add project</MDButton>
+      </MDBox> 
+
       
       <MDButton onClick={handleSubmit} color="success">Create Organization</MDButton>
       <MDButton onClick={handleOpenProjectDialog}>Create Project</MDButton>
@@ -263,6 +293,9 @@ const handleAddIndustry = () => {
   </DialogActions>
 </Dialog>
     </MDBox>
+    </form>
+
+
   );
 };
 

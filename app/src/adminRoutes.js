@@ -4,9 +4,10 @@ import Dashboard from "layouts/dashboard"
 import Profile from "layouts/profile";
 import ProjecsPage from "layouts/projects"
 import OrgsPage from "layouts/organizations";
-
+// import SignIn from "layouts/authentication"
 import AcceptInvitation from "layouts/dashboard/components/MembersOverview/acceptInvite"; // This is the component you will create
-
+import SignIn from "layouts/authentication/sign-in";
+import SignUp from "layouts/authentication/sign-up";
 
 const acceptInvitationRoute = {
     type: "collapse",
@@ -46,6 +47,13 @@ const adminRoutes = [
       route: "/profile",
       component: <Profile />,
     },
+    {
+        type: "collapse",
+        name: "Signin",
+        key: "signin",
+        route: "/sign-in",
+        component: <SignIn />,
+      },
     
   
   ];

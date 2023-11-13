@@ -165,6 +165,7 @@ export default function App() {
       return null;
     });
   };
+  
 
   // Determine which routes to render based on user role
   let routes;
@@ -223,7 +224,7 @@ export default function App() {
        {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/sign-in" />} />
       </Routes>
       
     </ThemeProvider>

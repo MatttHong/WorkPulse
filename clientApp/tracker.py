@@ -46,6 +46,26 @@ API_BASE_URL = 'http://localhost:3000/api/log'
 # This will hold the log ID once logging has started
 LOG_ID = None
 
+def authenticate(email, password):
+    url = 'http://localhost:3000/api/auth'
+    payload = {
+        'email': email,
+        'password': password
+    }
+    response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        return response.json()['token']
+    else:
+        raise Exception('Authentication failed')
+
+# Example usage
+try:
+    token = authenticate('user@example.com', 'password123')
+    print("Authentication successful. Token:", token)
+except Exception as e:
+    print(e)
+
+
 class LoginPage(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -102,7 +122,6 @@ class LoggingApp(tk.Tk):
         self.track_intervals = [10, 30, 50]  # Seconds after the minute to start tracking
         self.track_duration = 5  # Duration of tracking in seconds
         self.tracking = False  # Flag to indicate if tracking is active
-        self.start_track_timers()
 
     def start_track_timers(self):
         """Start timers to trigger mouse movement tracking."""
@@ -148,11 +167,27 @@ class LoggingApp(tk.Tk):
             self.stop_button['state'] = tk.DISABLED
             self.logout_button['state'] = tk.DISABLED
             self.login_page = LoginPage(self)
-
     def logout(self):
+        global LOG_ID
         self.logged_in = False
         self.update_login_state()
         messagebox.showinfo("Logout", "You have been logged out.")
+
+        # Stop the mouse listener
+        if self.mouse_listener.is_alive():
+            self.mouse_listener.stop()
+
+        # Stop the keyboard listener if it's running
+        if self.keyboard_listener.running:
+            self.keyboard_listener.stop()
+
+        # Reset the tracking flag
+        self.tracking = False
+
+        # If a logging session is active, stop it
+        if LOG_ID:
+            self.stop_logging()
+
     def start_logging(self):
         global LOG_ID
         url = f'{API_BASE_URL}'
@@ -189,13 +224,21 @@ class LoggingApp(tk.Tk):
                 print('Logging stopped successfully')
                 self.start_button['state'] = tk.NORMAL
                 self.stop_button['state'] = tk.DISABLED
-                self.mouse_listener.stop()
-                self.keyboard_listener.stop()
+
+                # Stop the mouse listener
+                if self.mouse_listener.is_alive():
+                    self.mouse_listener.stop()
+
+                # Stop the keyboard listener if it's running
+                if self.keyboard_listener.running:
+                    self.keyboard_listener.stop()
+
+                # Reset the tracking flag
+                self.tracking = False
+
                 LOG_ID = None
             except requests.exceptions.RequestException as e:
                 print(f'Failed to stop logging: {e}')
-        if self.mouse_listener.is_alive():
-            self.mouse_listener.stop()
 
         # Reset the mouse listener
         self.mouse_listener = mouse.Listener(on_click=self.on_click, on_scroll=self.on_scroll)

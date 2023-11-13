@@ -1,23 +1,28 @@
-# Use an official Python runtime as a parent image
+# Use Python 3.8 Slim as the base image
 FROM python:3.8-slim
+
+# Install dependencies required for Xvfb and your application
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libc6-dev \
+    libx11-dev \
+    tk \
+    xvfb
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the current directory contents into the container at /usr/src/app
+# Copy the application source code to the container
 COPY . .
 
-# Install any needed packages specified in requirements.txt
-# You should create a requirements.txt file listing the necessary Python packages
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 80 available to the world outside this container
-# This is optional and depends on whether your app needs to expose a port
-EXPOSE 80
+# Copy the start script to the container
+COPY start.sh /usr/src/app
 
-# Define environment variable
-# This is optional and depends on your application's needs
-ENV NAME World
+# Make the start script executable
+RUN chmod +x /usr/src/app/start.sh
 
-# Run tracker.py when the container launches
-CMD ["python", "./tracker.py"]
+# Set the start script as the entry point
+ENTRYPOINT ["/usr/src/app/start.sh"]
