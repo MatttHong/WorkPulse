@@ -139,7 +139,7 @@ function Overview() {
                             <Divider orientation="vertical" sx={{ml: -2, mr: 1}}/>
                             <ProfileInfoCard
                                 title="bio"
-                                description={userData.bio}
+                                bioProp={userData.bio}
                                 firstNameProp={firstName}// Pass the firstName as a string
                                 lastNameProp={lastName} // Pass the lastName as a string
                                 birthdayProp={birthday} // Pass the birthday as a string or "Unknown"
