@@ -134,7 +134,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        {firstName}
+                        {firstName} {/* Use the state variable instead of the prop */}
                     </MDTypography>
                 )}
             </MDBox>
@@ -151,7 +151,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        &nbsp;{lastName}
+                        {lastName} {/* Use the state variable instead of the prop */}
                     </MDTypography>
                 )}
             </MDBox>
@@ -169,7 +169,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        &nbsp;{birthdayProp}
+                        {birthday} {/* Use the state variable instead of the prop */}
                     </MDTypography>
                 )}
             </MDBox>

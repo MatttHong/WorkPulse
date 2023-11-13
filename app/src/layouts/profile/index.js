@@ -79,7 +79,6 @@ function Overview() {
 
     const [editMode, setEditMode] = useState(false);
     const [firstName, setFirstName] = useState(userData.firstName);
-    console.log("PRINT1: ", firstName);
     const [lastName, setLastName] = useState(userData.lastName);
     const [birthday, setBirthday] = useState(userData.birthday);
 
