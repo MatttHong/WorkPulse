@@ -66,7 +66,7 @@ describe('Invite API endpoints', () => {
         it('Inviting a new email', async () => {
             const data = { 
                 email: "testin1234321@example.com",
-                businessId: orgId
+                orgId: orgId
             };
             const response = await request.post('/api/invite')
                 .set('Authorization', `Bearer ${userToken}`)
@@ -107,7 +107,7 @@ describe('Invite API endpoints', () => {
         it('Reinviting an email', async () => {
             const data = { 
                 email: "testin1234321@example.com",
-                businessId: orgId
+                orgId: orgId
             };
             const response = await request.post('/api/invite')
                 .set('Authorization', `Bearer ${userToken}`)
@@ -171,7 +171,7 @@ describe('Invite API endpoints', () => {
 
             const newEmployee = new Employee({
                 email: email,
-                businessId: orgId,
+                orgId: orgId,
             }); 
 
             newEmployee.generateInviteToken()

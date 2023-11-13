@@ -8,20 +8,20 @@ const REACTURL = process.env.REACTURL || 'http://localhost:3001'
 
 exports.inviteUser = async (req, res) => {
   try {
-    const { businessId, email } = req.body;
+    const { orgId, email } = req.body;
     // Check if email, header, and body are provided in the request body
-    if (!businessId || !email) {
-      return res.status(400).json({ message: 'Email and businessId are required.' });
+    if (!orgId || !email) {
+      return res.status(400).json({ message: 'Email and orgId are required.' });
     }
 
     // Use async/await to query the employee
-    const existingEmployee = await Employee.findOne({ email, businessId });
+    const existingEmployee = await Employee.findOne({ email, orgId });
 
     if (existingEmployee) {
-      // Employee with the same email and businessId found; proceed with sending an email
+      // Employee with the same email and orgId found; proceed with sending an email
       existingEmployee.generateInviteToken(); // Generate a new token
       await existingEmployee.save(); // Save the updated employee with the new token
-      //existingEmployee.addToBusiness();
+      //existingEmployee.addToOrg();
       CreateEmailInvite(email, existingEmployee._id, true, existingEmployee.inviteToken)
         .then((inviteEmail) => {
             if (inviteEmail) {
@@ -49,14 +49,14 @@ exports.inviteUser = async (req, res) => {
       // Create a new employee object with default values
       const newEmployee = new Employee({
         email,
-        businessId,
+        orgId,
         status: Status.invited,
         // Add any other default values from your Employee model here
       });
       // if(process.env.NODE_ENV === 'test'){
       // }
       newEmployee.generateInviteToken();
-      newEmployee.addToBusiness();
+      newEmployee.addToOrg();
       // Save the new employee object to the database
       await newEmployee.save();
       inviteEmail = await CreateEmailInvite(email, newEmployee._id, false, newEmployee.inviteToken)

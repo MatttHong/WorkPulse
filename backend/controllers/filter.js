@@ -17,7 +17,7 @@ const limits = {
     departmentAdministrator : { min: 0, max: 24 },
     tasks : { min: 0, max: 24 },
     userId : { min: 0, max: 24 },
-    businessId : { min: 0, max: 24 },
+    orgId : { min: 0, max: 24 },
     employeeId : { min: 0, max: 24 },
     inviteToken : { min: 0, max: 37 },
     log : { max: -1 },

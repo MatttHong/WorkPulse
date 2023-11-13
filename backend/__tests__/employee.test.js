@@ -135,7 +135,7 @@ describe('Employee API endpoints', () => {
             const newEmployee = new Employee({
                 email : "poopscoop@gmail.com",
                 userId : userId,
-                businessId : orgId,
+                ordId : orgId,
                 status: Status.invited
             });
             await newEmployee.save()

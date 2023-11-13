@@ -59,8 +59,8 @@ exports.updateEmployee = (req, res, next) => {
 
         // Check if the user is either the employee or an organization admin
         const checkOrgAdmin = () => {
-            if (employee.businessId) {
-                return OrgModel.findById(employee.businessId)  // Ensure you use 'employee.businessId' not 'businessId'
+            if (employee.orgId) {
+                return OrgModel.findById(employee.orgId)
                     .then(org => {
                         if (!org || !org.organizationAdministrators.includes(req.TokenUserId)) {
                             throw new Error("Invalid Credentials");
@@ -77,7 +77,7 @@ exports.updateEmployee = (req, res, next) => {
             if (req.body.email !== undefined) employee.email = req.body.email;
             if (req.body.logs !== undefined) employee.logs = req.body.logs;
             if (req.body.employees !== undefined) employee.employees = req.body.employees;
-            if (req.body.businessId !== undefined) employee.businessId = req.body.businessId;
+            if (req.body.orgId !== undefined) employee.orgId = req.body.orgId;
             if (req.body.status !== undefined) employee.status = req.body.status;
 
             return employee.save();
