@@ -2,7 +2,6 @@ const Log = require("../models/logs");
 
 // Create a new log
 exports.createLog = (req, res, next) => {
-    console.log('here')
     const newLog = new Log({
         employee: req.body.employee,
         task: req.body.task,
@@ -174,10 +173,8 @@ exports.getLogsByEmployeeId = (req, res, next) => {
 
 // Add a log entry to an existing log
 exports.addLogEntry = (req, res, next) => {
-    console.log("addLogEntry")
     const logId = req.params.id;
     const logEntry = req.body.log; // Assuming the new log entry is sent in the request body
-    console.log(logEntry)
     if (!logEntry) {
         return res.status(400).json({
             message: "Log entry to add must be provided!",
@@ -193,7 +190,6 @@ exports.addLogEntry = (req, res, next) => {
             if (log.endTimestamp && log.endTimestamp < Date.now()) {
                 return res.status(400).json({ message: "Log already closed" });
             }
-            console.log("Valid timestamp");
             log.log.push(logEntry); 
 
             return log.save();
@@ -214,7 +210,6 @@ exports.addLogEntry = (req, res, next) => {
 
 // End a log session by setting endTimestamp
 exports.endLogSession = (req, res, next) => {
-    console.log("endLogSession")
     const logId = req.params.id;
     let logEmpId
     Log.findById(logId)

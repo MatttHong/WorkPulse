@@ -41,7 +41,7 @@ import {useEffect, useState} from "react";
 
 function ProfileInfoCard({
                              title,
-                             description,
+                             bioProp,
                              firstNameProp,
                              lastNameProp,
                              birthdayProp,
@@ -74,12 +74,14 @@ function ProfileInfoCard({
     const [firstName, setFirstName] = useState(firstNameProp);
     const [lastName, setLastName] = useState(lastNameProp);
     const [birthday, setBirthday] = useState(birthdayProp);
+    const [bio, setBio] = useState(bioProp); // Add this state for bio
 
     useEffect(() => {
         setFirstName(firstNameProp);
         setLastName(lastNameProp);
         setBirthday(birthdayProp);
-    }, [firstNameProp, lastNameProp, birthdayProp]);
+        setBio(bioProp);
+    }, [firstNameProp, lastNameProp, birthdayProp, bioProp]);
 
     const editOrSaveIcon = editMode ? <SaveIcon /> : <EditIcon />;
     const handleEditSaveClick = () => {
@@ -98,6 +100,7 @@ function ProfileInfoCard({
                 firstName,
                 lastName,
                 birthday,
+                bio
             };
 
             const response = await axios.put(`http://localhost:3000/api/users/${userId}`, updatedInfo, {
@@ -134,7 +137,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        {firstName}
+                        {firstName} {/* Use the state variable instead of the prop */}
                     </MDTypography>
                 )}
             </MDBox>
@@ -151,7 +154,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        &nbsp;{lastName}
+                        {lastName} {/* Use the state variable instead of the prop */}
                     </MDTypography>
                 )}
             </MDBox>
@@ -169,7 +172,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        &nbsp;{birthdayProp}
+                        {birthday} {/* Use the state variable instead of the prop */}
                     </MDTypography>
                 )}
             </MDBox>
@@ -208,10 +211,21 @@ function ProfileInfoCard({
                 </Tooltip>
             </MDBox>
             <MDBox p={2}>
-                <MDBox mb={2} lineHeight={1}>
-                    <MDTypography variant="button" color="text" fontWeight="light">
-                        {description}
-                    </MDTypography>
+                <MDBox display="flex" py={1} pr={2}>
+                    {editMode ? (
+                        <TextField
+                            value={bio}
+                            onChange={(e) => setBio(e.target.value)}
+                            variant="standard"
+                            fullWidth
+                            multiline
+                            rows={1} // Adjust the number of rows as needed
+                        />
+                    ) : (
+                        <MDTypography variant="button" fontWeight="regular" color="text">
+                            {bio} {/* Display the state variable */}
+                        </MDTypography>
+                    )}
                 </MDBox>
                 {renderItems()}
                 <MDBox opacity={0.3}>

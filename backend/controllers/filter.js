@@ -108,7 +108,7 @@ const validateAndFormatEmailParams = (req, res, next) => {
           // Validate the email format
           if (!emailRegex.test(req.body[key])) {
             let temp = req.params[key]
-            console.log(temp)
+            // console.log(temp)
             badEmail.push(temp) 
 
             // return res.status(400).json({

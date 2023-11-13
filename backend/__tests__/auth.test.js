@@ -101,7 +101,7 @@ describe('Auth API endpoints', () => {
       expect(res.body.message).toEqual('Wrong Login Details');
     })
   
-    it('waiting for 500ms', async () => {
+    it('waiting for 1000ms', async () => {
       await sleep(1000); // Sleep for 500 ms
     });
 

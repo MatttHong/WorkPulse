@@ -44,8 +44,7 @@ app.use("/api/dep", depRoutes);
 app.use("/api/employee", empRoutes);
 app.use("/api/log", logRoutes);
 app.use("/api/proj", projRoutes);
-// console.log("before if condition");
-// console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('NODE_ENV:', process.env.NODE_ENV);
 
 if(process.env.NODE_ENV === 'test'){
     console.log("adding override")

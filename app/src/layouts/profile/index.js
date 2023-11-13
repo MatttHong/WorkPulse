@@ -79,7 +79,6 @@ function Overview() {
 
     const [editMode, setEditMode] = useState(false);
     const [firstName, setFirstName] = useState(userData.firstName);
-    console.log("PRINT1: ", firstName);
     const [lastName, setLastName] = useState(userData.lastName);
     const [birthday, setBirthday] = useState(userData.birthday);
 
@@ -140,7 +139,7 @@ function Overview() {
                             <Divider orientation="vertical" sx={{ml: -2, mr: 1}}/>
                             <ProfileInfoCard
                                 title="bio"
-                                description={userData.bio}
+                                bioProp={userData.bio}
                                 firstNameProp={firstName}// Pass the firstName as a string
                                 lastNameProp={lastName} // Pass the lastName as a string
                                 birthdayProp={birthday} // Pass the birthday as a string or "Unknown"

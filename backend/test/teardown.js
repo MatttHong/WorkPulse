@@ -6,7 +6,6 @@ const { popFromList, isListPopulated, removeFromList, appendToList, getList, cle
 
 module.exports = async () => {
   // Use supertest to delete the user created in setup.js
-  console.log(getList())
   await mongoose.connect(`mongodb://${process.env.MONGO}`, { useNewUrlParser: true, useUnifiedTopology: true });
   // await supertest(app)
   //   .delete(`/api/users/${global.__USER_ID__}`)
