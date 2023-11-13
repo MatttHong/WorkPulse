@@ -12,7 +12,6 @@ beforeAll(async () => {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-
 });
 
 afterAll(async () => {
