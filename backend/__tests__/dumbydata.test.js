@@ -32,7 +32,7 @@ describe('Employee API endpoints', () => {
     let userem2 = 'test2@example.com';
     userId = process.env.USER_ID;
     userToken = process.env.AUTH_TOKEN;
-    let token, orgId, employeeId;
+    let token, orgId, employeeId, employeeId2;
     let token2, id2;
 
 
@@ -105,6 +105,56 @@ describe('Employee API endpoints', () => {
         token2 = res2.body.token;
 
     });
+
+    it('should create an employee', async () => {
+        console.log("here at error site: " + userId + " " + orgId);
+        const newEmployee = new Employee({
+            email : "poopscoop@gmail.com",
+            userId : id,
+            orgId : orgId,
+            status: Status.invited
+        });
+        await newEmployee.save()
+        employeeId = newEmployee.id
+        console.log(newEmployee);
+        appendToList(['employee', employeeId])
+    });
+
+    it('should create an employee', async () => {
+        console.log("here at error site: " + userId + " " + orgId);
+        const newEmployee = new Employee({
+            email : "poopscoop@gmail.com",
+            userId : id2,
+            orgId : orgId,
+            status: Status.invited
+        });
+        await newEmployee.save()
+        employeeId2 = newEmployee.id
+        console.log(newEmployee);
+        appendToList(['employee', employeeId])
+    });
+
+    it('should update user1', async () => {
+        const res = await request.put(`/api/users/${id}`)
+            .set('Authorization', `Bearer ${ogAuth}`) // Set the headers with the token
+            .send({
+                employments: [employeeId]
+            });
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.user.firstName).toEqual('UpdatedName');
+        expect(res.body.user.lastName).toEqual('User');
+    })
+    
+    it('should update user2', async () => {
+        const res = await request.put(`/api/users/${id2}`)
+            .set('Authorization', `Bearer ${ogAuth}`) // Set the headers with the token
+            .send({
+                employments: [employeeId2]
+            });
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.user.firstName).toEqual('UpdatedName');
+        expect(res.body.user.lastName).toEqual('User');
+    })
 
     it('should create a new organization', async () => {
         const newOrg = {
