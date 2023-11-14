@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 const uuid = require('uuid');
 const Organization = require("../models/organization"); 
 const Department = require("../models/department");
+const Status = require('../utils/status');
 
 
 const employeeSchema = new Schema({
@@ -11,7 +12,12 @@ const employeeSchema = new Schema({
   logs: { type: [String], default: [], required: true },
   employees: { type: [String], default: [], required: true },
   orgId: { type: String, required: true },
-  status: { type: String, required: true },
+  status: { 
+    type: String, 
+    required: true,
+    default: Status.invited,
+    enum: Object.values(Status)
+  },
   inviteToken: {
     type: String,
     required: false,

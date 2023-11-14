@@ -1,4 +1,5 @@
 const Log = require("../models/logs");
+const Status = require('../utils/status');
 
 // Create a new log
 exports.createLog = (req, res, next) => {
@@ -12,7 +13,9 @@ exports.createLog = (req, res, next) => {
         // startTimestamp defaults to Date.now()
         // endTimestamp is not required upon creation
     });
-
+    if(!newLog.status){
+        newLog.status = Status.starting
+    }
     newLog.save()
     .then((log) => {
         res.status(201).json({

@@ -4,7 +4,7 @@ const logController = require('../controllers/log');
 const { validateSession } = require('../controllers/session'); 
 const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
 
-router.use(checkBodyForLongValues, validateAndFormatEmailParams);
+router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams);
 
 // Route to create a new log
 router.post('', logController.createLog);

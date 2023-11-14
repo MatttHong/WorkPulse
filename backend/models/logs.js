@@ -11,8 +11,9 @@ const logSchema = mongoose.Schema({
     endTimestamp : { type: Date, required: false },
     status: {
       type: String,
+      required: true,
       enum: Object.values(Status),
-      default: Status.undefined
+      default: Status.starting
     },
     log : [{
       type: mongoose.Schema.Types.Mixed 
@@ -27,7 +28,10 @@ logSchema.methods.endSession = function () {
         try {
           await this.model('Log').updateOne(
             { _id: this._id }, 
-            { $set: { endTimestamp: end } } 
+            { $set: { 
+              endTimestamp: end,
+              status: Status.closed
+            } } ,
           );
           resolve();
         } catch (error) {

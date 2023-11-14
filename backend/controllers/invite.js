@@ -1,6 +1,6 @@
 const emailNewUser = require('../utils/smtps.js');
-const Employee = require('../models/employee'); // Import your Mongoose model for employees
-const Status = require('../utils/status'); // Import your Mongoose model for employees
+const Employee = require('../models/employee'); 
+const Status = require('../utils/status'); 
 const User = require('../models/user');
 const { createSession } = require('../controllers/session.js');
 // const { REACTURL } = require('../utils/environment');
@@ -51,7 +51,6 @@ exports.inviteUser = async (req, res) => {
         email,
         orgId,
         status: Status.invited,
-        // Add any other default values from your Employee model here
       });
       // if(process.env.NODE_ENV === 'test'){
       // }

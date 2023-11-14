@@ -10,6 +10,7 @@ function getCurrentDateFormatted() {
 }
 
 const userSchema = mongoose.Schema({
+    
     userName : { type: String, required: false },
     // salt: { type: String, required: true},
     password : { type: Object, default: "fillthisin", required: true },
@@ -22,6 +23,7 @@ const userSchema = mongoose.Schema({
     employments : {type: [String], default: [""], required: false },
     dateJoined: { type: String, required: true, default: getCurrentDateFormatted },
     reviews : {type: [Object], default: [], required: true}
+    
 });
 
 module.exports = mongoose.model("User", userSchema);
