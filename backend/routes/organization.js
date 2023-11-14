@@ -12,6 +12,8 @@ router.put('/:id', orgController.updateOrg);
 
 router.get('/:id', orgController.getOrgById);
 
+router.get('/email/:email', orgController.getOrgByEmail);
+
 router.get('', orgController.getOrgs);
 
 router.delete('/:id', orgController.deleteOrg);

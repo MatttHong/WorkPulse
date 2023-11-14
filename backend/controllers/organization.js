@@ -116,6 +116,29 @@ exports.getOrgById = (req, res, next) => {
     });
 };
 
+// Get an organization by Email
+exports.getOrgByEmail = (req, res, next) => {
+    const orgEmail = req.params.email; // Assuming the email is passed as a parameter
+
+    Organization.findOne({ organizationEmail: orgEmail })
+    .then((org) => {
+        if (!org) {
+            throw new Error("Organization not found");
+        }
+
+        res.status(200).json({
+            message: "Organization Found!",
+            org: org.toObject(),
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.status(404).json({
+            message: err.message || "Organization not found!",
+        });
+    });
+};
+
 // Delete an organization by ID
 exports.deleteOrg = (req, res, next) => {
     const orgId = req.params.id;

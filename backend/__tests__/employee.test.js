@@ -67,12 +67,25 @@ describe('Employee API endpoints', () => {
                     });
                     if (userResponse.statusCode === 201){
                         appendToList(['users', userResponse.body.post._id]);
-                        console.log(getList())
                         id = userResponse.body.post._id
                         expect(listLength()).toBeGreaterThan(0);
                     }
-                    expect(userResponse.statusCode).toEqual(201);
-                    expect(userResponse.body).toHaveProperty('post');
+                    if (userResponse.message === "User already exists."){
+                        const res2 = await supertest(app)
+                            .get(`/api/users/email/${userem}`)
+                            .set('Authorization', `Bearer ${userToken}`);
+                        if(res2.status === 200){
+                            appendToList(['users', res2.body.user._id]);
+                            id = res2.body.user._id
+                        }
+                        expect(id).toBeDefined();
+                        expect(res2.status).toEqual(200);
+                    } else {
+
+                        expect(userResponse.body.message).toEqual("User added successfully");
+                        expect(userResponse.statusCode).toEqual(201);
+                        expect(userResponse.body).toHaveProperty('post');
+                    }
                     
                     const res = await request.post('/api/auth')
                     .send({
@@ -103,6 +116,14 @@ describe('Employee API endpoints', () => {
                         id2 = userResponse2.body.post._id
                         expect(listLength()).toBeGreaterThan(0);
         
+                    } else if (userResponse2.message === "User already exists."){
+                        const res3 = await supertest(app)
+                            .get(`/api/users/email/${userem2}`)
+                            .set('Authorization', `Bearer ${userToken}`);
+                        if(res3.status === 200){
+                            appendToList(['users', res3.body.user._id]);
+                            id2 = res3.body.user._id
+                        }
                     }
                     expect(userResponse2.statusCode).toEqual(201);
                     expect(userResponse2.body).toHaveProperty('post');
@@ -138,29 +159,38 @@ describe('Employee API endpoints', () => {
         
                     if (response.status === 201) {
                         appendToList(['org', response.body.org._id]);
+                    } 
+                    if (response.message === "Organization already exists." || response.body.message === "Organization already exists."){
+                            // appendToList(['org', response.body.org._id]);
+                            const abcd = await request.get(`/api/org/email/${newOrg.organizationEmail}`)
+                                .set('Authorization', `Bearer ${token}`);
+                            orgId = abcd.response.org._id
+                            expect(orgId).toBeDefined();
+                            expect(orgId).not.toBeNull();
+                            expect(orgId).not.toBe('');
+                            appendToList(['org', orgId]);
+                    } else {
+                        expect(response.body.message).toEqual("Organization added successfully");
+                        expect(response.status).toBe(201);
+                        expect(response.body.org.organizationAdministrators).toContain(userId);
+                        expect(response.body.org.organizationAdministrators).not.toEqual([userId]);
+                        orgId = response.body.org._id;
+                        expect(orgId).toBeTruthy();
                     }
-                    expect(response.body.message).toEqual("Organization added successfully");
-                    expect(response.status).toBe(201);
-                    expect(response.body.org.organizationAdministrators).toContain(userId);
-                    expect(response.body.org.organizationAdministrators).not.toEqual([userId]);
-                    orgId = response.body.org._id;
-                    expect(orgId).toBeTruthy();
-                    
+                   
                 });
 
             });
             describe('creating an employee for testing', () => {
                 it('should create an employee', async () => {
-                    console.log("here at error site: " + userId + " " + orgId);
                     const newEmployee = new Employee({
-                        email : "poopscoop@gmail.com",
+                        email : "testytesty@gmail.com",
                         userId : userId,
                         orgId : orgId,
                         status: Status.invited
                     });
                     await newEmployee.save()
                     employeeId = newEmployee.id
-                    console.log(newEmployee);
                     appendToList(['employee', employeeId])
                 });
             });

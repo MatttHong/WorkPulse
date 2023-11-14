@@ -87,10 +87,6 @@ describe('Organization API endpoints', () => {
             if(response.statusCode === 201){
                 appendToList(['org', response.body.id]);
             }
-            console.log('error is here: ' + response.body);
-            console.log('fuck' + response.message);
-            console.log(response.statusCode);
-            console.log(response.status);
             expect(response.statusCode).toEqual(201);
             expect(response.body).toHaveProperty('log');
             logId = response.body.log._id; // Save log ID for future tests
@@ -107,7 +103,6 @@ describe('Organization API endpoints', () => {
                 .set('Authorization', `Bearer ${userToken}`)
                 .send(updatedLog);
 
-            console.log(response.message)
             expect(response.statusCode).toEqual(200);
             expect(response.body.log.task).toEqual(updatedLog.task);
         });
@@ -118,7 +113,6 @@ describe('Organization API endpoints', () => {
                 .get('/api/log')
                 .set('Authorization', `Bearer ${userToken}`);
 
-            console.log("this is shit" + response.message);
             expect(response.statusCode).toEqual(200);
             expect(Array.isArray(response.body.logs)).toBeTruthy();
         });
