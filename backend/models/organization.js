@@ -9,7 +9,7 @@ const organizationSchema = mongoose.Schema({
     imageLink: { type: String, required: false },
     industry : { type: [String], default: [], required: true},
     projects : { type: [String], default: [], required: true},
-    departments: { type: [String], default: [], required: true},
+    departments: { type: [String], default: [], required: true}
 
 });
 

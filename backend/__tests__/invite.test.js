@@ -216,6 +216,7 @@ describe('Invite API endpoints', () => {
             expect(response.status).toBe(400);
 
         });
+        
         it('should return 400 if an middleware error occurs', async () => {
             // Mocking an internal server error by passing invalid data
             const data = {
@@ -252,7 +253,6 @@ describe('Invite API endpoints', () => {
             expect(response.body.userId).toBeDefined();
             expect(response.body.token).toBeDefined();
 
-            // });
         });
 
     });
