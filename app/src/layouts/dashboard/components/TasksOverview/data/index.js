@@ -23,7 +23,7 @@ import MDAvatar from "components/MDAvatar";
 import Checkbox from '@mui/material/Checkbox';
 
 
-export default function data() {
+export default function data(userLogs) {
     const avatars = (members) =>
         members.map(([image, name]) => (
             <Tooltip key={name} title={name} placeholder="bottom">
@@ -69,7 +69,7 @@ export default function data() {
             {
                 checkbox: (
                     <Checkbox
-                        onChange={(event) => handleCheckboxChange(event, 'Material UI XD Version')}
+                        // onChange={(event) => handleCheckboxChange(event, 'Material UI XD Version')}
                         // You would need to handle the state management and submission logic in `handleCheckboxChange`
                     />
                 ),

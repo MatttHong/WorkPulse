@@ -13,7 +13,7 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 
-import {useState, useCallback} from "react";
+import {useState, useCallback, useEffect} from "react";
 
 // @mui material components
 import Dialog from "@mui/material/Dialog";
@@ -66,9 +66,9 @@ import TaskForm from "./addTask";
 // };
 
 function Tasks() {
-    const {columns, rows} = data();
     const [menu, setMenu] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
+    const {columns, rows} = data();
 
 
     const openMenu = ({currentTarget}) => setMenu(currentTarget);

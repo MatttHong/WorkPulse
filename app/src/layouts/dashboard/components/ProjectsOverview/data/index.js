@@ -1,58 +1,89 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react/function-component-definition */
-/**
- =========================================================
- * Material Dashboard 2 React - v2.2.0
- =========================================================
-
- * Product Page: https://www.creative-tim.com/product/material-dashboard-react
- * Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
- Coded by www.creative-tim.com
-
- =========================================================
-
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- */
-
-// @mui material components
+import React from "react";
 import Tooltip from "@mui/material/Tooltip";
-import MDBox from "components/MDBox";
+import Button from "@mui/material/Button";
 import MDTypography from "components/MDTypography";
-import MDAvatar from "components/MDAvatar";
-import MDProgress from "components/MDProgress";
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
-// Images
-import logoXD from "assets/images/small-logos/logo-xd.svg";
-import logoAtlassian from "assets/images/small-logos/logo-atlassian.svg";
-import logoSlack from "assets/images/small-logos/logo-slack.svg";
-import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
-import logoJira from "assets/images/small-logos/logo-jira.svg";
-import logoInvesion from "assets/images/small-logos/logo-invision.svg";
-import team1 from "assets/images/team-1.jpg";
-import team2 from "assets/images/team-2.jpg";
-import team3 from "assets/images/team-3.jpg";
-import team4 from "assets/images/team-4.jpg";
+// Helper function to format the date and time
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString(); // This will format the date and time according to the locale
+}
 
-export default function data() {
+
+export default function data(userLogs) {
+    // If userLogs is null or undefined, return default structure with no rows
+    if (!userLogs) {
+        return {
+            columns: [
+                {Header: "Session Info", accessor: "info", width: "45%", align: "left"},
+                {Header: "Status", accessor: "status", align: "left"},
+            ],
+            rows: [],
+        };
+    }
+
+    // Sort userLogs by 'starting' status first, then by timestamp
+    const sortedLogs = userLogs.sort((a, b) => {
+        // Compare by status first
+        if (a.status.toLowerCase() === 'starting' && b.status.toLowerCase() !== 'starting') {
+            return -1;
+        } else if (a.status.toLowerCase() !== 'starting' && b.status.toLowerCase() === 'starting') {
+            return 1;
+        } else {
+            // If statuses are the same, compare by timestamp
+            const dateA = new Date(a.startTimestamp).getTime();
+            const dateB = new Date(b.startTimestamp).getTime();
+            return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
+        }
+    });
+
+
+
+    // Map sortedLogs to rows
+    const logRows = sortedLogs.map((log) => {
+        const formattedStartTime = formatTimestamp(log.startTimestamp);
+        let statusComponent;
+
+        switch (log.status.toLowerCase()) {
+            case 'starting':
+                statusComponent = (
+                    <Tooltip title="Ongoing" placement="bottom" arrow>
+                        <AccessTimeIcon sx={{color: 'grey'}}/>
+                    </Tooltip>
+                );
+                break;
+            case 'closed':
+                statusComponent = (
+                    <Tooltip title="Closed" placement="bottom" arrow>
+                        <CheckCircleRoundedIcon sx={{color: 'green'}}/>
+                    </Tooltip>
+                );
+                break;
+            default:
+                statusComponent = (
+                    <Tooltip title="Closed" placement="bottom" arrow>
+                        <CheckCircleRoundedIcon sx={{color: 'green'}}/>
+                    </Tooltip>
+                );
+        }
+
+        return {
+            info: (
+                <MDTypography variant="caption" color="text" fontWeight="medium">
+                    Start Time: {formattedStartTime}
+                </MDTypography>
+            ),
+            status: statusComponent,
+        };
+    });
+
     return {
         columns: [
             {Header: "Session Info", accessor: "info", width: "45%", align: "left"},
-            {Header: "Status", accessor: "status", width: "10%", align: "left"},
+            {Header: "Status", accessor: "status", align: "right"},
         ],
-
-        rows: [
-            {
-                info:
-                    <MDTypography variant="caption" color="text" fontWeight="medium">
-                        Start Time - End Time
-                    </MDTypography>,
-                status: (
-                    <CheckCircleRoundedIcon/>
-                ),
-            },
-
-        ],
+        rows: logRows,
     };
 }
