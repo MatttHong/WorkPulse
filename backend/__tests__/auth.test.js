@@ -45,100 +45,104 @@ describe('Auth API endpoints', () => {
       });
       
     });
+    
+    describe('Proper Testing', () => {
 
-    it('should get a user by ID with valid Token', async () => {
-      const res = await request.get(`/api/users/${userId}`)
-        .set('Authorization', `Bearer ${userToken}`);
-  
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.user._id).toEqual(userId);
-    });
-
-    it('should create a new user then log in', async () => {
-      const userResponse = await supertest(app)
-      .post('/api/users')
-      .send({
-          userName: 'testuser',
-          password: userpas,
-          userType: 'test',
-          firstName: 'Test',
-          lastName: 'User',
-          email: userem,
-          birthday: '1990-01-01',
-          bio: 'A test bio',
-          employments: [],
-          logs: ['anything can go here no matter how long it is and this is proof of this concept, literally anything even above the character max for the default']
-        });
-      if (userResponse.statusCode === 201){
-
-        id = userResponse.body.post._id
-        appendToList(['users', userResponse.body.post._id]);
-        expect(listLength()).toBeGreaterThan(0);
-      }
-      expect(userResponse.statusCode).toEqual(201);
-      expect(userResponse.body).toHaveProperty('post');
-     
-      const res = await request.post('/api/auth')
-        .send({
-            email: userem,
-            password: userpas
-            })
-      expect(res.statusCode).toEqual(200);
-      firstToken = res.body.token;
-      // expect(res.body.message).toEqual('Wrong Login Details');
-    });
-
-    it('should get a user by ID with new Token', async () => {
-      const res = await request.get(`/api/users/${id}`)
-        .set('Authorization', `Bearer ${firstToken}`);
-  
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.user._id).toEqual(id);
-    });
-
-    it('should fail to log in', async () => {
-      const res = await request.post('/api/auth')
-        .send({
-        email: userem,
-        password: userpas.slice(0, Math.floor(Math.random() * password.length)) + password.slice(Math.floor(Math.random() * password.length) + 1)
-        })
-      expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toEqual('Wrong Login Details');
-    })
-  
-    it('waiting for 1000ms', async () => {
-      await sleep(1000); // Sleep for 500 ms
-    });
-
-    it('should successfully log in and get a new token', async () => {
-        const res = await request.post('/api/auth')
-            .send({
-            email: userem,
-            password: userpas
-            })
+      it('should get a user by ID with valid Token', async () => {
+        const res = await request.get(`/api/users/${userId}`)
+          .set('Authorization', `Bearer ${userToken}`);
+    
         expect(res.statusCode).toEqual(200);
-        newToken = res.body.token;
-        expect(newToken).toBeTruthy();
-        expect(newToken).not.toEqual(firstToken);
-        expect(res.body.message).toEqual('Correct Details');
-        expect()
-    })
+        expect(res.body.user._id).toEqual(userId);
+      });
 
-    it('should fail to get a user by ID with invalid Token', async () => {
+      it('should create a new user then log in', async () => {
+        const userResponse = await supertest(app)
+        .post('/api/users')
+        .send({
+            userName: 'testuser',
+            password: userpas,
+            userType: 'test',
+            firstName: 'Test',
+            lastName: 'User',
+            email: userem,
+            birthday: '1990-01-01',
+            bio: 'A test bio',
+            employments: [],
+            logs: ['anything can go here no matter how long it is and this is proof of this concept, literally anything even above the character max for the default']
+          });
+        if (userResponse.statusCode === 201){
+
+          id = userResponse.body.post._id
+          appendToList(['users', userResponse.body.post._id]);
+          expect(listLength()).toBeGreaterThan(0);
+        }
+        expect(userResponse.statusCode).toEqual(201);
+        expect(userResponse.body).toHaveProperty('post');
+      
+        const res = await request.post('/api/auth')
+          .send({
+              email: userem,
+              password: userpas
+              })
+        expect(res.statusCode).toEqual(200);
+        firstToken = res.body.token;
+        // expect(res.body.message).toEqual('Wrong Login Details');
+      });
+
+      it('should get a user by ID with new Token', async () => {
         const res = await request.get(`/api/users/${id}`)
           .set('Authorization', `Bearer ${firstToken}`);
     
-        expect(newToken).not.toEqual(firstToken);
-        expect(res.statusCode).toEqual(401);
-        expect(res.body.message).toEqual('Session expired or invalid');
-    });
-
-    it('should get a user by ID with new Token', async () => {
-        const res = await request.get(`/api/users/${id}`)
-          .set('Authorization', `Bearer ${newToken}`);
-        
         expect(res.statusCode).toEqual(200);
         expect(res.body.user._id).toEqual(id);
+      });
+
+      it('should fail to log in', async () => {
+        const res = await request.post('/api/auth')
+          .send({
+          email: userem,
+          password: userpas.slice(0, Math.floor(Math.random() * password.length)) + password.slice(Math.floor(Math.random() * password.length) + 1)
+          })
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message).toEqual('Wrong Login Details');
+      })
+    
+      it('waiting for 1000ms', async () => {
+        await sleep(1000); // Sleep for 500 ms
+      });
+
+      it('should successfully log in and get a new token', async () => {
+          const res = await request.post('/api/auth')
+              .send({
+              email: userem,
+              password: userpas
+              })
+          expect(res.statusCode).toEqual(200);
+          newToken = res.body.token;
+          expect(newToken).toBeTruthy();
+          expect(newToken).not.toEqual(firstToken);
+          expect(res.body.message).toEqual('Correct Details');
+          expect()
+      })
+
+      it('should fail to get a user by ID with invalid Token', async () => {
+          const res = await request.get(`/api/users/${id}`)
+            .set('Authorization', `Bearer ${firstToken}`);
+      
+          expect(newToken).not.toEqual(firstToken);
+          expect(res.statusCode).toEqual(401);
+          expect(res.body.message).toEqual('Session expired or invalid');
+      });
+
+      it('should get a user by ID with new Token', async () => {
+          const res = await request.get(`/api/users/${id}`)
+            .set('Authorization', `Bearer ${newToken}`);
+          
+          expect(res.statusCode).toEqual(200);
+          expect(res.body.user._id).toEqual(id);
+      });
+
     });
 
 });
