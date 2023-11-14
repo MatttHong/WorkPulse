@@ -9,7 +9,11 @@ import threading
 import time
 
 # Set this to True when testing without a server
-TESTING_WITHOUT_SERVER = True
+TESTING_WITHOUT_SERVER = False
+
+global_bearer_token = None
+USER_ID = None
+LOG_ID = None
 
 # Mock responses for testing
 mock_post_response = Mock()
@@ -22,47 +26,16 @@ mock_patch_response.ok = True
 mock_put_response = Mock()
 mock_put_response.ok = True
 
-# Mock functions to replace 'requests' methods
-# Define a mock bearer token for testing purposes
-MOCK_BEARER_TOKEN = 'mock_token'
-
-def check_bearer_token(headers):
-    """Function to check if the correct bearer token is provided in the headers."""
-    auth_header = headers.get('Authorization', '')
-    return auth_header == f'Bearer {MOCK_BEARER_TOKEN}'
-
-def mock_post(url, json, headers=None):
-    if headers is None or not check_bearer_token(headers):
-        raise requests.exceptions.HTTPError("Unauthorized: No valid token provided", response=mock.Mock(status=401))
-    print(f"Mock POST request to {url} with {json}")
-    return mock_post_response
-
-def mock_patch(url, headers=None):
-    if headers is None or not check_bearer_token(headers):
-        raise requests.exceptions.HTTPError("Unauthorized: No valid token provided", response=mock.Mock(status=401))
-    print(f"Mock PATCH request to {url}")
-    return mock_patch_response
-
-def mock_put(url, json, headers=None):
-    if headers is None or not check_bearer_token(headers):
-        raise requests.exceptions.HTTPError("Unauthorized: No valid token provided", response=mock.Mock(status=401))
-    print(f"Mock PUT request to {url} with {json}")
-    return mock_put_response
-
-
-# Replace 'requests' methods with mocks if testing without server
-if TESTING_WITHOUT_SERVER:
-    requests.post = mock_post
-    requests.patch = mock_patch
-    requests.put = mock_put
 
 # Replace with the actual base URL of your API
 API_BASE_URL = 'http://localhost:3000/api/log'
 
 # This will hold the log ID once logging has started
-LOG_ID = None
 
 def get_bearer_token(url, username, password):
+    global global_bearer_token
+    global USER_ID
+
     # Replace these with the appropriate fields required by your API
     auth_data = {
         'email': username,
@@ -74,14 +47,13 @@ def get_bearer_token(url, username, password):
 
     # Check if the request was successful
     if response.status_code == 200:
-        # Extract the token from the response
-        token = response.json().get('access_token')
-        return token
+        data = response.json()
+        global_bearer_token = data.get("token")
+        USER_ID = data.get("data").get("_id")
     else:
         # Handle errors
         error_message = response.json().get('message', 'Failed to retrieve token')
         raise Exception(f"{error_message}, status code: {response.status_code}")
-
 
 class LoginPage(tk.Toplevel):
     def __init__(self, parent):
@@ -108,12 +80,14 @@ class LoginPage(tk.Toplevel):
         username = self.username_entry.get()
         password = self.password_entry.get()
         try:
-            self.parent.bearer_token = get_bearer_token('token_url', username, password)
+            # Replace 'your_auth_endpoint' with the actual endpoint URL
+            get_bearer_token('http://localhost:3000/api/auth', username, password)
             self.parent.logged_in = True
             self.parent.update_login_state()
             self.destroy()
         except Exception as e:
             messagebox.showerror("Login Failed", str(e))
+
 
 class LoggingApp(tk.Tk):
     def __init__(self):
@@ -138,10 +112,10 @@ class LoggingApp(tk.Tk):
         self.keyboard_listener = keyboard.Listener(on_press=self.on_press)
 
         self.track_intervals = [10, 30, 50]  # Seconds after the minute to start tracking
-        self.track_duration = 5  # Duration of tracking in seconds
+        self.track_duration = 1  # Duration of tracking in seconds
         self.tracking = False  # Flag to indicate if tracking is active
 
-    def start_track_timers(self):
+    def start_track_timers(self):        
         """Start timers to trigger mouse movement tracking."""
         current_time = datetime.now()
         for interval in self.track_intervals:
@@ -173,9 +147,7 @@ class LoggingApp(tk.Tk):
     def on_move(self, x, y):
         """Handle mouse movement event."""
         if self.tracking and self.logged_in:  # Only track movements if logged in and tracking is active
-            timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
-            self.add_log_entry(f'Mouse moved at {timestamp} to position ({x}, {y})')
-            print()
+            self.add_log_entry(f'Mouse moved to position ({x}, {y})')
 
     def update_login_state(self):
         if self.logged_in:
@@ -211,15 +183,16 @@ class LoggingApp(tk.Tk):
         global LOG_ID
         url = f'{API_BASE_URL}'
         log_data = {
-            'employee': '654467918111a89f6cdd9546'
+            'employee': USER_ID
         }
         headers = {
-            'Authorization': f'Bearer {self.bearer_token}'
+            'Authorization': f'Bearer {global_bearer_token}'
         }
         try:
             response = requests.post(url, json=log_data, headers=headers)
             response.raise_for_status()
-            LOG_ID = response.body._id
+            data = response.json()
+            LOG_ID = data.get('log', {}).get('_id')           
             print(f'Logging started with ID: {LOG_ID}')
             self.start_button['state'] = tk.DISABLED
             self.stop_button['state'] = tk.NORMAL
@@ -241,7 +214,7 @@ class LoggingApp(tk.Tk):
         if LOG_ID:
             url = f'{API_BASE_URL}/{LOG_ID}/end'
             headers = {
-                'Authorization': f'Bearer {self.bearer_token}'
+                'Authorization': f'Bearer {global_bearer_token}'
             }
             try:
                 response = requests.patch(url, headers=headers)
@@ -261,7 +234,6 @@ class LoggingApp(tk.Tk):
                 # Reset the tracking flag
                 self.tracking = False
 
-                LOG_ID = None
             except requests.exceptions.RequestException as e:
                 print(f'Failed to stop logging: {e}')
 
@@ -269,25 +241,20 @@ class LoggingApp(tk.Tk):
         self.mouse_listener = mouse.Listener(on_click=self.on_click, on_scroll=self.on_scroll)
 
     def add_log_entry(self, action, x=None, y=None):
-        global LOG_ID
-        if LOG_ID:
-            timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
-            entry = {
-                'action': action,
-                'timestamp': timestamp,
-                'x': x,
-                'y': y
-            }
-            url = f'{API_BASE_URL}/{LOG_ID}/entry'
-            headers = {
-                'Authorization': f'Bearer {self.bearer_token}'
-            }
-            try:
-                response = requests.put(url, json=entry, headers=headers)
-                response.raise_for_status()
-                print('Log entry added successfully:', entry)
-            except requests.exceptions.RequestException as e:
-                print(f'Failed to add log entry: {e}')
+        timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+        entry = {
+            'log': [action, timestamp,x, y]
+        }
+        url = f'{API_BASE_URL}/{LOG_ID}/entry'
+        headers = {
+            'Authorization': f'Bearer {global_bearer_token}'
+        }
+        try:
+            response = requests.put(url, json=entry, headers=headers)
+            response.raise_for_status()
+            print('Log entry added successfully:', entry)
+        except requests.exceptions.RequestException as e:
+            print(f'Failed to add log entry: {e}')
 
     def on_click(self, x, y, button, pressed):
         if pressed:
