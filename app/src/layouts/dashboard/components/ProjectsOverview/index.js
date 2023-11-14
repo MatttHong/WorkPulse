@@ -64,7 +64,7 @@ function Projects() {
             }
         };
 
-        fetchUserData();
+        fetchLogData();
     }, []); // The empty array means this effect will only run once, similar to componentDidMount
 
     const openMenu = ({currentTarget}) => setMenu(currentTarget);
