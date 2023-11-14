@@ -30,6 +30,14 @@ describe('Department API endpoints', () => {
   let token;
   let userpas = 'password1!D';
   let userem = 'testest@example.com';
+  describe('Should always work', () =>{
+
+    test('this test will always pass', () => {
+      expect(true).toBe(true);
+    });
+    
+  });
+  
   describe('Setup For Future Tests', () => {
     it('should create a new user then log in', async () => {
       const userResponse = await supertest(app)

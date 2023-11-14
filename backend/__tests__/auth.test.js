@@ -37,10 +37,15 @@ describe('Auth API endpoints', () => {
     let id;
     let firstToken;
     let newToken;
-    // test('should always pass', () => {
-    //     expect(true).toBeTruthy();
-    // });
     
+    describe('Should always work', () =>{
+
+      test('this test will always pass', () => {
+        expect(true).toBe(true);
+      });
+      
+    });
+
     it('should get a user by ID with valid Token', async () => {
       const res = await request.get(`/api/users/${userId}`)
         .set('Authorization', `Bearer ${userToken}`);

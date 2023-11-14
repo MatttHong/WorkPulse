@@ -38,6 +38,15 @@ describe('Invite API endpoints', () => {
     let employeeId;
     let email;
     let inviteToken;
+
+    describe('Should always work', () =>{
+
+        test('this test will always pass', () => {
+          expect(true).toBe(true);
+        });
+        
+    });
+
     describe('setup with new organization', () => {
         it('should create a new organization', async () => {
             const newOrg = { 
@@ -61,6 +70,7 @@ describe('Invite API endpoints', () => {
             expect(orgId).toBeTruthy();
         });
     });
+
     describe('Invite a new user through the whole pipeline', () => {
     
         it('Inviting a new email', async () => {
@@ -142,6 +152,7 @@ describe('Invite API endpoints', () => {
         });
 
     });
+
     describe('Accepting new invite', () => {
         it('should return 400 if required fields are missing', async () => {
             const data = {}; // Missing required fields
@@ -193,7 +204,7 @@ describe('Invite API endpoints', () => {
             // Mocking an internal server error by passing invalid data
             const data = {
                 employeeId: 'validemployeeid',
-                email: 'invalidemail', // Invalid email format
+                email: 'invalid@email', // Invalid email format
                 inviteToken: 'validtoken',
             };
         

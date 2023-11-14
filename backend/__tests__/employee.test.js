@@ -35,112 +35,132 @@ describe('Employee API endpoints', () => {
     let token, orgId, employeeId;
     let token2, id2;
 
+    describe('Should always work', () =>{
+
+        test('this test will always pass', () => {
+          expect(true).toBe(true);
+        });
+        
+    });
+
     describe('Setup Functions', () => {
+    
+        describe('setting up users for testing', () => {
 
-        it('should create a new user then log in', async () => {
+            it('should create a new user then log in', async () => {
 
-            const userResponse = await supertest(app)
-            .post('/api/users')
-            .send({
-                userName: 'testuser',
-                password: userpas,
-                userType: 'test',
-                firstName: 'Test',
-                lastName: 'User',
-                email: userem,
-                birthday: '1990-01-01',
-                bio: 'A test bio',
-                employments: [],
-                logs: ['anything can go here no matter how long it is and this is proof of this concept, literally anything even above the character max for the default']
-            });
-            if (userResponse.statusCode === 201){
-                appendToList(['users', userResponse.body.post._id]);
-                console.log(getList())
-                id = userResponse.body.post._id
-                expect(listLength()).toBeGreaterThan(0);
-            }
-            expect(userResponse.statusCode).toEqual(201);
-            expect(userResponse.body).toHaveProperty('post');
-            
-            const res = await request.post('/api/auth')
-            .send({
-                email: userem,
-                password: userpas
-                })
-            expect(res.statusCode).toEqual(200);
-            token = res.body.token;
-        });
-
-        it('should create a second new user and log in', async () => {
-            const userResponse2 = await supertest(app)
-            .post('/api/users')
-            .send({
-                userName: 'testuser',
-                password: userpas,
-                userType: 'test',
-                firstName: 'Test',
-                lastName: 'User',
-                email: userem2,
-                birthday: '1990-01-01',
-                bio: 'A test bio',
-                employments: [],
-              });
-            if (userResponse2.statusCode === 201){
-      
-                appendToList(['users', userResponse2.body.post._id]);
-                id2 = userResponse2.body.post._id
-                expect(listLength()).toBeGreaterThan(0);
-  
-            }
-            expect(userResponse2.statusCode).toEqual(201);
-            expect(userResponse2.body).toHaveProperty('post');
-            
-  
-            const res2 = await request.post('/api/auth')
+                const userResponse = await supertest(app)
+                .post('/api/users')
                 .send({
-                    email: userem2,
+                    userName: 'testuser',
+                    password: userpas,
+                    userType: 'test',
+                    firstName: 'Test',
+                    lastName: 'User',
+                    email: userem,
+                    birthday: '1990-01-01',
+                    bio: 'A test bio',
+                    employments: [],
+                    logs: ['anything can go here no matter how long it is and this is proof of this concept, literally anything even above the character max for the default']
+                });
+                if (userResponse.statusCode === 201){
+                    appendToList(['users', userResponse.body.post._id]);
+                    console.log(getList())
+                    id = userResponse.body.post._id
+                    expect(listLength()).toBeGreaterThan(0);
+                }
+                expect(userResponse.statusCode).toEqual(201);
+                expect(userResponse.body).toHaveProperty('post');
+                
+                const res = await request.post('/api/auth')
+                .send({
+                    email: userem,
                     password: userpas
-                })
-  
-            expect(res2.statusCode).toEqual(200);
-            token2 = res2.body.token;
-
-        });
-
-        it('should create a new organization', async () => {
-            const newOrg = { 
-                organizationName: "TestOrg",
-                organizationEmail: "testorg1@example.com",
-                organizationAdministrators: [id2],
-                employees: [userId],
-                industry: "Technology"
-            };
-
-            const response = await request.post('/api/org')
-                .set('Authorization', `Bearer ${userToken}`)
-                .send(newOrg);
-
-            if (response.status === 201) {
-                appendToList(['org', response.body.org._id]);
-            }
-            expect(response.body.message).toEqual("Organization added successfully");
-            expect(response.status).toBe(201);
-            expect(response.body.org.organizationAdministrators).toContain(userId);
-            expect(response.body.org.organizationAdministrators).not.toEqual([userId]);
-            orgId = response.body.org._id;
-            expect(orgId).toBeTruthy();
-            
-        });
-        it('should create an employee', async () => {
-            const newEmployee = new Employee({
-                email : "poopscoop@gmail.com",
-                userId : userId,
-                ordId : orgId,
-                status: Status.invited
+                    })
+                expect(res.statusCode).toEqual(200);
+                token = res.body.token;
             });
-            await newEmployee.save()
-            employeeId = newEmployee.id
-            appendToList(['employee', employeeId])
+    
+            it('should create a second new user and log in', async () => {
+                const userResponse2 = await supertest(app)
+                .post('/api/users')
+                .send({
+                    userName: 'testuser',
+                    password: userpas,
+                    userType: 'test',
+                    firstName: 'Test',
+                    lastName: 'User',
+                    email: userem2,
+                    birthday: '1990-01-01',
+                    bio: 'A test bio',
+                    employments: [],
+                  });
+                if (userResponse2.statusCode === 201){
+          
+                    appendToList(['users', userResponse2.body.post._id]);
+                    id2 = userResponse2.body.post._id
+                    expect(listLength()).toBeGreaterThan(0);
+      
+                }
+                expect(userResponse2.statusCode).toEqual(201);
+                expect(userResponse2.body).toHaveProperty('post');
+                
+      
+                const res2 = await request.post('/api/auth')
+                    .send({
+                        email: userem2,
+                        password: userpas
+                    })
+      
+                expect(res2.statusCode).toEqual(200);
+                token2 = res2.body.token;
+    
+            });
+
+        });
+
+        describe('creating a new org for testing', () => {
+
+            it('should create a new organization', async () => {
+                const newOrg = { 
+                    organizationName: "TestOrg",
+                    organizationEmail: "testorg1@example.com",
+                    organizationAdministrators: [id2],
+                    employees: [userId],
+                    industry: "Technology"
+                };
+    
+                const response = await request.post('/api/org')
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .send(newOrg);
+    
+                if (response.status === 201) {
+                    appendToList(['org', response.body.org._id]);
+                }
+                expect(response.body.message).toEqual("Organization added successfully");
+                expect(response.status).toBe(201);
+                expect(response.body.org.organizationAdministrators).toContain(userId);
+                expect(response.body.org.organizationAdministrators).not.toEqual([userId]);
+                orgId = response.body.org._id;
+                expect(orgId).toBeTruthy();
+                
+            });
+
+        });
+        describe('creating an employee for testing', () => {
+            it('should create an employee', async () => {
+                console.log("here at error site: " + userId + " " + orgId);
+                const newEmployee = new Employee({
+                    email : "poopscoop@gmail.com",
+                    userId : userId,
+                    orgId : orgId,
+                    status: Status.invited
+                });
+                await newEmployee.save()
+                employeeId = newEmployee.id
+                console.log(newEmployee);
+                appendToList(['employee', employeeId])
+            });
         });
 
     });
@@ -252,4 +272,5 @@ describe('Employee API endpoints', () => {
             expect(response.status).toBe(404);
         });
     });
+
 });

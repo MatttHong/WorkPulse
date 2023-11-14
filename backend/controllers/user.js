@@ -3,7 +3,15 @@ const { generateSalt, hash, compare } = require('../utils/salt.js');
 
 // Create a new user (makes a hash for the password)
 exports.createUser = async (req, res, next) => {
-    let hashedPassword = hash(req.body.password);
+    let hashedPassword;
+    try {
+         hashedPassword = hash(req.body.password);
+    } catch(err) {
+        return res.status(500).json({
+            message: 'Failed Password Encryption'
+        })
+    }
+
     
     try {
         const foundUser = await User.findOne({ email: req.body.email });
