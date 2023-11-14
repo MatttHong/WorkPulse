@@ -45,6 +45,7 @@ import data from "layouts/projects/data/data/projectsTableData"
 import DataTable from "examples/Tables/DataTable";
 import AddOrganizationComponent from "./components/addOrganization";
 import EditOrganizationForm from "./components/editOrganization";
+import EmployeeList from "./components/membersOverview";
 import axios from "axios";
 
 // Custom components for Projects Page
@@ -55,20 +56,58 @@ function OrgsPage() {
   const [currentProject, setCurrentOrg] = useState(null);
   const [menu, setMenu] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [organizations, setProjects] = useState([]);
+  const [organizations, setOrganizations] = useState([]);
   const [editingOrg, setEditingOrg] = useState(null);
-  
+  const [openInviteDialog, setOpenInviteDialog] = useState(false);
+  const [projects, setProjects] = useState(null);
 
+ 
   
+const fetchEmployees = async () => {
+    try {
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5NzQ5OTIsImV4cCI6MTcwMDAwMzc5Mn0.d_-VdSLirHJePTPz-0OEGqvqwqyvYw8-wZ1chTlaAzE";
+        const response = await axios.get('http://localhost:3000/api/employee' , {
+            headers: {
+                Authorization: "Bearer " + token,
+            }
+    }
+    );
+        setOrganizations(response.data.orgs);
+        return response.data.employees;
 
+    } catch (error) {
+        console.error('Error fetching employees:', error);
+        return [];
+    }
+};
+
+  const handleOpenInviteDialog = () => setOpenInviteDialog(true);
+
+
+  function mapEmployeesToOrganizations(organizations, employees) {
+    if (!organizations || !employees) {
+      // Handle the case where organizations or employees is undefined
+      return [];
+    }
+    return organizations.map(org => {
+      const members = employees.filter(emp => emp.orgId === org._id)
+                               .map(emp => emp.name); // Assuming 'name' is the field you want to display
+      return { ...org, members };
+    });
+  }
   useEffect(() => {
-    fetchOrgs();
+    fetchOrgs().then(organizations => {
+    //   fetchEmployees().then(employees => {
+    //     const organizationsWithMembers = mapEmployeesToOrganizations(organizations, employees);
+    //     //setProjects(organizationsWithMembers);
+    //   });
+    });
   }, []);
 
   const fetchOrgs = async () => {
     const BACKEND_ENDPOINT = 'http://localhost:3000/api/org';
     try {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5NzQ5OTIsImV4cCI6MTcwMDAwMzc5Mn0.d_-VdSLirHJePTPz-0OEGqvqwqyvYw8-wZ1chTlaAzE";
         const response = await axios.get(BACKEND_ENDPOINT, {
             headers: {
                 Authorization: "Bearer " + token,
@@ -77,7 +116,7 @@ function OrgsPage() {
         // Directly use response.data instead of response.json()
         const data = response.data;
         console.log("got orgs", data);
-        setProjects(data.orgs); // Assuming the backend returns an object with an 'orgs' property
+        setOrganizations(data.orgs);
     } catch (error) {
         console.error('Error fetching organizations:', error);
     }
@@ -106,13 +145,14 @@ function OrgsPage() {
   const handleSaveEdit = async (updatedOrg) => {
     // ... close modal logic ...
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5NzQ5OTIsImV4cCI6MTcwMDAwMzc5Mn0.d_-VdSLirHJePTPz-0OEGqvqwqyvYw8-wZ1chTlaAzE";
       const response = await axios.put(`http://localhost:3000/api/org/${updatedOrg._id}`, updatedOrg, {
         headers: {
             Authorization: "Bearer " + token,
         }
     });
     const data = response.data;
+    console.log(data);
     console.log('Organization Saved:', response.data);
     
       // Handle successful update
@@ -124,8 +164,8 @@ function OrgsPage() {
 
   const handleDelete = (orgId) => {
     if (window.confirm("Are you sure you want to delete this organization?")) {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
-      axios.delete(`http://localhost:3000 /api/org/${orgId}`, {
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5NzQ5OTIsImV4cCI6MTcwMDAwMzc5Mn0.d_-VdSLirHJePTPz-0OEGqvqwqyvYw8-wZ1chTlaAzE";
+      axios.delete(`http://localhost:3000/api/org/${orgId}`, {
         headers: {
             Authorization: "Bearer " + token,
         }
@@ -142,7 +182,22 @@ function OrgsPage() {
     }
   };
 
+  
 
+//   function updateOrganizationTable(organizationsWithMembers) {
+//     const tableBody = document.getElementById('orgTableBody');
+//     tableBody.innerHTML = ''; // Clear existing rows
+
+//     organizationsWithMembers.forEach(org => {
+//         const row = document.createElement('tr');
+//         row.innerHTML = `
+//             <td>${org.name}</td>
+//             <td>${org.members.map(member => member.name).join(', ')}</td>
+//             <!-- other columns -->
+//         `;
+//         tableBody.appendChild(row);
+//     });
+// }
   
   const handleClose = () => {
     setOpen(false);
@@ -153,6 +208,7 @@ function OrgsPage() {
     fetchOrgs();          // Refresh the organization list
   };
 
+  
   const renderMenu = (
     <Menu
       id="simple-menu"
@@ -172,15 +228,15 @@ function OrgsPage() {
     </Menu>
   );
 
-
+  
   const columns = [
     { Header: "Organization Name", accessor: "organizationName" },
     { Header: "Actions", accessor: "actions" },
   ];
-
   // Map the organizations to rows for the DataTable
   const rows = organizations.map(organization => ({
     organizationName: organization.organizationName,
+    
     
     actions: (
         <>
@@ -257,7 +313,6 @@ function OrgsPage() {
 
           />
          
-          
         
           
         </MDBox>
@@ -280,5 +335,7 @@ function OrgsPage() {
     </DashboardLayout>
   );
 }
+
+
 
 export default OrgsPage;

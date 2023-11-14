@@ -99,15 +99,8 @@ const handleAddAdmin = () => {
 
 const handleAddEmployee = async () => {
   if (employeeEmail) {
-    const userExists = await checkUserExists(employeeEmail);
-    if (userExists) {
-      setEmployee([...employee, employeeEmail]);
-    } else {
-      // Open confirmation dialog
-      setEmailToInvite(employeeEmail);
-      setOpenConfirmationDialog(true);
-    }
-    setEmployeeEmail('');
+    setEmployee([...employee, employeeEmail]);
+    setEmployeeEmail(''); 
   }
 };
 
@@ -156,14 +149,14 @@ const handleSubmit = (event) => {
   createOrganization(orgData);
   
  }else{
-  //console.log("Incorreect Field");
+  console.log("Incorreect Field");
  }
   
 };
 //no duplicatge
 const createOrganization = async (organizationData) => {
   try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5NzQ5OTIsImV4cCI6MTcwMDAwMzc5Mn0.d_-VdSLirHJePTPz-0OEGqvqwqyvYw8-wZ1chTlaAzE";
       const response = await axios.post('http://localhost:3000/api/org', organizationData, {
           headers: {
               Authorization: "Bearer " + token,
@@ -196,27 +189,27 @@ const validateFields = async () => {
     newErrors.orgEmail = 'Organization Email is required';
   }
 
-  // Validate Admin Emails
-  for (const email of admin) {
-    const userExists = await checkUserExists(email);
-    if (!userExists) {
-      isValid = false;
-      newErrors.adminEmail = `Admin email ${email} does not exist`;
-      // Optionally trigger invitation email
-      sendInvitationEmail(email);
-    }
-  }
+  // // Validate Admin Emails
+  // for (const email of admin) {
+  //   const userExists = await checkUserExists(email);
+  //   if (!userExists) {
+  //     isValid = false;
+  //     newErrors.adminEmail = `Admin email ${email} does not exist`;
+  //     // Optionally trigger invitation email
+  //     //sendInvitationEmail(email);
+  //   }
+  // }
 
-  // Validate Employee Emails
-  for (const email of employee) {
-    const userExists = await checkUserExists(email);
-    if (!userExists) {
-      isValid = false;
-      newErrors.employeeEmail = `Employee email ${email} does not exist`;
-      // Optionally trigger invitation email
-      sendInvitationEmail(email);
-    }
-  }
+  // // Validate Employee Emails
+  // for (const email of employee) {
+  //   const userExists = await checkUserExists(email);
+  //   if (!userExists) {
+  //     isValid = false;
+  //     newErrors.employeeEmail = `Employee email ${email} does not exist`;
+  //     // Optionally trigger invitation email
+  //     //sendInvitationEmail(email);
+  //   }
+  // }
 
   setErrors(newErrors);
   return isValid;
@@ -239,24 +232,7 @@ const ConfirmationDialog = () => (
     </DialogActions>
   </Dialog>
 );
-const checkUserExists = async (email) => {
-  try {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
-    const response = await axios.get(`http://localhost:3000/api/users/email/${email}`, {
-    headers: {
-      Authorization: "Bearer " + token
-    }
-      
-    });
-    if (response.status === 404) {
-      return false; // User does not exist
-    }
-    return true; // User exists
-  } catch (error) {
-    console.error('Error checking user:', error);
-    return false;
-  }
-};
+
 
 // Function to send invitation email
 const sendInvitationEmail = async (email) => {
@@ -266,7 +242,7 @@ const sendInvitationEmail = async (email) => {
     header: "header",
     body: "body",
 };
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5MTI0MTcsImV4cCI6MTY5OTk0MTIxN30.x3aLW0kU0eZsa9LtPpWYwr-_5I-KzXJtVSbKr2RiVNc";
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk5NzQ5OTIsImV4cCI6MTcwMDAwMzc5Mn0.d_-VdSLirHJePTPz-0OEGqvqwqyvYw8-wZ1chTlaAzE";
 const BACKEND_ENDPOINT = 'http://localhost:3000/api/invite';
 try {
   const response = await fetch(BACKEND_ENDPOINT, {
@@ -372,19 +348,6 @@ try {
           onChange={(e) => setIndustryName(e.target.value)}
         />
         <MDButton onClick={handleAddIndustry}>Add Industry</MDButton>
-      </MDBox> 
-
-      <MDBox>
-        {project.map((email, index) => (
-          <MDTypography key={index}>{email}</MDTypography>
-        ))}
-         <MDInput
-          type="text"
-          placeholder="project"
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
-        />
-        <MDButton onClick={handleAddProject}>Add project</MDButton>
       </MDBox> 
 
       
