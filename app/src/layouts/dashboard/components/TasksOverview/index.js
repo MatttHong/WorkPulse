@@ -15,16 +15,11 @@
 
 import {useState, useCallback, useEffect} from "react";
 
-// @mui material components
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
+
 
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -37,98 +32,72 @@ import DataTable from "examples/Tables/DataTable";
 // Data
 import data from "layouts/dashboard/components/TasksOverview/data";
 import TaskForm from "./addTask";
+import axios from "axios";
 
 
-
-// const handleAddTask = async (taskData) => {
-//   const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
-//
-//   try {
-//       const response = await fetch(BACKEND_ENDPOINT, {
-//           method: 'POST',
-//           headers: {
-//               'Content-Type': 'application/json'
-//           },
-//           body: JSON.stringify(taskData)
-//       });
-//
-//       if (!response.ok) {
-//         throw new Error('Network response was not ok: ' + response.statusText);
-//       }
-//       const data = await response.json();
-//       console.log('Task added:', data);
-//       // Close dialog and refresh projects list
-//       handleCloseDialog();
-//       // TODO: Refresh projects list here
-//   } catch (error) {
-//       console.error('Error adding task:', error);
-//   }
-// };
 
 function Tasks() {
-    const [menu, setMenu] = useState(null);
-    const [openDialog, setOpenDialog] = useState(false);
-    const {columns, rows} = data();
+    const [userProjects, setUserProjects] = useState([]); // Initial state as null or appropriate default
+    const [userAdmins, setUserAdmins] = useState([]);
+    const {columns, rows} = data(userProjects, userAdmins);
 
+    useEffect(() => {
+        const fetchProjects = async () => {
+            const token = localStorage.getItem('token');
 
-    const openMenu = ({currentTarget}) => setMenu(currentTarget);
-    const closeMenu = () => setMenu(null);
+            try {
+                const response = await fetch(`http://localhost:3000/api/proj/`, {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    }
+                });
 
-    const handleOpenDialog = () => {
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserProjects(data.projects); // Set all the projects
 
-        setOpenDialog(true);
-        closeMenu();
-    };
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    };
-    const renderMenu = (
-        <Menu
-            id="simple-menu"
-            anchorEl={menu}
-            anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
-            }}
-            transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-            }}
-            open={Boolean(menu)}
-            onClose={closeMenu}
-        >
-            <MenuItem onClick={handleOpenDialog}>New Task</MenuItem>
-        </Menu>
-    );
+                    // Fetch each project administrator's details
+                    for (const project of data.projects) {
+                        for (const adminId of project.projectAdministrators) {
+                            const userResponse = await fetch(`http://localhost:3000/api/users/${adminId}`, {
+                                headers: {
+                                    Authorization: "Bearer " + token,
+                                }
+                            });
+
+                            if (userResponse.ok) {
+                                const adminData = await userResponse.json();
+                                setUserAdmins(prevAdmins => [...prevAdmins, adminData.user]);
+                            } else {
+                                console.error('Failed to fetch admin data:', userResponse.status);
+                            }
+                        }
+                    }
+                } else {
+                    console.error('Failed to fetch projects:', response.status);
+                }
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
 
     return (
         <Card>
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                 <MDBox>
                     <MDTypography variant="h6" gutterBottom>
-                        Tasks
+                        Projects
                     </MDTypography>
                     <MDBox display="flex" alignItems="center" lineHeight={0}>
-                        <Icon
-                            sx={{
-                                fontWeight: "bold",
-                                color: ({palette: {info}}) => info.main,
-                                mt: -0.5,
-                            }}
-                        >
-                            done
-                        </Icon>
                         <MDTypography variant="button" fontWeight="regular" color="text">
-                            &nbsp;<strong>30 done</strong> this month
+                            &nbsp;Total <strong>{userProjects.length} </strong>
                         </MDTypography>
                     </MDBox>
                 </MDBox>
-                <MDBox color="text" px={2}>
-                    <Icon sx={{cursor: "pointer", fontWeight: "bold"}} fontSize="small" onClick={openMenu}>
-                        more_vert
-                    </Icon>
-                </MDBox>
-                {renderMenu}
             </MDBox>
             <MDBox>
                 <DataTable
@@ -139,19 +108,7 @@ function Tasks() {
                     entriesPerPage={false}
                 />
             </MDBox>
-            <Dialog open={openDialog} onClose={handleCloseDialog}>
-                <DialogTitle>Create Task</DialogTitle>
-                <DialogContent>
-                    {/*<TaskForm onAddTask={handleAddTask}/>*/}
-                </DialogContent>
-                <MDButton onClick={handleCloseDialog} color="error">
-                    Cancel
-                </MDButton>
-            </Dialog>
-            <DialogActions>
 
-
-            </DialogActions>
         </Card>
     );
 }

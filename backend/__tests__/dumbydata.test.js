@@ -117,7 +117,7 @@ describe('Employee API endpoints', () => {
         await newEmployee.save()
         employeeId = newEmployee.id
         console.log(newEmployee);
-        appendToList(['employee', employeeId])
+        //appendToList(['employee', employeeId])
     });
 
     it('should create an employee', async () => {
@@ -131,7 +131,7 @@ describe('Employee API endpoints', () => {
         await newEmployee.save()
         employeeId2 = newEmployee.id
         console.log(newEmployee);
-        appendToList(['employee', employeeId])
+        //appendToList(['employee', employeeId])
     });
 
     it('should update user1', async () => {

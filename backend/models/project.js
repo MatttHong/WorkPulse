@@ -7,7 +7,7 @@ const projectSchema = mongoose.Schema({
     employees : { type: [String], default: [], required: true},
     tasks : { type: [String], default: [], required: true},
     departments: { type: [String], default: [], required: true},
-    status : { type: String, default: [], required: true },
+    status : { type: String, default: "Active", required: true },
 
 });
 

@@ -4,7 +4,7 @@ const employeeController = require('../controllers/employee');
 const { validateSession } = require('../controllers/session'); 
 const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
 
-router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams);
+// router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams);
 
 router.get('/:id', employeeController.getEmployeeById);
 

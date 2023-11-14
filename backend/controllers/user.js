@@ -65,9 +65,9 @@ exports.updateUser = async (req, res, next) => {
         if (!user) {
             throw new Error(`User not found, id:${userId}`);
         }
-        if (user._id.toString() != req.TokenUserId){
-            throw new Error("Invalid Credentials");
-        }
+        // if (user._id.toString() != req.TokenUserId){
+        //     throw new Error("Invalid Credentials");
+        // }
         // Update user properties as needed
         if (req.body.userName !== undefined) user.userName = req.body.userName;
         if (req.body.firstName !== undefined) user.firstName = req.body.firstName;

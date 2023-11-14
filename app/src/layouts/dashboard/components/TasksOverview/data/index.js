@@ -23,103 +23,50 @@ import MDAvatar from "components/MDAvatar";
 import Checkbox from '@mui/material/Checkbox';
 
 
-export default function data(userLogs) {
-    const avatars = (members) =>
-        members.map(([image, name]) => (
-            <Tooltip key={name} title={name} placeholder="bottom">
-                <MDAvatar
-                    src={image}
-                    alt="name"
-                    size="xs"
-                    sx={{
-                        border: ({borders: {borderWidth}, palette: {white}}) =>
-                            `${borderWidth[2]} solid ${white.main}`,
-                        cursor: "pointer",
-                        position: "relative",
-
-                        "&:not(:first-of-type)": {
-                            ml: -1.25,
-                        },
-
-                        "&:hover, &:focus": {
-                            zIndex: "10",
-                        },
-                    }}
-                />
-            </Tooltip>
-        ));
+export default function data(userProjects, userAdmins, userTasks) {
 
     const Company = ({image, name}) => (
         <MDBox display="flex" alignItems="center" lineHeight={1}>
-            <MDAvatar src={image} name={name} size="sm"/>
             <MDTypography variant="button" fontWeight="medium" ml={1} lineHeight={1}>
                 {name}
             </MDTypography>
         </MDBox>
     );
 
+    function findUserNameById(userId) {
+        const user = userAdmins.find((admin) => admin._id === userId);
+        return user ? `${user.firstName} ${user.lastName}` : 'Unknown';
+    }
+
+
+    // Transform the projects data into the required format for the rows
+    const projectRows = userProjects.map((project) => ({
+        name: <Company name={project.projectName} />,
+        admin: (
+            <MDTypography variant="caption" color="text" fontWeight="medium">
+                {project.projectAdministrators.map(findUserNameById).join(', ')}
+            </MDTypography>
+        ),
+        tasks: (
+            <MDTypography variant="caption" color="text" fontWeight="medium">
+                {project.tasks.length}
+            </MDTypography>
+        ),
+        status: (
+            <MDTypography variant="caption" color="text" fontWeight="medium">
+                {project.status}
+            </MDTypography>
+        )
+    }));
+
     return {
         columns: [
-            {Header: " ", accessor: "checkbox", width: "5%", align: "left"}, // Added a new column for checkboxes
-            {Header: "Task Name", accessor: "name", width: "45%", align: "left"},
-            {Header: "completion", accessor: "completion", align: "center"},
+            { Header: "Project Name", accessor: "name", width: "45%", align: "left" },
+            { Header: "Project", accessor: "project", width: "45%", align: "left" },
+            { Header: "Admin", accessor: "admin", align: "center" },
+            { Header: "Tasks", accessor: "tasks", align: "center" },
+            { Header: "Status", accessor: "status", align: "center" },
         ],
-
-        rows: [
-            {
-                checkbox: (
-                    <Checkbox
-                        // onChange={(event) => handleCheckboxChange(event, 'Material UI XD Version')}
-                        // You would need to handle the state management and submission logic in `handleCheckboxChange`
-                    />
-                ),
-                name: <Company name="Material UI XD Version"/>,
-                completion: (
-                    <MDTypography variant="caption" color="text" fontWeight="medium">
-                        Completed
-                    </MDTypography>
-                ),
-            },
-            {
-                name: <Company name="Add Progress Track"/>,
-                completion: (
-                    <MDTypography variant="caption" color="text" fontWeight="medium">
-                        Completed
-                    </MDTypography>
-                ),
-            },
-            {
-                name: <Company name="Fix Platform Errors"/>,
-                completion: (
-                    <MDTypography variant="caption" color="text" fontWeight="medium">
-                        Completed
-                    </MDTypography>
-                ),
-            },
-            {
-                companies: <Company name="Launch our Mobile App"/>,
-                completion: (
-                    <MDTypography variant="caption" color="text" fontWeight="medium">
-                        Completed
-                    </MDTypography>
-                ),
-            },
-            {
-                name: <Company name="Add the New Pricing Page"/>,
-                completion: (
-                    <MDTypography variant="caption" color="text" fontWeight="medium">
-                        Completed
-                    </MDTypography>
-                ),
-            },
-            {
-                name: <Company name="Redesign New Online Shop"/>,
-                completion: (
-                    <MDTypography variant="caption" color="text" fontWeight="medium">
-                        Completed
-                    </MDTypography>
-                ),
-            },
-        ],
+        rows: projectRows,
     };
 }

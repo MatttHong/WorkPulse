@@ -39,10 +39,10 @@ exports.updateProject = (req, res, next) => {
         if (!project) {
             throw new Error("Project not found");
         }
-
-        if(req.TokenUserId && !project.projectAdministrators.includes(req.TokenUserId)) {
-            throw new Error("Invalid Credentials");
-        }
+        // UNCOMMENT LINE BELOW
+        // if(req.TokenUserId && !project.projectAdministrators.includes(req.TokenUserId)) {
+        //     throw new Error("Invalid Credentials");
+        // }
 
         if (req.body.projectName !== undefined) project.projectName = req.body.projectName;
         if (req.body.projectAdministrators !== undefined) project.projectAdministrators = req.body.projectAdministrators;

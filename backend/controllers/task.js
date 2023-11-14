@@ -38,9 +38,10 @@ exports.updateTask = (req, res, next) => {
             throw new Error("Task not found");
         }
 
-        if(req.TokenUserId && !task.taskAdministrators.includes(req.TokenUserId)) {
-            throw new Error("Invalid Credentials");
-        }
+        // UNCOMMENT THIS LATER
+        // if(req.TokenUserId && !task.taskAdministrators.includes(req.TokenUserId)) {
+        //     throw new Error("Invalid Credentials");
+        // }
 
         if (req.body.taskName !== undefined) task.taskName = req.body.taskName;
         if (req.body.taskAdministrators !== undefined) task.taskAdministrators = req.body.taskAdministrators;

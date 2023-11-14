@@ -49,19 +49,19 @@ function Dashboard() {
                 <MDBox mt={4.5}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6} lg={4}>
-                            <MDBox mb={3}>
-                                <ReportsLineChart
-                                    color="success"
-                                    title="daily sales"
-                                    description={
-                                        <>
-                                            (<strong>+15%</strong>) increase in today sales.
-                                        </>
-                                    }
-                                    date="updated 4 min ago"
-                                    chart={sales}
-                                />
-                            </MDBox>
+                            {/*<MDBox mb={3}>*/}
+                            {/*    <ReportsLineChart*/}
+                            {/*        color="success"*/}
+                            {/*        title="daily sales"*/}
+                            {/*        description={*/}
+                            {/*            <>*/}
+                            {/*                (<strong>+15%</strong>) increase in today sales.*/}
+                            {/*            </>*/}
+                            {/*        }*/}
+                            {/*        date="updated 4 min ago"*/}
+                            {/*        chart={sales}*/}
+                            {/*    />*/}
+                            {/*</MDBox>*/}
                         </Grid>
                         {/* <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
@@ -83,12 +83,10 @@ function Dashboard() {
                             <TasksOverview/>
                         </Grid>
                         <Grid item xs={12} md={6} lg={8}>
-                            <ProjectsOverview/>
+                            <MembersOverview/>
                         </Grid>
                         <Grid item xs={12} md={6} lg={8}>
-                            <MDBox>
-                                <MembersOverview/>
-                            </MDBox>
+                            <ProjectsOverview/>
                         </Grid>
                     </Grid>
                 </MDBox>

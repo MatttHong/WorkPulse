@@ -4,7 +4,7 @@ const orgController = require("../controllers/organization");
 const { validateSession } = require('../controllers/session'); 
 const { checkBodyForLongValues, validateAndFormatEmailParams } = require('../controllers/filter'); 
 
-router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams);
+// router.use(validateSession, checkBodyForLongValues, validateAndFormatEmailParams);
 
 router.post('', orgController.createOrg);
 

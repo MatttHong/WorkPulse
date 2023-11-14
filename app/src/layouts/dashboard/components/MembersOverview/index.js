@@ -13,7 +13,7 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -32,68 +32,125 @@ import MDInput from "components/MDInput";
 import DataTable from "examples/Tables/DataTable";
 
 // Data
-import MDButton from "components/MDButton";
-import membersTableData from "layouts/dashboard/components/MembersOverview/data/membersTableData";
-import InviteComponent from "./invite";
+import data from "layouts/dashboard/components/MembersOverview/data";
 
 
 function MembersOverview() {
-    const {columns, rows} = membersTableData();
-    const [menu, setMenu] = useState(null);
+    const handleCompleteTask = (taskId) => {
+        setUserTasks((prevTasks) =>
+            prevTasks.map((task) => {
+                if (task._id === taskId) {
+                    return { ...task, status: 'Completed' };
+                }
+                return task;
+            })
+                .sort((a, b) => (a.status === 'Completed' ? 1 : -1)) // Sort tasks after updating the status
+        );
+    };
 
-    const openMenu = ({currentTarget}) => setMenu(currentTarget);
-    const closeMenu = () => setMenu(null);
+    const [userProjects, setUserProjects] = useState([]); // Initial state as null or appropriate default
+    const [userAdmins, setUserAdmins] = useState([]);
+    const [userTasks, setUserTasks] = useState([]);
+    const {columns, rows} = data(userProjects, userAdmins, userTasks, handleCompleteTask);
 
-    const renderMenu = (
-        <Menu
-            id="simple-menu"
-            anchorEl={menu}
-            anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
-            }}
-            transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-            }}
-            open={Boolean(menu)}
-            onClose={closeMenu}
-        >
-            <MenuItem onClick={closeMenu}></MenuItem>
-        </Menu>
-    );
+    useEffect(() => {
+        const fetchProjects = async () => {
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/proj/`, {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserProjects(data.projects); // Set all the projects
+
+                    // Fetch each project administrator's details
+                    for (const project of data.projects) {
+                        for (const adminId of project.projectAdministrators) {
+                            const userResponse = await fetch(`http://localhost:3000/api/users/${adminId}`, {
+                                headers: {
+                                    Authorization: "Bearer " + token,
+                                }
+                            });
+
+                            if (userResponse.ok) {
+                                const adminData = await userResponse.json();
+                                setUserAdmins(prevAdmins => [...prevAdmins, adminData.user]);
+                            } else {
+                                console.error('Failed to fetch admin data:', userResponse.status);
+                            }
+                        }
+                    }
+
+                    for (const project of data.projects) {
+                        for (const taskID of project.tasks) {
+                            const userResponse = await fetch(`http://localhost:3000/api/task/${taskID}`, {
+                                headers: {
+                                    Authorization: "Bearer " + token,
+                                }
+                            });
+
+                            if (userResponse.ok) {
+                                const taskData = await userResponse.json();
+                                setUserTasks(prevTasks => [...prevTasks, taskData.task]);
+                            } else {
+                                console.error('Failed to fetch task data:', userResponse.status);
+                            }
+                        }
+                    }
+                } else {
+                    console.error('Failed to fetch tasks:', response.status);
+                }
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
+    console.log("PROJECTS", userProjects);
+    console.log("ADMINS", userAdmins);
+    console.log("TASKS", userTasks);
 
     return (
-        <Grid item xs={10}>
-            <Card>
-                <MDBox pt={3}>
-                    <DataTable
-                        table={{columns, rows}}
-                        isSorted={false}
-                        entriesPerPage={false}
-                        showTotalEntries={false}
-                        noEndBorder
-                    />
+        <Card>
+            <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+                <MDBox>
+                    <MDTypography variant="h6" gutterBottom>
+                         Tasks
+                    </MDTypography>
+                    <MDBox display="flex" alignItems="center" lineHeight={0}>
+                        <Icon
+                            sx={{
+                                fontWeight: "bold",
+                                color: "green",
+                                mt: -0.5,
+                            }}
+                        >
+                            done
+                        </Icon>
+                        <MDTypography variant="button" fontWeight="regular" color="text">
+                            &nbsp;<strong>1</strong> done
+                        </MDTypography>
+                    </MDBox>
                 </MDBox>
-            </Card>
-            <MDBox
-                mt={3}
-                py={2}
-                px={2}
-
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-            >
-                <MDTypography variant="h6" color="white">
-                    Members Overview
-                </MDTypography>
-                <Grid item xs={12}>
-                    <InviteComponent/>
-                </Grid>
             </MDBox>
-        </Grid>
+            <MDBox>
+                <DataTable
+                    table={{columns, rows}}
+                    showTotalEntries={false}
+                    isSorted={false}
+                    noEndBorder
+                    entriesPerPage={false}
+                />
+            </MDBox>
+
+        </Card>
     );
 }
 
