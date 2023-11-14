@@ -111,12 +111,12 @@ describe('Employee API endpoints', () => {
             organizationName: "TestOrg",
             organizationEmail: "testorg1@example.com",
             organizationAdministrators: [id2],
-            employees: [userId],
+            employees: [],
             industry: "Technology"
         };
 
         const response = await request.post('/api/org')
-            .set('Authorization', `Bearer ${userToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send(newOrg);
 
         if (response.status === 201) {
