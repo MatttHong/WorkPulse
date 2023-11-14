@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const app = require('../app');
 const mongoose = require('mongoose');
-const { popFromList, isListPopulated, removeFromList, appendToList, clean, getList, listLength, getToken } = require('../utils/moduleForTestingSupport');
+const { popFromList, isListPopulated, removeFromList, appendToList, clean, getList, listLength } = require('../utils/moduleForTestingSupport');
 
 const request = supertest(app);
 let userToken;
@@ -30,6 +30,14 @@ describe('Department API endpoints', () => {
   let token;
   let userpas = 'password1!D';
   let userem = 'testest@example.com';
+  describe('Should always work', () =>{
+
+    test('this test will always pass', () => {
+      expect(true).toBe(true);
+    });
+    
+  });
+  
   describe('Setup For Future Tests', () => {
     it('should create a new user then log in', async () => {
       const userResponse = await supertest(app)

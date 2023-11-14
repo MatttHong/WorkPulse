@@ -28,6 +28,7 @@ import { BrowserRoute, Switch, Route } from "react-router-dom";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import AcceptInvitation from "layouts/dashboard/components/MembersOverview/acceptInvite"; // This is the component you will create
+import OrgsPage from "layouts/organizations";
 
 const acceptInvitationRoute = {
   type: "collapse",
@@ -107,6 +108,13 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+  },
+  {
+    type: "collapse",
+    name: "Organizations",
+    key: "orgs",
+    route: "/organizations",
+    component: <OrgsPage />,
   },
 ];
 // routes.push(acceptInvitationRoute);

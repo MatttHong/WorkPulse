@@ -12,9 +12,7 @@ function appendToList(newValues, globState = '__TEST_STATE__', globVar = 'usersT
     if(!b){
         console.log("PROBLEM MAYBE BIG MAYBE SMALL " + a + " " + b)
     }
-    console.log('ye')
     currentValues.push(newValues);
-    console.log("pushed new values: " + newValues + " to " + currentValues);
     global[globState][globVar] = currentValues;
 }
 
@@ -96,62 +94,62 @@ function initList(globState = '__TEST_STATE__', globVar = 'usersToDelete'){
 }
 
 
-function callback(){
-    console.log("Eval " + (global.__TEST_STATE__.userToken && 
-        !global.__TEST_STATE__.isTokenLocked));
+// function callback(){
+//     console.log("Eval " + (global.__TEST_STATE__.userToken && 
+//         !global.__TEST_STATE__.isTokenLocked));
         
 
-}
+// }
 
 // Managing the token:
-function waitForToken() {
-    console.log(global.__TEST_STATE__);
-    if (!global.__TEST_STATE__) {
-        global.__TEST_STATE__ = {};
-    }
-    // 654ed24b3107606007d2cc38
-    // 654ed24d7d8ccb0e6149ddc2
-    return new Promise((resolve, reject) => {
-        const intervalIds = setInterval(() => {}, 100); // checks every 100 milliseconds
+// function waitForToken() {
+//     console.log(global.__TEST_STATE__);
+//     if (!global.__TEST_STATE__) {
+//         global.__TEST_STATE__ = {};
+//     }
+//     // 654ed24b3107606007d2cc38
+//     // 654ed24d7d8ccb0e6149ddc2
+//     return new Promise((resolve, reject) => {
+//         const intervalIds = setInterval(() => {}, 100); // checks every 100 milliseconds
 
-        setTimeout(() => {
-            clearInterval(intervalId);
-            reject(new Error("Timeout waiting for token"));
-        }, 10000); // 10 seconds timeout
-    });
-}
+//         setTimeout(() => {
+//             clearInterval(intervalId);
+//             reject(new Error("Timeout waiting for token"));
+//         }, 10000); // 10 seconds timeout
+//     });
+// }
 
-async function getToken() {
-    try {
-        const token = await waitForToken();
-        return token;
-    } catch (error) {
-        console.log('Error getting token:', error);
-        throw error;
-    }
-}
+// async function getToken() {
+//     try {
+//         const token = await waitForToken();
+//         return token;
+//     } catch (error) {
+//         console.log('Error getting token:', error);
+//         throw error;
+//     }
+// }
 
-function lockToken() {
-    if (!global.__TEST_STATE__) {
-        global.__TEST_STATE__ = {};
-    }
-    global.__TEST_STATE__.isTokenLocked = true;
-}
+// function lockToken() {
+//     if (!global.__TEST_STATE__) {
+//         global.__TEST_STATE__ = {};
+//     }
+//     global.__TEST_STATE__.isTokenLocked = true;
+// }
 
-function unlockToken() {
-    if (global.__TEST_STATE__) {
-        global.__TEST_STATE__.isTokenLocked = false;
-    }
-}
+// function unlockToken() {
+//     if (global.__TEST_STATE__) {
+//         global.__TEST_STATE__.isTokenLocked = false;
+//     }
+// }
 
-function addToken(token) {
-    if (!global.__TEST_STATE__) {
-        global.__TEST_STATE__ = {};
-    }
-    global.__TEST_STATE__.userToken = token;
-    unlockToken();
-    // return token;
-}
+// function addToken(token) {
+//     if (!global.__TEST_STATE__) {
+//         global.__TEST_STATE__ = {};
+//     }
+//     global.__TEST_STATE__.userToken = token;
+//     unlockToken();
+//     // return token;
+// }
 
 async function clean(userToken = process.env.AUTH_TOKEN){
     // let userToken = process.env.AUTH_TOKEN;
@@ -186,11 +184,11 @@ module.exports = {
     removeFromList,
     isListPopulated,
     listLength,
-    getToken,
-    lockToken,
-    unlockToken,
+    // getToken,
+    // lockToken,
+    // unlockToken,
     initList,
-    addToken,
+    // addToken,
     clean,
     popFromList
 };

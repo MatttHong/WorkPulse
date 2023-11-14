@@ -1,91 +1,84 @@
 const emailNewUser = require('../utils/smtps.js');
 const Employee = require('../models/employee'); // Import your Mongoose model for employees
 const Status = require('../utils/status'); // Import your Mongoose model for employees
-const User = require('../models/user')
+const User = require('../models/user');
+const { createSession } = require('../controllers/session.js');
 // const { REACTURL } = require('../utils/environment');
 const REACTURL = process.env.REACTURL || 'http://localhost:3001'
 
 exports.inviteUser = async (req, res) => {
   try {
-    const { businessId, email } = req.body;
-
+    const { orgId, email } = req.body;
     // Check if email, header, and body are provided in the request body
-    if (!businessId || !email) {
-      return res.status(400).json({ error: 'Email, header, and body are required.' });
+    if (!orgId || !email) {
+      return res.status(400).json({ message: 'Email and orgId are required.' });
     }
 
     // Use async/await to query the employee
-    const existingEmployee = await Employee.findOne({ email, businessId });
+    const existingEmployee = await Employee.findOne({ email, orgId });
 
     if (existingEmployee) {
-      console.log('existing')
-      // Employee with the same email and businessId found; proceed with sending an email
+      // Employee with the same email and orgId found; proceed with sending an email
       existingEmployee.generateInviteToken(); // Generate a new token
       await existingEmployee.save(); // Save the updated employee with the new token
-      //existingEmployee.addToBusiness();
+      //existingEmployee.addToOrg();
       CreateEmailInvite(email, existingEmployee._id, true, existingEmployee.inviteToken)
         .then((inviteEmail) => {
             if (inviteEmail) {
-                console.log('win');
                 if(process.env.NODE_ENV === 'test'){
                   return res.status(200).json({ message: 'Invitation email sent successfully.', 
                                              employeeId: existingEmployee._id,
                                             inviteToken: existingEmployee.inviteToken,
-                                                  email: email });
+                                                  email: email,
+                                                    new: false
+                                                  });
                 } else {
                   return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
                 }
             } else {
-                console.log('loss');
-                return res.status(500).json({ error: 'Internal server error' });
+                return res.status(500).json({ message: 'Internal server error' });
             }
         })
         .catch((error) => {
-            console.error('Error sending invitation email:', error);
-            return res.status(500).json({ error: 'Internal server error' });
+            return res.status(500).json({ 
+              message: 'Internal server error', 
+              error: error
+          });
         });
     } else {
-      console.log('new')
       // Create a new employee object with default values
       const newEmployee = new Employee({
         email,
-        businessId,
+        orgId,
         status: Status.invited,
         // Add any other default values from your Employee model here
       });
-      
+      // if(process.env.NODE_ENV === 'test'){
+      // }
       newEmployee.generateInviteToken();
-      newEmployee.addToBusiness();
+      newEmployee.addToOrg();
       // Save the new employee object to the database
       await newEmployee.save();
-      inviteEmail = await CreateEmailInvite(email, newEmployee._id, false, existingEmployee.inviteToken)
+      inviteEmail = await CreateEmailInvite(email, newEmployee._id, false, newEmployee.inviteToken)
       if (inviteEmail) {
-          console.log('win');
-          return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
+          if(process.env.NODE_ENV === 'test'){
+            return res.status(200).json({ message: 'Invitation email sent successfully.', 
+                                       employeeId: newEmployee._id,
+                                      inviteToken: newEmployee.inviteToken,
+                                            email: email,
+                                              new: true
+                                          });
+          } else {
+              return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
+          }
       } else {
-          console.log('loss');
-          return res.status(500).json({ error: 'Internal server error' });
+          return res.status(500).json({ message: 'Internal server error' });
       }
-      // Generate the invite email with the new employeeId and token
-      // CreateEmailInvite(email, existingEmployee._id, true, existingEmployee.inviteToken)
-      //   .then((inviteEmail) => {
-      //       if (inviteEmail) {
-      //           console.log('win');
-      //           return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: newEmployee._id });
-      //       } else {
-      //           console.log('loss');
-      //           return res.status(500).json({ error: 'Internal server error' });
-      //       }
-      //   })
-      //   .catch((error) => {
-      //       console.error('Error sending invitation email:', error);
-      //       return res.status(500).json({ error: 'Internal server error' });
-      //   });
-      // Respond with the newly created employee's _id
+
     }
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.log(error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -95,21 +88,21 @@ exports.acceptInvite = async (req, res, next) => {
       const { employeeId, email, inviteToken } = req.body;
   
       if (!employeeId || !email || !inviteToken) {
-        return res.status(400).json({ error: 'Missing required fields' });
+        return res.status(400).json({ message: 'Missing required fields' });
       }
   
       // Find the employee by their ID and check if the invite token is valid
       const employee = await Employee.findById(employeeId);
       
       if (!employee) {
-        return res.status(404).json({ error: 'Employee not found' });
+        return res.status(404).json({ message: 'Employee not found' });
       }
   
       // Check if the invite token is valid
       const isTokenValid = await Employee.isInviteTokenValid(inviteToken);
   
       if (!isTokenValid) {
-        return res.status(400).json({ error: 'Invalid invite token' });
+        return res.status(400).json({ message: 'Invalid invite token' });
       }
   
       // Find the user by their email
@@ -143,13 +136,13 @@ exports.acceptInvite = async (req, res, next) => {
      
     } catch (error) {
       // Handle any errors that occur during the process
-      console.error(error);
-      return res.status(500).json({ error: 'Internal server error' });
+      console.log(error);
+      return res.status(500).json({ message: 'Internal server error' });
     }
   };  
 
 function CreateEmailInvite(email, employeeId, invited, token) {
-    if(invited) {
+  if(invited) {
         header = "Resending Invitation To Join Pulse"
     } else {
         header = "Invitation To Join Pulse"
@@ -175,15 +168,13 @@ function CreateEmailInvite(email, employeeId, invited, token) {
       emailNewUser(email, header, body)
         .then((result) => {
             if (result) {
-                console.log('success');
                 resolve(true);
             } else {
-                console.log('fail');
                 resolve(false);
             }
         })
         .catch((error) => {
-            console.error('Error sending email:', error);
+            console.log('Error sending email:', error);
             resolve(false);
         });
     });

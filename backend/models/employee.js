@@ -10,7 +10,7 @@ const employeeSchema = new Schema({
   email: { type: String, required: true },
   logs: { type: [String], default: [], required: true },
   employees: { type: [String], default: [], required: true },
-  businessId: { type: String, required: true },
+  orgId: { type: String, required: true },
   status: { type: String, required: true },
   inviteToken: {
     type: String,
@@ -41,9 +41,9 @@ employeeSchema.statics.isInviteTokenValid = async function (token) {
   return currentTimestamp <= employee.inviteTokenExpiration;
 };
 
-employeeSchema.methods.addToBusiness = function () {
+employeeSchema.methods.addToOrg = function () {
     return new Promise((resolve, reject) => {
-      Organization.findById(this.businessId)
+      Organization.findById(this.orgId)
         .then(org => {
           if (!org) {
             reject(new Error("Organization not found."));

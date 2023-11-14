@@ -18,6 +18,7 @@ const limits = {
     tasks : { min: 24, max: 24 },
     userId : { min: 24, max: 24 },
     businessId : { min: 24, max: 24 },
+    orgId : { min: 24, max: 24 },
     employeeId : { min: 24, max: 24 },
     inviteToken : { min: 33, max: 37 },
     log : { max: -1 },
@@ -108,7 +109,7 @@ const validateAndFormatEmailParams = (req, res, next) => {
           // Validate the email format
           if (!emailRegex.test(req.body[key])) {
             let temp = req.params[key]
-            console.log(temp)
+            // console.log(temp)
             badEmail.push(temp) 
 
             // return res.status(400).json({

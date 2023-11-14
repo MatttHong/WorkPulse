@@ -33,6 +33,14 @@ describe('Organization API endpoints', () => {
     let token, orgId, id;
     let token2, id2;
 
+    describe('Should always work', () =>{
+
+        test('this test will always pass', () => {
+          expect(true).toBe(true);
+        });
+        
+      });
+
     describe('Setup For Future Tests', () => {
         it('should create a new user then log in', async () => {
           const userResponse = await supertest(app)
@@ -87,7 +95,7 @@ describe('Organization API endpoints', () => {
                 .set('Authorization', `Bearer ${userToken}`)
                 .send(newOrg);
             if (response.status === 201) {
-                appendToList(['org', orgId]);
+                appendToList(['org', response.body.org.id]);
             }
             expect(response.body.message).toEqual("Organization added successfully");
             expect(response.status).toBe(201);

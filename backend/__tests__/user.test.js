@@ -2,7 +2,7 @@
 const supertest = require('supertest');
 const app = require('../app'); 
 const mongoose = require('mongoose');
-const { popFromList, isListPopulated, removeFromList, appendToList, clean, getList, listLength, getToken } = require('../utils/moduleForTestingSupport');
+const { popFromList, isListPopulated, removeFromList, appendToList, clean, getList, listLength } = require('../utils/moduleForTestingSupport');
 
 const request = supertest(app);
 let userToken;
