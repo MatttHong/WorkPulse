@@ -86,7 +86,7 @@ describe('Employee API endpoints', () => {
             });
         if (userResponse2.statusCode === 201){
 
-            appendToList(['users', userResponse2.body.post._id]);
+            // appendToList(['users', userResponse2.body.post._id]);
             id2 = userResponse2.body.post._id
             expect(listLength()).toBeGreaterThan(0);
 
@@ -120,7 +120,7 @@ describe('Employee API endpoints', () => {
             .send(newOrg);
 
         if (response.status === 201) {
-            appendToList(['org', response.body.org._id]);
+            // appendToList(['org', response.body.org._id]);
         }
         expect(response.body.message).toEqual("Organization added successfully");
         expect(response.status).toBe(201);
