@@ -60,43 +60,12 @@ function Projects() {
 
                 }
             } catch (error) {
-                console.error("Failed to fetch user data:", error);
+                console.error("Failed to fetch log data:", error);
             }
         };
 
         fetchLogData();
     }, []); // The empty array means this effect will only run once, similar to componentDidMount
-
-    const openMenu = ({currentTarget}) => setMenu(currentTarget);
-    const closeMenu = () => setMenu(null);
-
-    const handleOpenDialog = () => {
-
-        setOpenDialog(true);
-        closeMenu();
-    };
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-    };
-    const renderMenu = (
-        <Menu
-            id="simple-menu"
-            anchorEl={menu}
-            anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
-            }}
-            transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-            }}
-            open={Boolean(menu)}
-            onClose={closeMenu}
-        >
-            <MenuItem onClick={handleOpenDialog}>New Project</MenuItem>
-        </Menu>
-    );
-
 
 
     return (

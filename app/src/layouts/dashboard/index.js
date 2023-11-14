@@ -1,17 +1,17 @@
 /**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
+ =========================================================
+ * Material Dashboard 2 React - v2.2.0
+ =========================================================
 
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
+ * Product Page: https://www.creative-tim.com/product/material-dashboard-react
+ * Copyright 2023 Creative Tim (https://www.creative-tim.com)
 
-Coded by www.creative-tim.com
+ Coded by www.creative-tim.com
 
  =========================================================
 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ */
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -35,66 +35,35 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 import ProjectsOverview from "layouts/dashboard/components/ProjectsOverview";
 import TasksOverview from "layouts/dashboard/components/TasksOverview";
 import MembersOverview from "layouts/dashboard/components/MembersOverview";
+
 // import InviteComponent from "components/MembersOverview/invite/invite";
 
 
 function Dashboard() {
-  const { sales, tasks } = reportsLineChartData;
+    const {sales, tasks} = reportsLineChartData;
 
-  return (
-    <DashboardLayout>
-      <DashboardNavbar />
-      <MDBox py={3}>
-        <Grid container spacing={3}>
-          
-          {/* <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Today's Work"
-                count="6 hours today"
-                percentage={{
-                  color: "success",
-                  amount: "+3%",
-                  label: "than yesterday",
-                }}
-              />
-            </MDBox>
-          </Grid> */}
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="success"
-                icon="store"
-                title="Revenue"
-                count="34k"
-                percentage={{
-                  color: "success",
-                  amount: "+1%",
-                  label: "than yesterday",
-                }}
-              />
-            </MDBox>
-          </Grid>
-        </Grid>
-        <MDBox mt={4.5}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="success"
-                  title="daily sales"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today sales.
-                    </>
-                  }
-                  date="updated 4 min ago"
-                  chart={sales}
-                />
-              </MDBox>
-            </Grid>
-            {/* <Grid item xs={12} md={6} lg={4}>
+    return (
+        <DashboardLayout>
+            <DashboardNavbar/>
+            <MDBox py={3}>
+                <MDBox mt={4.5}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} md={6} lg={4}>
+                            <MDBox mb={3}>
+                                <ReportsLineChart
+                                    color="success"
+                                    title="daily sales"
+                                    description={
+                                        <>
+                                            (<strong>+15%</strong>) increase in today sales.
+                                        </>
+                                    }
+                                    date="updated 4 min ago"
+                                    chart={sales}
+                                />
+                            </MDBox>
+                        </Grid>
+                        {/* <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="dark"
@@ -105,27 +74,28 @@ function Dashboard() {
                 />
               </MDBox>
             </Grid> */}
-          </Grid>
-        </MDBox>
-        <MDBox>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={8}>
-              <ProjectsOverview />
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <TasksOverview />
-            </Grid>
-            <Grid item xs={12} md={6} lg={8}>
-              <MDBox>
-                <MembersOverview />
-              </MDBox>
-            </Grid>
-          </Grid>
-        </MDBox>
-      </MDBox>
-      <Footer />
-    </DashboardLayout>
-  );
+                    </Grid>
+                </MDBox>
+
+                <MDBox>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} md={6} lg={8}>
+                            <TasksOverview/>
+                        </Grid>
+                        <Grid item xs={12} md={6} lg={8}>
+                            <ProjectsOverview/>
+                        </Grid>
+                        <Grid item xs={12} md={6} lg={8}>
+                            <MDBox>
+                                <MembersOverview/>
+                            </MDBox>
+                        </Grid>
+                    </Grid>
+                </MDBox>
+            </MDBox>
+            <Footer/>
+        </DashboardLayout>
+    );
 }
 
 export default Dashboard;
