@@ -47,218 +47,218 @@ describe('Invite API endpoints', () => {
         
     });
 
-    // describe('Proper Testing', () => {
+    describe('Proper Testing', () => {
 
-    //     describe('setup with new organization', () => {
-    //         it('should create a new organization', async () => {
-    //             const newOrg = { 
-    //                 organizationName: "TestOrg",
-    //                 organizationEmail: "testorggg333@example.com",
-    //                 organizationAdministrators: [],
-    //                 employees: [userId],
-    //                 industry: ["Technology"]
-    //             };
+        describe('setup with new organization', () => {
+            it('should create a new organization', async () => {
+                const newOrg = { 
+                    organizationName: "TestOrg",
+                    organizationEmail: "testorggg333@example.com",
+                    organizationAdministrators: [],
+                    employees: [userId],
+                    industry: ["Technology"]
+                };
 
-    //             const response = await request.post('/api/org')
-    //                 .set('Authorization', `Bearer ${userToken}`)
-    //                 .send(newOrg);
-    //             if (response.status === 201) {
-    //                 appendToList(['org', response.body.org.id]);
-    //             }
-    //             expect(response.body.message).toEqual("Organization added successfully");
-    //             expect(response.status).toBe(201);
-    //             expect(response.body.org.organizationAdministrators).toEqual([userId]);
-    //             orgId = response.body.org.id;
-    //             expect(orgId).toBeTruthy();
-    //         });
-    //     });
+                const response = await request.post('/api/org')
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .send(newOrg);
+                if (response.status === 201) {
+                    appendToList(['org', response.body.org.id]);
+                }
+                expect(response.body.message).toEqual("Organization added successfully");
+                expect(response.status).toBe(201);
+                expect(response.body.org.organizationAdministrators).toEqual([userId]);
+                orgId = response.body.org.id;
+                expect(orgId).toBeTruthy();
+            });
+        });
 
-    //     describe('Invite a new user through the whole pipeline', () => {
+        describe('Invite a new user through the whole pipeline', () => {
         
-    //         it('Inviting a new email', async () => {
-    //             const data = { 
-    //                 email: "testin1234321@example.com",
-    //                 orgId: orgId
-    //             };
-    //             const response = await request.post('/api/invite')
-    //                 .set('Authorization', `Bearer ${userToken}`)
-    //                 .send(data);
+            it('Inviting a new email', async () => {
+                const data = { 
+                    email: "testin1234321@example.com",
+                    orgId: orgId
+                };
+                const response = await request.post('/api/invite')
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .send(data);
                 
-    //             if(response.status === 200){
-    //                 appendToList(['employee', response.body.employeeId]);
-    //                 // if(response.body.userId){
-    //                 //     appendToList(['user', response.body.userId]);
-    //                 // }
-    //             }
-    //             expect(response.body.message).toEqual('Invitation email sent successfully.');
-    //             expect(response.status).toBe(200);
-    //             expect(response.body.new).toEqual(true)
-    //             // expect(response.body).not.toHaveProperty('userId');
-    //             employeeId = response.body.employeeId;
-    //             inviteToken = response.body.inviteToken;
-    //             email = response.body.email;
+                if(response.status === 200){
+                    appendToList(['employee', response.body.employeeId]);
+                    // if(response.body.userId){
+                    //     appendToList(['user', response.body.userId]);
+                    // }
+                }
+                expect(response.body.message).toEqual('Invitation email sent successfully.');
+                expect(response.status).toBe(200);
+                expect(response.body.new).toEqual(true)
+                // expect(response.body).not.toHaveProperty('userId');
+                employeeId = response.body.employeeId;
+                inviteToken = response.body.inviteToken;
+                email = response.body.email;
 
-    //             expect(employeeId).toBeDefined();
-    //             expect(employeeId).not.toBeNull();
-    //             expect(employeeId).toBeTruthy();
+                expect(employeeId).toBeDefined();
+                expect(employeeId).not.toBeNull();
+                expect(employeeId).toBeTruthy();
                 
-    //             expect(inviteToken).toBeDefined();
-    //             expect(inviteToken).not.toBeNull();
-    //             expect(inviteToken).toBeTruthy();
+                expect(inviteToken).toBeDefined();
+                expect(inviteToken).not.toBeNull();
+                expect(inviteToken).toBeTruthy();
                 
-    //             expect(email).toBeDefined();
-    //             expect(email).not.toBeNull();
-    //             expect(email).toBeTruthy();
+                expect(email).toBeDefined();
+                expect(email).not.toBeNull();
+                expect(email).toBeTruthy();
                 
-    //         });
+            });
 
-    //         it('waiting for 500ms', async () => {
-    //             await sleep(500); // Sleep for 500 ms
-    //         });
+            it('waiting for 500ms', async () => {
+                await sleep(500); // Sleep for 500 ms
+            });
 
-    //         it('Reinviting an email', async () => {
-    //             const data = { 
-    //                 email: "testin1234321@example.com",
-    //                 orgId: orgId
-    //             };
-    //             const response = await request.post('/api/invite')
-    //                 .set('Authorization', `Bearer ${userToken}`)
-    //                 .send(data);
+            it('Reinviting an email', async () => {
+                const data = { 
+                    email: "testin1234321@example.com",
+                    orgId: orgId
+                };
+                const response = await request.post('/api/invite')
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .send(data);
                 
-    //             if(response.status === 200){
-    //                 appendToList(['employee', response.body.employeeId]);
-    //                 // if(response.body.userId){
-    //                 //     appendToList(['user', response.body.userId]);
-    //                 // }
-    //             }
-    //             expect(response.body.message).toEqual('Invitation email sent successfully.');
-    //             expect(response.status).toBe(200);
-    //             expect(response.body.new).toEqual(false)
-    //             // expect(response.body).toHaveProperty('userId');
-    //             employeeId = response.body.employeeId;
-    //             inviteToken = response.body.inviteToken;
-    //             email = response.body.email;
+                if(response.status === 200){
+                    appendToList(['employee', response.body.employeeId]);
+                    // if(response.body.userId){
+                    //     appendToList(['user', response.body.userId]);
+                    // }
+                }
+                expect(response.body.message).toEqual('Invitation email sent successfully.');
+                expect(response.status).toBe(200);
+                expect(response.body.new).toEqual(false)
+                // expect(response.body).toHaveProperty('userId');
+                employeeId = response.body.employeeId;
+                inviteToken = response.body.inviteToken;
+                email = response.body.email;
 
-    //             expect(employeeId).toBeDefined();
-    //             expect(employeeId).not.toBeNull();
-    //             expect(employeeId).toBeTruthy();
+                expect(employeeId).toBeDefined();
+                expect(employeeId).not.toBeNull();
+                expect(employeeId).toBeTruthy();
                 
-    //             expect(inviteToken).toBeDefined();
-    //             expect(inviteToken).not.toBeNull();
-    //             expect(inviteToken).toBeTruthy();
+                expect(inviteToken).toBeDefined();
+                expect(inviteToken).not.toBeNull();
+                expect(inviteToken).toBeTruthy();
                 
-    //             expect(email).toBeDefined();
-    //             expect(email).not.toBeNull();
-    //             expect(email).toBeTruthy();
+                expect(email).toBeDefined();
+                expect(email).not.toBeNull();
+                expect(email).toBeTruthy();
                 
-    //         });
+            });
 
-    //     });
+        });
 
-    //     describe('Accepting new invite', () => {
-    //         it('should return 400 if required fields are missing', async () => {
-    //             const data = {}; // Missing required fields
+        describe('Accepting new invite', () => {
+            it('should return 400 if required fields are missing', async () => {
+                const data = {}; // Missing required fields
             
-    //             const response = await request.put('/api/invite')
-    //             .send(data);
+                const response = await request.put('/api/invite')
+                .send(data);
             
-    //             expect(response.status).toBe(400);
-    //             expect(response.body.message).toBe('Missing required fields');
-    //         });
+                expect(response.status).toBe(400);
+                expect(response.body.message).toBe('Missing required fields');
+            });
             
-    //         it('should return 404 if employee does not exist', async () => {
-    //             const data = {
-    //             employeeId: userId,
-    //             email: email,
-    //             inviteToken: inviteToken,
-    //             };
+            it('should return 404 if employee does not exist', async () => {
+                const data = {
+                employeeId: userId,
+                email: email,
+                inviteToken: inviteToken,
+                };
             
-    //             const response = await request.put('/api/invite')
-    //             .send(data);
+                const response = await request.put('/api/invite')
+                .send(data);
             
-    //             expect(response.status).toBe(404);
-    //             expect(response.body.message).toBe('Employee not found');
-    //         });
+                expect(response.status).toBe(404);
+                expect(response.body.message).toBe('Employee not found');
+            });
             
-    //         it('should return 400 if invite token is invalid', async () => {
+            it('should return 400 if invite token is invalid', async () => {
 
-    //             const newEmployee = new Employee({
-    //                 email: email,
-    //                 orgId: orgId,
-    //             }); 
+                const newEmployee = new Employee({
+                    email: email,
+                    orgId: orgId,
+                }); 
 
-    //             newEmployee.generateInviteToken()
+                newEmployee.generateInviteToken()
 
-    //             const data = {
-    //                 employeeId: employeeId,
-    //                 email: email,
-    //                 inviteToken: newEmployee.inviteToken,
-    //             };
+                const data = {
+                    employeeId: employeeId,
+                    email: email,
+                    inviteToken: newEmployee.inviteToken,
+                };
             
-    //             const response = await request.put('/api/invite')
-    //                 .send(data);
+                const response = await request.put('/api/invite')
+                    .send(data);
             
-    //             expect(response.body.message).toBe('Invalid invite token');
-    //             expect(response.status).toBe(400);
-    //         });
+                expect(response.body.message).toBe('Invalid invite token');
+                expect(response.status).toBe(400);
+            });
             
-    //         it('should return 400 if an middleware error occurs', async () => {
-    //             // Mocking an internal server error by passing invalid data
-    //             const data = {
-    //                 employeeId: 'validemployeeid',
-    //                 email: 'invalid@email', // Invalid email format
-    //                 inviteToken: 'validtoken',
-    //             };
+            it('should return 400 if an middleware error occurs', async () => {
+                // Mocking an internal server error by passing invalid data
+                const data = {
+                    employeeId: 'validemployeeid',
+                    email: 'invalid@email', // Invalid email format
+                    inviteToken: 'validtoken',
+                };
             
-    //             const response = await request.put('/api/invite')
-    //                 .set('Authorization', `Bearer ${userToken}`)
-    //                 .send(data);
+                const response = await request.put('/api/invite')
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .send(data);
             
-    //             expect(response.body.message).toBe('Request body contains values with invalid lengths.');
-    //             expect(response.status).toBe(400);
+                expect(response.body.message).toBe('Request body contains values with invalid lengths.');
+                expect(response.status).toBe(400);
 
-    //         });
+            });
 
-    //         it('should return 400 if an middleware error occurs', async () => {
-    //             // Mocking an internal server error by passing invalid data
-    //             const data = {
-    //                 employeeId: userId,
-    //                 email: 'invalidemail', // Invalid email format
-    //                 inviteToken: inviteToken,
-    //             };
+            it('should return 400 if an middleware error occurs', async () => {
+                // Mocking an internal server error by passing invalid data
+                const data = {
+                    employeeId: userId,
+                    email: 'invalidemail', // Invalid email format
+                    inviteToken: inviteToken,
+                };
             
-    //             const res = await request.put('/api/invite')
-    //             .set('Authorization', `Bearer ${userToken}`)
-    //             .send(data);
+                const res = await request.put('/api/invite')
+                .set('Authorization', `Bearer ${userToken}`)
+                .send(data);
                 
-    //             expect(res.body.message).toBe('Invalid email format.');
-    //             expect(res.status).toBe(400);
-    //         });
+                expect(res.body.message).toBe('Invalid email format.');
+                expect(res.status).toBe(400);
+            });
 
-    //         it('should return 200 for a proper run through', async () => {
-    //             const data = {
-    //                 employeeId: employeeId,
-    //                 email: email, 
-    //                 inviteToken: inviteToken,
-    //             };
+            it('should return 200 for a proper run through', async () => {
+                const data = {
+                    employeeId: employeeId,
+                    email: email, 
+                    inviteToken: inviteToken,
+                };
             
-    //             const response = await request.put('/api/invite')
-    //                 .set('Authorization', `Bearer ${userToken}`)
-    //                 .send(data);
+                const response = await request.put('/api/invite')
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .send(data);
             
-    //             if(response.status === 200){
-    //                 appendToList(['users', response.userId]);
-    //             }
+                if(response.status === 200){
+                    appendToList(['users', response.userId]);
+                }
 
-    //             expect(response.body.message).toBe('Employee updated successfully');
-    //             expect(response.status).toBe(200);
-    //             expect(response.body.userId).toBeDefined();
-    //             expect(response.body.token).toBeDefined();
+                expect(response.body.message).toBe('Employee updated successfully');
+                expect(response.status).toBe(200);
+                expect(response.body.userId).toBeDefined();
+                expect(response.body.token).toBeDefined();
 
-    //         });
+            });
 
-    //     });
+        });
 
-    // });
+    });
 
 });
