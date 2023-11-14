@@ -65,7 +65,8 @@ exports.updateUser = async (req, res, next) => {
         if (!user) {
             throw new Error(`User not found, id:${userId}`);
         }
-        if (user._id.toString() != req.TokenUserId){
+        if (user._id.toString() != req.TokenUserId.toString()){
+            console.log("comparison: " + user._id + " " + req.TokenUserId);
             throw new Error("Invalid Credentials");
         }
         // Update user properties as needed
