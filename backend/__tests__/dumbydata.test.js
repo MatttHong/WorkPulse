@@ -29,7 +29,7 @@ describe('Employee API endpoints', () => {
     // });
     let userpas = 'password1!D';
     let userem = 'testt@example.com';
-    let userem2 = 'testtttttttt@example.com';
+    let userem2 = 'test2@example.com';
     userId = process.env.USER_ID;
     userToken = process.env.AUTH_TOKEN;
     let token, orgId, employeeId;
@@ -69,5 +69,68 @@ describe('Employee API endpoints', () => {
         expect(res.statusCode).toEqual(200);
         token = res.body.token;
     });
+
+    it('should create a second new user and log in', async () => {
+        const userResponse2 = await supertest(app)
+            .post('/api/users')
+            .send({
+                userName: 'testuser',
+                password: userpas,
+                userType: 'test',
+                firstName: 'Test',
+                lastName: 'User 2',
+                email: userem2,
+                birthday: '2000-01-01',
+                bio: 'A test bio',
+                employments: [],
+            });
+        if (userResponse2.statusCode === 201){
+
+            appendToList(['users', userResponse2.body.post._id]);
+            id2 = userResponse2.body.post._id
+            expect(listLength()).toBeGreaterThan(0);
+
+        }
+        expect(userResponse2.statusCode).toEqual(201);
+        expect(userResponse2.body).toHaveProperty('post');
+
+
+        const res2 = await request.post('/api/auth')
+            .send({
+                email: userem2,
+                password: userpas
+            })
+
+        expect(res2.statusCode).toEqual(200);
+        token2 = res2.body.token;
+
+    });
+
+    it('should create a new organization', async () => {
+        const newOrg = {
+            organizationName: "TestOrg",
+            organizationEmail: "testorg1@example.com",
+            organizationAdministrators: [id2],
+            employees: [userId],
+            industry: "Technology"
+        };
+
+        const response = await request.post('/api/org')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send(newOrg);
+
+        if (response.status === 201) {
+            appendToList(['org', response.body.org._id]);
+        }
+        expect(response.body.message).toEqual("Organization added successfully");
+        expect(response.status).toBe(201);
+        expect(response.body.org.organizationAdministrators).toContain(userId);
+        expect(response.body.org.organizationAdministrators).not.toEqual([userId]);
+        orgId = response.body.org._id;
+        expect(orgId).toBeTruthy();
+
+    });
+
+
 
 });

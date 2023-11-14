@@ -35,7 +35,6 @@ function Projects() {
                     if (response.ok) {
                         const data = await response.json();
                         setUserLogs(data.logs);
-                        console.log(userLogs);
                     } else {
                         console.error('Failed to fetch logs:', response.status);
                     }
@@ -46,6 +45,8 @@ function Projects() {
         };
         fetchLogs();
     }, []);
+
+    console.log(userLogs);
 
     return (
         <Card>
