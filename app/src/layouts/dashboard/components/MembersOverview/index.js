@@ -33,25 +33,61 @@ import DataTable from "examples/Tables/DataTable";
 
 // Data
 import data from "layouts/dashboard/components/MembersOverview/data";
+import Checkbox from "@mui/material/Checkbox";
 
 
 function MembersOverview() {
-    const handleCompleteTask = (taskId) => {
-        setUserTasks((prevTasks) =>
-            prevTasks.map((task) => {
-                if (task._id === taskId) {
-                    return { ...task, status: 'Completed' };
-                }
-                return task;
-            })
-                .sort((a, b) => (a.status === 'Completed' ? 1 : -1)) // Sort tasks after updating the status
-        );
-    };
+    const Company = ({image, name}) => (
+        <MDBox display="flex" alignItems="center" lineHeight={1}>
+            <MDTypography variant="button" fontWeight="medium" ml={1} lineHeight={1}>
+                {name}
+            </MDTypography>
+        </MDBox>
+    );
 
-    const [userProjects, setUserProjects] = useState([]); // Initial state as null or appropriate default
+    function findUserNameById(userId) {
+        const user = userAdmins.find((admin) => admin._id === userId);
+        return user ? `${user.firstName} ${user.lastName}` : 'Unknown';
+    }
+
+    function findProjectNameByTaskId(taskId) {
+        const project = userProjects.find((project) => project.tasks && project.tasks.includes(taskId));
+        return project ? project.projectName : 'Unknown';
+    }
+
+    function handleUpdateTask(task) {
+        setUserTasks([...userTasks.filter(f => f._id !== task._id),
+                           {...task, status: task.status === 'Completed' ? 'Active' : 'Completed' }]);
+        task.status = task.status === 'Completed' ? 'Active' : 'Completed';
+        const token = localStorage.getItem('token');
+        const updateTask = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/api/task/${task._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: "Bearer " + token,
+                    },
+                    body: JSON.stringify({ status: task.status })
+                });
+
+                if (response.ok) {
+                    console.log(`Task ${task._id} updated successfully.`);
+                    // Additional logic after successful update
+                } else {
+                    console.error(`Failed to update task ${task._id}:`, response.status);
+                }
+            } catch (error) {
+                console.error(`Error updating task ${task._id}:`, error);
+            }
+        };
+
+        updateTask();
+    }
+
+    const [userProjects, setUserProjects] = useState([]);
     const [userAdmins, setUserAdmins] = useState([]);
     const [userTasks, setUserTasks] = useState([]);
-    const {columns, rows} = data(userProjects, userAdmins, userTasks, handleCompleteTask);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -142,7 +178,48 @@ function MembersOverview() {
             </MDBox>
             <MDBox>
                 <DataTable
-                    table={{columns, rows}}
+                    table={{
+                        columns: [
+                            {Header: " ", accessor: "checkbox"},
+                            {Header: "Task Name", accessor: "name", width: "45%", align: "left"},
+                            {Header: "Project", accessor: "project", width: "45%", align: "left"},
+                            {Header: "Admin", accessor: "admin", align: "center"},
+                            {Header: "Status", accessor: "status", align: "center"},
+                        ],
+                        rows: Array.isArray(userTasks) ? userTasks.map((task) => ({
+                            checkbox: (
+                                <Checkbox
+                                    checked={task.status === 'Completed'}
+                                    onChange={() => handleUpdateTask(task)}
+                                    color="primary"
+                                    inputProps={{
+                                        'aria-label': 'select all desserts',
+                                    }}
+                                />
+                            ),
+                            name: <Company name={task.taskName}/>,
+                            project: (
+                                <MDTypography variant="caption" color="text" fontWeight="medium">
+                                    {findProjectNameByTaskId(task._id)}
+                                </MDTypography>
+                            ),
+                            admin: (
+                                <MDTypography variant="caption" color="text" fontWeight="medium">
+                                    {Array.isArray(task.taskAdministrators) ? task.taskAdministrators.map(findUserNameById).join(', ') : 'No Admins'}
+                                </MDTypography>
+                            ),
+                            tasks: (
+                                <MDTypography variant="caption" color="text" fontWeight="medium">
+                                    {Array.isArray(task.employees) ? task.employees.map(findUserNameById).join(', ') : 'No Assignees'}
+                                </MDTypography>
+                            ),
+                            status: (
+                                <MDTypography variant="caption" color="text" fontWeight="medium">
+                                    {task.status}
+                                </MDTypography>
+                            )
+                        })):[],
+                    }}
                     showTotalEntries={false}
                     isSorted={false}
                     noEndBorder
