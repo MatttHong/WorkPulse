@@ -30,9 +30,6 @@ import MDInput from "components/MDInput";
 
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
-
-// Data
-import data from "layouts/dashboard/components/MembersOverview/data";
 import Checkbox from "@mui/material/Checkbox";
 
 
@@ -45,6 +42,11 @@ function MembersOverview() {
         </MDBox>
     );
 
+    const completedTaskStyle = {
+        textDecoration: 'line-through',
+        color: 'lightgrey'
+    };
+
     function findUserNameById(userId) {
         const user = userAdmins.find((admin) => admin._id === userId);
         return user ? `${user.firstName} ${user.lastName}` : 'Unknown';
@@ -55,10 +57,31 @@ function MembersOverview() {
         return project ? project.projectName : 'Unknown';
     }
 
+    function sortTasks(taskA, taskB) {
+        // Sort by status (Active tasks first)
+        if (taskA.status !== taskB.status) {
+            return taskA.status === 'Completed' ? 1 : -1;
+        }
+
+        // Sort by project name
+        const projectNameA = findProjectNameByTaskId(taskA._id);
+        const projectNameB = findProjectNameByTaskId(taskB._id);
+        if (projectNameA !== projectNameB) {
+            return projectNameA.localeCompare(projectNameB);
+        }
+
+        // Sort by task name
+        return taskA.taskName.localeCompare(taskB.taskName);
+    }
+
     function handleUpdateTask(task) {
-        setUserTasks([...userTasks.filter(f => f._id !== task._id),
-                           {...task, status: task.status === 'Completed' ? 'Active' : 'Completed' }]);
-        task.status = task.status === 'Completed' ? 'Active' : 'Completed';
+        const newStatus = task.status === 'Completed' ? 'Active' : 'Completed';
+        setUserTasks(userTasks.map(f => {
+            if (f._id === task._id) {
+                return {...task, status: newStatus}
+            }
+            return f;
+        }))
         const token = localStorage.getItem('token');
         const updateTask = async () => {
             try {
@@ -68,7 +91,7 @@ function MembersOverview() {
                         'Content-Type': 'application/json',
                         Authorization: "Bearer " + token,
                     },
-                    body: JSON.stringify({ status: task.status })
+                    body: JSON.stringify({status: newStatus})
                 });
 
                 if (response.ok) {
@@ -158,7 +181,7 @@ function MembersOverview() {
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                 <MDBox>
                     <MDTypography variant="h6" gutterBottom>
-                         Tasks
+                        Tasks
                     </MDTypography>
                     <MDBox display="flex" alignItems="center" lineHeight={0}>
                         <Icon
@@ -171,7 +194,7 @@ function MembersOverview() {
                             done
                         </Icon>
                         <MDTypography variant="button" fontWeight="regular" color="text">
-                            &nbsp;<strong>1</strong> done
+                            &nbsp;<strong>{userTasks.filter(task => task.status === 'Completed').length}</strong> done
                         </MDTypography>
                     </MDBox>
                 </MDBox>
@@ -186,7 +209,7 @@ function MembersOverview() {
                             {Header: "Admin", accessor: "admin", align: "center"},
                             {Header: "Status", accessor: "status", align: "center"},
                         ],
-                        rows: Array.isArray(userTasks) ? userTasks.map((task) => ({
+                        rows: Array.isArray(userTasks) ? userTasks.sort(sortTasks).map((task) => ({
                             checkbox: (
                                 <Checkbox
                                     checked={task.status === 'Completed'}
@@ -197,7 +220,14 @@ function MembersOverview() {
                                     }}
                                 />
                             ),
-                            name: <Company name={task.taskName}/>,
+                            name: <MDTypography
+                                    variant="caption"
+                                    color="text"
+                                    fontWeight="medium"
+                                    style={task.status === 'Completed' ? completedTaskStyle : null}
+                                  >
+                                    {task.taskName}
+                            </MDTypography>,
                             project: (
                                 <MDTypography variant="caption" color="text" fontWeight="medium">
                                     {findProjectNameByTaskId(task._id)}
@@ -218,7 +248,7 @@ function MembersOverview() {
                                     {task.status}
                                 </MDTypography>
                             )
-                        })):[],
+                        })) : [],
                     }}
                     showTotalEntries={false}
                     isSorted={false}
