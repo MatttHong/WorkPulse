@@ -13,7 +13,7 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 
-import {useState, useCallback, useEffect} from "react";
+import {useState, useEffect} from "react";
 
 
 import Card from "@mui/material/Card";
@@ -23,8 +23,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import { Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Button } from '@mui/material';
-
+import {Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Button} from '@mui/material';
 
 
 // Material Dashboard 2 React components
@@ -51,7 +50,7 @@ function Organizations() {
     const [dummyOrg, setDummyOrg] = useState([]);
 
     // data funcs
-    const fetchEmployeeID = async () => {
+    const fetchUserData = async () => {
         const userEmail = localStorage.getItem("email");
         const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
             headers: {
@@ -99,7 +98,7 @@ function Organizations() {
 
     const fetchData = async () => {
         try {
-            const userData = await fetchEmployeeID();
+            const userData = await fetchUserData();
             if (userData.status === "Success") {
                 const employeeID = userData.user.employments[0];
                 setEmployeeID(employeeID);
@@ -281,17 +280,21 @@ function Organizations() {
     console.log("orgaID:", orgaId);
     console.log("userOrganization:", userOrganization);
     console.log("Departments:", departments);
-    console.log("ADMIN USERS:", adminUsers);
-    console.log("OROROROROROROROR:", nonAdminEmployees);
-
+    console.log("ADMIN EMPLOYEES:", adminEmployees);
+    console.log("NONADMIN EMPLOYEES:", nonAdminEmployees);
+    console.log("*****************************");
 
     // visual vars
     const [editMode, setEditMode] = useState(false);
     const [adminEditMode, setAdminEditMode] = useState(false);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [selectedEmail, setSelectedEmail] = useState(null);
-    const [selectionWarning, setSelectionWarning] = useState("");
-
+    const [deptEditMode, setDeptEditMode] = useState(false);
+    const [isAddAdminDialogOpen, setIsAddAdminDialogOpen] = useState(false);
+    const [isAddDeptDialogOpen, setIsAddDeptDialogOpen] = useState(false);
+    const [addAdminSelectedEmail, setAddAdminSelectedEmail] = useState(null);
+    const [addDeptSelectedEmail, setAddDeptSelectedEmail] = useState(null)
+    const [addAdminSelectionWarning, setAddAdminSelectionWarning] = useState("");
+    const [addDeptSelectionWarning, setAddDeptSelectionWarning] = useState("");
+    const [addDeptNewDeptName, setAddDeptNewDeptName] = useState("");
 
     // visual funcs
     const handleEditOrgClick = () => {
@@ -333,28 +336,47 @@ function Organizations() {
         setAdminEditMode(true);
     };
 
-    const handleAddAdminClick = async () => {
-        setIsDialogOpen(true);
+    const handleDeptEditClick = () => {
+        setDeptEditMode(true);
     };
 
-    const handleEditOrgSaveAdminChanges = () => {
-        // Logic to save administrator changes
+    const handleAddAdminClick = async () => {
+        setIsAddAdminDialogOpen(true);
+    };
+
+    const handleAddDeptClick = async () => {
+        setIsAddDeptDialogOpen(true)
+    };
+
+    const handleAddAdminEditToggle = () => {
         setAdminEditMode(false);
     };
 
+    const handleAddDeptEditToggle = () => {
+        setDeptEditMode(false);
+    };
+
     const handleAddAdminSelectEmail = (email) => {
-        setSelectedEmail(email);
+        setAddAdminSelectedEmail(email);
+    };
+
+    const handleAddDeptSelectEmail = (email) => {
+        setAddDeptSelectedEmail(email);
+    }
+
+    const handleAddDeptNameChange = (event) => {
+        setAddDeptNewDeptName(event.target.value);
     };
 
     const handleAddAdminConfirm = async () => {
-        setSelectionWarning("");
+        setAddAdminSelectionWarning("");
 
-        if (!selectedEmail) {
-            setSelectionWarning("Please select an employee to add as an administrator.");
+        if (!addAdminSelectedEmail) {
+            setAddAdminSelectionWarning("Please select an employee to add as an administrator.");
             return;
         }
 
-        const selectedEmployee = nonAdminEmployees.find(emp => emp.email === selectedEmail);
+        const selectedEmployee = nonAdminEmployees.find(emp => emp.email === addAdminSelectedEmail);
 
         if (selectedEmployee) {
             const updatedAdmins = [...userOrganization.organizationAdministrators, selectedEmployee._id];
@@ -370,16 +392,18 @@ function Organizations() {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ organizationAdministrators: updatedAdmins })
+                    body: JSON.stringify({organizationAdministrators: updatedAdmins})
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to update organization administrators');
+                    setAddAdminSelectionWarning('Failed to add new administrator. Please try again.');
+                    return;
                 }
 
-                setIsDialogOpen(false);
+                setIsAddAdminDialogOpen(false);
             } catch (error) {
-                console.error('Error updating organization administrators: ', error);
+                console.error('Error adding new department: ', error);
+                setAddAdminSelectionWarning('An error occurred while adding the new administrator. Please try again.');
                 setUserOrganization(prevState => ({
                     ...prevState,
                     organizationAdministrators: prevState.organizationAdministrators.slice(0, -1)
@@ -388,6 +412,85 @@ function Organizations() {
         }
     };
 
+    const handleAddDeptConfirm = async () => {
+        setAddDeptSelectionWarning("");
+
+        if (!addDeptNewDeptName) {
+            setAddDeptSelectionWarning("Please enter a name for new department.");
+            return;
+        }
+
+        if (!addDeptSelectedEmail) {
+            setAddDeptSelectionWarning("Please select an employee to add as an administrator.");
+            return;
+        }
+
+        const selectedEmployee = [...adminEmployees, ...nonAdminEmployees].find(emp => emp.email === addDeptSelectedEmail);
+
+        console.log("**********JSON:", selectedEmployee._id);
+        console.log("SELECTED EMPLOYEE:", selectedEmployee);
+
+        if (!selectedEmployee) {
+            setAddDeptSelectionWarning("Selected administrator not found.");
+            return;
+        }
+
+        const newDep = {
+            departmentName: addDeptNewDeptName,
+            departmentAdministrators: [selectedEmployee._id]
+        };
+
+        try {
+            let response = await fetch("http://localhost:3000/api/dep", {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newDep)
+            });
+
+            console.log("RESPONSE!!!!!!!!!!!!!:", response);
+
+            if (!response.ok) {
+                setAddDeptSelectionWarning('Failed to add new department. Please try again.');
+                return;
+            }
+
+            const newDeptData = await response.json();
+
+            console.log("NEWDEPTDATA!!!!!!!!!!!!!:", newDeptData);
+
+            const updatedDepartments = [...userOrganization.departments, newDeptData.dept._id];
+            setUserOrganization(prevState => ({
+                ...prevState,
+                departments: updatedDepartments
+            }));
+
+            response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ departments: updatedDepartments })
+            });
+
+            if (!response.ok) {
+                setAddAdminSelectionWarning('Failed to add new department. Please try again.');
+                return;
+            }
+
+            setIsAddDeptDialogOpen(false);
+        } catch (error) {
+            console.error('Error updating organization departments: ', error);
+            setAddDeptSelectionWarning('An error occurred while updating the organization departments. Please try again.');
+            setUserOrganization(prevState => ({
+                ...prevState,
+                organizationAdministrators: prevState.organizationAdministrators.slice(0, -1)
+            }));
+        }
+    };
 
     const handleRemoveAdmin = async (adminId) => {
         const updatedAdmins = userOrganization.organizationAdministrators.filter(id => id !== adminId);
@@ -403,7 +506,7 @@ function Organizations() {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ organizationAdministrators: updatedAdmins })
+                body: JSON.stringify({organizationAdministrators: updatedAdmins})
             });
 
             if (!response.ok) {
@@ -415,6 +518,36 @@ function Organizations() {
             setUserOrganization(prevState => ({
                 ...prevState,
                 organizationAdministrators: [...prevState.organizationAdministrators, adminId]
+            }));
+        }
+    };
+
+    const handleRemoveDept = async (deptId) => {
+        const updatedDepts = userOrganization.departments.filter(id => id !== deptId);
+        setUserOrganization(prevState => ({
+            ...prevState,
+            departments: updatedDepts
+        }));
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({departments: updatedDepts})
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to remove department');
+            }
+
+        } catch (error) {
+            console.error('Error removing department: ', error);
+            setUserOrganization(prevState => ({
+                ...prevState,
+                departments: [...prevState.organizationAdministrators, deptId]
             }));
         }
     };
@@ -441,6 +574,7 @@ function Organizations() {
                                 label={<MDTypography fontWeight={"bold"}
                                                      sx={{color: 'grey', fontSize: '1rem'}}>Email</MDTypography>}
                                 onChange={handleInputChange}
+                                variant="outlined"
                                 variant="outlined"
                                 sx={{marginBottom: '8px'}}
                                 fullWidth
@@ -474,20 +608,22 @@ function Organizations() {
                     )}
                 </MDBox>
                 <IconButton onClick={editMode ? handleEditOrgSave : handleEditOrgClick}>
-                    {editMode ? <SaveIcon sx={{ fontSize: 'medium !important' }}/> : <EditIcon sx={{ fontSize: 'medium !important' }}/>}
+                    {editMode ? <SaveIcon sx={{fontSize: 'medium !important'}}/> :
+                        <EditIcon sx={{fontSize: 'medium !important'}}/>}
                 </IconButton>
             </MDBox>
 
-            <Dialog sx={{ '& .MuiDialog-paper': { minWidth: '700px' } }} open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <Dialog sx={{'& .MuiDialog-paper': {minWidth: '700px'}}} open={isAddAdminDialogOpen}
+                    onClose={() => setIsAddAdminDialogOpen(false)}>
                 <DialogTitle sx={{lineHeight: "2", textAlign: "center"}}>Add New Administrator</DialogTitle>
                 <DialogContent>
-                    <MDTypography variant="subtitle2" sx={{ textAlign: "center" }}>
+                    <MDTypography variant="subtitle2" sx={{textAlign: "center"}}>
                         Please select an employee to assign as an administrator.
                     </MDTypography>
                 </DialogContent>
                 <MDBox display="flex" flexDirection="column" alignItems="center">
-                    <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto" sx={{ margin: 'auto' }}>
-                        <List sx={{ width: '100%', mb: 2}}>
+                    <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto" sx={{margin: 'auto'}}>
+                        <List sx={{width: '100%', mb: 2}}>
                             {Array.isArray(nonAdminEmployees) ? nonAdminEmployees.map((employee) => (
                                 <ListItem
                                     button
@@ -495,32 +631,35 @@ function Organizations() {
                                     onClick={() => handleAddAdminSelectEmail(employee.email)}
                                     sx={{
                                         width: '100%',
-                                        backgroundColor: employee.email === selectedEmail ? '#e0e0e0' : 'transparent',
+                                        backgroundColor: employee.email === addAdminSelectedEmail ? '#e0e0e0' : 'transparent',
                                         justifyContent: 'center',
                                         mx: 'auto'
                                     }}
                                 >
-                                    <ListItemText primary={employee.email} sx={{ textAlign: 'left', '& .MuiListItemText-primary': { fontSize: '1rem', padding: '2px'}}} />
+                                    <ListItemText primary={employee.email} sx={{
+                                        textAlign: 'left',
+                                        '& .MuiListItemText-primary': {fontSize: '1rem', padding: '2px'}
+                                    }}/>
                                 </ListItem>
                             )) : 'Something unexpected happened while fetching organization employees.'}
                         </List>
                     </MDBox>
-                    {selectedEmail && (
-                        <MDTypography variant="body2" style={{ margin: '20px 0' }}>
-                            {selectedEmail} will be added as an administrator
+                    {addAdminSelectedEmail && (
+                        <MDTypography variant="body2" style={{margin: '20px 0'}}>
+                            {addAdminSelectedEmail} will be added as an administrator
                         </MDTypography>
                     )}
-                    {selectionWarning && (
-                        <MDTypography variant="body2" sx={{ color: 'red', textAlign: 'center', mt: 2 }}>
-                            {selectionWarning}
+                    {addAdminSelectionWarning && (
+                        <MDTypography variant="body2" sx={{color: 'red', textAlign: 'center', mt: 2}}>
+                            {addAdminSelectionWarning}
                         </MDTypography>
                     )}
-                    <Button onClick={handleAddAdminConfirm} color="primary" variant="contained" sx={{ color: 'white', mt: 2, mb: 2 }}>
+                    <MDButton onClick={handleAddAdminConfirm} color="info" variant="contained"
+                              sx={{color: 'white', mt: 2, mb: 2}}>
                         OK
-                    </Button>
+                    </MDButton>
                 </MDBox>
             </Dialog>
-
             <MDBox display="flex" flexDirection="column">
                 <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                     <MDTypography
@@ -534,27 +673,27 @@ function Organizations() {
                         <>
                             <MDTypography>
                                 <IconButton
-                                    onClick={handleEditOrgSaveAdminChanges}
-                                    sx={{ padding: 0 }}
+                                    onClick={handleAddAdminEditToggle}
+                                    sx={{padding: 0}}
                                 >
-                                    <SaveIcon sx={{ fontSize: 'medium !important' }}/>
+                                    <SaveIcon sx={{fontSize: 'medium !important'}}/>
                                 </IconButton>
                             </MDTypography>
-                            <MDTypography sx={{ padding: '0 !important' }}>
+                            <MDTypography sx={{padding: '0 !important'}}>
                                 <IconButton
                                     onClick={handleAddAdminClick}
-                                    sx={{ padding: '0 !important' }}
+                                    sx={{padding: '0 !important'}}
                                 >
-                                    <AddIcon sx={{ fontSize: 'medium !important' }} />
+                                    <AddIcon sx={{fontSize: 'medium !important'}}/>
                                 </IconButton>
                             </MDTypography>
                         </>
                     ) : (
                         <IconButton
                             onClick={handleAdminEditClick}
-                            sx={{ padding: 0 }}
+                            sx={{padding: 0}}
                         >
-                            <EditIcon sx={{ fontSize: 'medium !important' }}/>
+                            <EditIcon sx={{fontSize: 'medium !important'}}/>
                         </IconButton>
                     )}
                 </MDBox>
@@ -564,8 +703,7 @@ function Organizations() {
                         columns: [
                             {Header: "Name", accessor: "name", align: "left"},
                             {Header: "Email", accessor: "email", align: "left"},
-                            {Header: "", accessor: "actions", align: "center"}, // Include this if you have actions like remove
-                            // ...other columns if needed
+                            {Header: "", accessor: "actions", align: "center"}
                         ],
                         rows: adminUsers.map((adminUser, index) => {
                             const adminEmployee = adminEmployees[index];
@@ -583,9 +721,9 @@ function Organizations() {
                                 actions: adminEditMode ? (
                                     <IconButton
                                         onClick={() => handleRemoveAdmin(adminEmployee._id)}
-                                        sx={{ padding: 0 }}
+                                        sx={{padding: 0}}
                                     >
-                                        <RemoveCircleOutlineIcon sx={{ fontSize: 'medium !important' }}/>
+                                        <RemoveCircleOutlineIcon sx={{fontSize: 'medium !important'}}/>
                                     </IconButton>
                                 ) : null,
                             };
@@ -597,22 +735,50 @@ function Organizations() {
                     entriesPerPage={false}
                 />
             </MDBox>
-            <MDBox>
-                <MDTypography
-                    variant="button"
-                    fontWeight="medium"
-                    color="black"
-                    style={{marginLeft: "1rem"}}
-                >
-                    &nbsp; Organization Departments
-                </MDTypography>
+            <MDBox display="flex" flexDirection="column">
+                <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+                    <MDTypography
+                        variant="button"
+                        fontWeight="medium"
+                        color="black"
+                    >
+                        &nbsp; Organization Departments
+                    </MDTypography>
+                    {deptEditMode ? (
+                        <>
+                            <MDTypography>
+                                <IconButton
+                                    onClick={handleAddDeptEditToggle}
+                                    sx={{padding: 0}}
+                                >
+                                    <SaveIcon sx={{fontSize: 'medium !important'}}/>
+                                </IconButton>
+                            </MDTypography>
+                            <MDTypography sx={{padding: '0 !important'}}>
+                                <IconButton
+                                    onClick={handleAddDeptClick}
+                                    sx={{padding: '0 !important'}}
+                                >
+                                    <AddIcon sx={{fontSize: 'medium !important'}}/>
+                                </IconButton>
+                            </MDTypography>
+                        </>
+                    ) : (
+                        <IconButton
+                            onClick={handleDeptEditClick}
+                            sx={{padding: 0}}
+                        >
+                            <EditIcon sx={{fontSize: 'medium !important'}}/>
+                        </IconButton>
+                    )}
+                </MDBox>
 
                 <DataTable
                     table={{
                         columns: [
                             {Header: "Name", accessor: "name", align: "left"},
                             {Header: "Admin", accessor: "admin", align: "left"},
-                            // ...other columns if needed
+                            {Header: "", accessor: "actions", align: "center"}
                         ],
                         rows: departments.map((department) => {
                             return {
@@ -626,7 +792,14 @@ function Organizations() {
                                         {department.admins.map(admin => admin.email).join(', ')}
                                     </MDTypography>
                                 ),
-                                // ...other fields if needed
+                                actions: deptEditMode ? (
+                                    <IconButton
+                                        onClick={() => handleRemoveDept(department._id)}
+                                        sx={{padding: 0}}
+                                    >
+                                        <RemoveCircleOutlineIcon sx={{fontSize: 'medium !important'}}/>
+                                    </IconButton>
+                                ) : null,
                             };
                         }),
                     }}
@@ -636,6 +809,67 @@ function Organizations() {
                     entriesPerPage={false}
                 />
             </MDBox>
+
+            <Dialog sx={{'& .MuiDialog-paper': {minWidth: '700px'}}} open={isAddDeptDialogOpen}
+                    onClose={() => setIsAddDeptDialogOpen(false)}>
+                <DialogTitle sx={{lineHeight: "2", textAlign: "center"}}>Add New Department</DialogTitle>
+                <DialogContent>
+                    <MDBox display="flex" flexDirection="column" alignItems="center" p={3}>
+                        <TextField
+                            label={<MDTypography fontWeight="bold" sx={{color: 'grey', fontSize: '1rem'}}>Department
+                                Name</MDTypography>}
+                            variant="outlined"
+                            value={addDeptNewDeptName}
+                            onChange={handleAddDeptNameChange}
+                            fullWidth
+                            sx={{mb: 2}}
+                        />
+                        <MDTypography variant="subtitle2" sx={{textAlign: "center"}}>
+                            Please select an employee to assign as an administrator:
+                        </MDTypography>
+                    </MDBox>
+                    <MDBox display="flex" flexDirection="column" alignItems="center">
+                        <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto"
+                               sx={{margin: 'auto'}}>
+                            <List sx={{width: '100%', mb: 2}}>
+                                {Array.isArray(adminEmployees) && Array.isArray(nonAdminEmployees) ? [...adminEmployees, ...nonAdminEmployees].map((employee) => (
+                                    <ListItem
+                                        button
+                                        key={employee.id}
+                                        onClick={() => handleAddDeptSelectEmail(employee.email)}
+                                        sx={{
+                                            width: '100%',
+                                            backgroundColor: employee.email === addDeptSelectionWarning ? '#e0e0e0' : 'transparent',
+                                            justifyContent: 'center',
+                                            mx: 'auto'
+                                        }}
+                                    >
+                                        <ListItemText primary={employee.email} sx={{
+                                            textAlign: 'center',
+                                            '& .MuiListItemText-primary': {fontSize: '1rem', padding: '2px'}
+                                        }}/>
+                                    </ListItem>
+                                )) : 'Something unexpected happened while fetching organization employees.'}
+                            </List>
+                        </MDBox>
+                        {addDeptSelectedEmail && (
+                            <MDTypography variant="body2" style={{margin: '20px 0'}}>
+                                {addDeptSelectedEmail} will be added as the department administrator
+                            </MDTypography>
+                        )}
+                        {addDeptSelectionWarning && (
+                            <MDTypography variant="body2" sx={{color: 'red', textAlign: 'center', mt: 2}}>
+                                {addDeptSelectionWarning}
+                            </MDTypography>
+                        )}
+                        <MDButton onClick={handleAddDeptConfirm} color="info" variant="contained"
+                                  sx={{color: 'white', mt: 2, mb: 2}}>
+                            Add Department
+                        </MDButton>
+                    </MDBox>
+                </DialogContent>
+            </Dialog>
+
             <MDBox>
                 <MDTypography
                     variant="button"
@@ -688,7 +922,8 @@ function Organizations() {
                 />
             </MDBox>
         </Card>
-    );
+    )
+        ;
 
 }
 
