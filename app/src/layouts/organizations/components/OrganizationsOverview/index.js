@@ -45,6 +45,7 @@ function Organizations() {
     const [userOrganization, setUserOrganization] = useState([]);
     const [adminEmployees, setAdminEmployees] = useState([]);
     const [adminUsers, setAdminUsers] = useState([]);
+    const [nonAdminEmployees, setNonAdminEmployees] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [departmentAdmins, setDepartmentAdmins] = useState([]);
     const [dummyOrg, setDummyOrg] = useState([]);
@@ -165,6 +166,25 @@ function Organizations() {
         setAdminEmployees(adminEmps);
     };
 
+    const fetchNonAdminEmployees = async () => {
+        if (userOrganization && userOrganization.employees && userOrganization.organizationAdministrators) {
+            const employeeDetailsPromises = userOrganization.employees
+                .filter(empId => !userOrganization.organizationAdministrators.includes(empId))
+                .map(empId => fetchEmployee(empId));
+
+            try {
+                const employeeDetails = await Promise.all(employeeDetailsPromises);
+
+                const nonAdminEmployees = employeeDetails.filter(employee => employee !== null);
+
+                setNonAdminEmployees(nonAdminEmployees);
+            } catch (error) {
+                console.error("Error fetching non-admin employees: ", error);
+            }
+        }
+    };
+
+
     const fetchDepartments = async () => {
         const departmentIds = userOrganization.departments;
         const departmentList = [];
@@ -252,7 +272,9 @@ function Organizations() {
         if (userOrganization && userOrganization.organizationAdministrators && userOrganization.departments) {
             fetchAdministrators();
             fetchDepartments();
+            fetchNonAdminEmployees();
         }
+        //here
     }, [userOrganization]);
 
     console.log("employeeID:", employeeID);
@@ -260,33 +282,24 @@ function Organizations() {
     console.log("userOrganization:", userOrganization);
     console.log("Departments:", departments);
     console.log("ADMIN USERS:", adminUsers);
-
-    useEffect(() => {
-
-
-        if (userOrganization && userOrganization.organizationAdministrators) {
-            fetchAdministrators();
-        }
-    }, [userOrganization]);
+    console.log("OROROROROROROROR:", nonAdminEmployees);
 
 
     // visual vars
     const [editMode, setEditMode] = useState(false);
     const [adminEditMode, setAdminEditMode] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [employeeEmails, setEmployeeEmails] = useState([]);
+    const [selectedEmail, setSelectedEmail] = useState(null);
+    const [selectionWarning, setSelectionWarning] = useState("");
 
 
     // visual funcs
-    const handleEditClick = () => {
+    const handleEditOrgClick = () => {
         setDummyOrg({...userOrganization});
         setEditMode(true);
     };
 
-    const handleSave = async () => {
-        // Perform validation
-        // ...
-
+    const handleEditOrgSave = async () => {
         try {
             console.log("DUMMY ORG:", dummyOrg);
             const response = await axios.put(`http://localhost:3000/api/org/${dummyOrg._id}`, dummyOrg, {
@@ -322,30 +335,88 @@ function Organizations() {
 
     const handleAddAdminClick = async () => {
         setIsDialogOpen(true);
-        // Fetch employees' details using their IDs from userOrganization.employees
-        // For now, we'll use placeholders since you mentioned the backend isn't available
-        const fetchedEmployees = userOrganization.employees.map(id => {
-            // Placeholder for fetched employee data
-            return { id, email: `placeholder_for_${id}@example.com` };
-        });
-        setEmployeeEmails(fetchedEmployees);
     };
 
-    const handleSaveAdminChanges = () => {
+    const handleEditOrgSaveAdminChanges = () => {
         // Logic to save administrator changes
         setAdminEditMode(false);
     };
 
-    const handleRemoveAdmin = (adminId) => {
-        // Logic to remove an administrator by adminId
+    const handleAddAdminSelectEmail = (email) => {
+        setSelectedEmail(email);
     };
 
-    const handleSelectEmail = (email) => {
+    const handleAddAdminConfirm = async () => {
+        setSelectionWarning("");
 
+        if (!selectedEmail) {
+            setSelectionWarning("Please select an employee to add as an administrator.");
+            return;
+        }
+
+        const selectedEmployee = nonAdminEmployees.find(emp => emp.email === selectedEmail);
+
+        if (selectedEmployee) {
+            const updatedAdmins = [...userOrganization.organizationAdministrators, selectedEmployee._id];
+            setUserOrganization(prevState => ({
+                ...prevState,
+                organizationAdministrators: updatedAdmins
+            }));
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ organizationAdministrators: updatedAdmins })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update organization administrators');
+                }
+
+                setIsDialogOpen(false);
+            } catch (error) {
+                console.error('Error updating organization administrators: ', error);
+                setUserOrganization(prevState => ({
+                    ...prevState,
+                    organizationAdministrators: prevState.organizationAdministrators.slice(0, -1)
+                }));
+            }
+        }
     };
 
-    const handleConfirm = () => {
 
+    const handleRemoveAdmin = async (adminId) => {
+        const updatedAdmins = userOrganization.organizationAdministrators.filter(id => id !== adminId);
+        setUserOrganization(prevState => ({
+            ...prevState,
+            organizationAdministrators: updatedAdmins
+        }));
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ organizationAdministrators: updatedAdmins })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to remove administrator');
+            }
+
+        } catch (error) {
+            console.error('Error removing administrator: ', error);
+            setUserOrganization(prevState => ({
+                ...prevState,
+                organizationAdministrators: [...prevState.organizationAdministrators, adminId]
+            }));
+        }
     };
 
     return (
@@ -402,29 +473,52 @@ function Organizations() {
                         </>
                     )}
                 </MDBox>
-                <IconButton onClick={editMode ? handleSave : handleEditClick}>
+                <IconButton onClick={editMode ? handleEditOrgSave : handleEditOrgClick}>
                     {editMode ? <SaveIcon sx={{ fontSize: 'medium !important' }}/> : <EditIcon sx={{ fontSize: 'medium !important' }}/>}
                 </IconButton>
             </MDBox>
 
-            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <DialogTitle>Add New Administrator</DialogTitle>
-                <List>
-                    {employeeEmails.map((employee) => (
-                        <ListItem
-                            button
-                            key={employee.id}
-                            // onClick={() => handleSelectEmail(employee.email)}
-                            // selected={employee.email === selectedEmail}
-                            style={{ backgroundColor: employee.email === false ? '#e0e0e0' : 'transparent' }}
-                        >
-                            <ListItemText primary={employee.email} />
-                        </ListItem>
-                    ))}
-                </List>
-                <Button onClick={handleConfirm} color="primary">
-                    OK
-                </Button>
+            <Dialog sx={{ '& .MuiDialog-paper': { minWidth: '700px' } }} open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                <DialogTitle sx={{lineHeight: "2", textAlign: "center"}}>Add New Administrator</DialogTitle>
+                <DialogContent>
+                    <MDTypography variant="subtitle2" sx={{ textAlign: "center" }}>
+                        Please select an employee to assign as an administrator.
+                    </MDTypography>
+                </DialogContent>
+                <MDBox display="flex" flexDirection="column" alignItems="center">
+                    <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto" sx={{ margin: 'auto' }}>
+                        <List sx={{ width: '100%', mb: 2}}>
+                            {Array.isArray(nonAdminEmployees) ? nonAdminEmployees.map((employee) => (
+                                <ListItem
+                                    button
+                                    key={employee.id}
+                                    onClick={() => handleAddAdminSelectEmail(employee.email)}
+                                    sx={{
+                                        width: '100%',
+                                        backgroundColor: employee.email === selectedEmail ? '#e0e0e0' : 'transparent',
+                                        justifyContent: 'center',
+                                        mx: 'auto'
+                                    }}
+                                >
+                                    <ListItemText primary={employee.email} sx={{ textAlign: 'left', '& .MuiListItemText-primary': { fontSize: '1rem', padding: '2px'}}} />
+                                </ListItem>
+                            )) : 'Something unexpected happened while fetching organization employees.'}
+                        </List>
+                    </MDBox>
+                    {selectedEmail && (
+                        <MDTypography variant="body2" style={{ margin: '20px 0' }}>
+                            {selectedEmail} will be added as an administrator
+                        </MDTypography>
+                    )}
+                    {selectionWarning && (
+                        <MDTypography variant="body2" sx={{ color: 'red', textAlign: 'center', mt: 2 }}>
+                            {selectionWarning}
+                        </MDTypography>
+                    )}
+                    <Button onClick={handleAddAdminConfirm} color="primary" variant="contained" sx={{ color: 'white', mt: 2, mb: 2 }}>
+                        OK
+                    </Button>
+                </MDBox>
             </Dialog>
 
             <MDBox display="flex" flexDirection="column">
@@ -440,7 +534,7 @@ function Organizations() {
                         <>
                             <MDTypography>
                                 <IconButton
-                                    onClick={handleSaveAdminChanges}
+                                    onClick={handleEditOrgSaveAdminChanges}
                                     sx={{ padding: 0 }}
                                 >
                                     <SaveIcon sx={{ fontSize: 'medium !important' }}/>
@@ -488,7 +582,7 @@ function Organizations() {
                                 ) : null,
                                 actions: adminEditMode ? (
                                     <IconButton
-                                        onClick={() => handleRemoveAdmin(adminUser._id)}
+                                        onClick={() => handleRemoveAdmin(adminEmployee._id)}
                                         sx={{ padding: 0 }}
                                     >
                                         <RemoveCircleOutlineIcon sx={{ fontSize: 'medium !important' }}/>
