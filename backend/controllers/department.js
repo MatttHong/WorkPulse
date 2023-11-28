@@ -122,9 +122,9 @@ exports.deleteDept = (req, res, next) => {
         }
 
         // Check if the user has the necessary credentials to delete the department
-        if (req.TokenUserId && !dept.departmentAdministrators.includes(req.TokenUserId)) {
-            throw new Error("Invalid Credentials");
-        }
+        // if (req.TokenUserId && !dept.departmentAdministrators.includes(req.TokenUserId)) {
+        //     throw new Error("Invalid Credentials");
+        // }
 
         // If the user has the credentials, proceed with department deletion
         return Department.findByIdAndRemove(deptId);

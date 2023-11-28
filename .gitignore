@@ -2,7 +2,7 @@
 node_modules/
 npm-debug.log
 package-lock.json
-
+backend
 # macOS
 .DS_Store
 

@@ -1,18 +1,3 @@
-/**
- =========================================================
- * Material Dashboard 2 React - v2.2.0
- =========================================================
-
- * Product Page: https://www.creative-tim.com/product/material-dashboard-react
- * Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
- Coded by www.creative-tim.com
-
- =========================================================
-
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- */
-
 import {useState, useEffect} from "react";
 
 
@@ -20,8 +5,10 @@ import Card from "@mui/material/Card";
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import SaveIcon from '@mui/icons-material/Save';
-import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import {Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Button} from '@mui/material';
 
@@ -35,6 +22,7 @@ import MDButton from "components/MDButton";
 import DataTable from "examples/Tables/DataTable";
 
 import axios from "axios";
+import Tooltip from '@mui/material/Tooltip';
 
 function Organizations() {
     // data vars
@@ -46,7 +34,6 @@ function Organizations() {
     const [adminUsers, setAdminUsers] = useState([]);
     const [nonAdminEmployees, setNonAdminEmployees] = useState([]);
     const [departments, setDepartments] = useState([]);
-    const [departmentAdmins, setDepartmentAdmins] = useState([]);
     const [dummyOrg, setDummyOrg] = useState([]);
 
     // data funcs
@@ -288,12 +275,16 @@ function Organizations() {
     const [editMode, setEditMode] = useState(false);
     const [adminEditMode, setAdminEditMode] = useState(false);
     const [deptEditMode, setDeptEditMode] = useState(false);
+    const [editDept, setEditDept] = useState(undefined);
     const [isAddAdminDialogOpen, setIsAddAdminDialogOpen] = useState(false);
     const [isAddDeptDialogOpen, setIsAddDeptDialogOpen] = useState(false);
+    const [isEditDeptDialogOpen, setIsEditDeptDialogOpen] = useState(false);
     const [addAdminSelectedEmail, setAddAdminSelectedEmail] = useState(null);
-    const [addDeptSelectedEmail, setAddDeptSelectedEmail] = useState(null)
+    const [addDeptSelectedEmail, setAddDeptSelectedEmail] = useState(null);
+    const [editDeptSelectedEmail, setEditDeptSelectedEmail] = useState(null);
     const [addAdminSelectionWarning, setAddAdminSelectionWarning] = useState("");
     const [addDeptSelectionWarning, setAddDeptSelectionWarning] = useState("");
+    const [editDeptSelectionWarning, setEditDeptSelectionWarning] = useState("");
     const [addDeptNewDeptName, setAddDeptNewDeptName] = useState("");
 
     // visual funcs
@@ -348,6 +339,13 @@ function Organizations() {
         setIsAddDeptDialogOpen(true)
     };
 
+    const handleEditSingleDeptClick = (selectedDepartment) => {
+        console.log("BIZI TANI YARRAK:", selectedDepartment);
+        setEditDept(selectedDepartment);
+        console.log("BIZI TANI YARRAK:", editDept);
+        setIsEditDeptDialogOpen(true);
+    }
+
     const handleAddAdminEditToggle = () => {
         setAdminEditMode(false);
     };
@@ -362,6 +360,10 @@ function Organizations() {
 
     const handleAddDeptSelectEmail = (email) => {
         setAddDeptSelectedEmail(email);
+    }
+
+    const handleEditDeptSelectEmail = (email) => {
+        setEditDeptSelectedEmail(email);
     }
 
     const handleAddDeptNameChange = (event) => {
@@ -492,6 +494,53 @@ function Organizations() {
         }
     };
 
+    const handleEditDeptConfirm = async () => {
+        setEditDeptSelectionWarning("");
+
+        if (!editDeptSelectedEmail) {
+            setEditDeptSelectionWarning("Please select an employee to add as an administrator.");
+            return;
+        }
+
+        const selectedEmployee = [...adminEmployees, ...nonAdminEmployees].find(emp => emp.email === editDeptSelectedEmail);
+
+        console.log("**********JSON:", selectedEmployee._id);
+        console.log("SELECTED EMPLOYEE:", selectedEmployee);
+
+        if (!selectedEmployee) {
+            setAddDeptSelectionWarning("Selected administrator not found.");
+            return;
+        }
+
+        const newAdmins = {
+            departmentAdministrators: [...editDept.departmentAdministrators, selectedEmployee._id]
+        };
+
+        try {
+            let response = await fetch(`http://localhost:3000/api/dep/${editDept._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newAdmins)
+            });
+
+            console.log("RESPONSE!!!!!!!!!!!!!:", response);
+
+            if (!response.ok) {
+                setAddDeptSelectionWarning('Failed to update the department. Please try again.');
+                return;
+            }
+
+
+
+            setIsEditDeptDialogOpen(false);
+        } catch (error) {
+            console.error('Error updating department: ', error);
+        }
+    };
+
     const handleRemoveAdmin = async (adminId) => {
         const updatedAdmins = userOrganization.organizationAdministrators.filter(id => id !== adminId);
         setUserOrganization(prevState => ({
@@ -530,7 +579,19 @@ function Organizations() {
         }));
 
         try {
-            const response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+            const deleteResponse = await fetch(`http://localhost:3000/api/dep/${deptId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (!deleteResponse.ok) {
+                throw new Error('Failed to remove department');
+            }
+
+            const updateOrgResponse = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -539,7 +600,7 @@ function Organizations() {
                 body: JSON.stringify({departments: updatedDepts})
             });
 
-            if (!response.ok) {
+            if (!updateOrgResponse.ok) {
                 throw new Error('Failed to remove department');
             }
 
@@ -550,6 +611,44 @@ function Organizations() {
                 departments: [...prevState.organizationAdministrators, deptId]
             }));
         }
+    };
+
+    const EmailList = ({ admins }) => {
+        const [showFullList, setShowFullList] = useState(false);
+
+        const truncatedEmails = admins.slice(0, 2).map((admin) => admin.email).join(', ');
+
+        const fullEmails = showFullList
+            ? admins
+                .map((admin) => admin.email)
+                .reduce((acc, email, index) => {
+                    const groupIndex = Math.floor(index / 3);
+                    acc[groupIndex] = (acc[groupIndex] || []).concat(email);
+                    return acc;
+                }, [])
+                .map((group) => group.join(', '))
+                .join(', ')
+            : truncatedEmails;
+
+        const handleToggleList = () => {
+            setShowFullList(!showFullList);
+        };
+
+        return (
+            <div>
+                <MDTypography variant="caption" color="text" fontWeight="regular">
+                    {showFullList ? fullEmails : truncatedEmails + (admins.length > 2 ? ',' : '')}
+                </MDTypography>
+
+                {admins.length > 2 && (
+                    <Tooltip title={showFullList ? 'Collapse list' : 'Expand list'}>
+                        <IconButton size="small" onClick={handleToggleList}>
+                            {showFullList ? <ArrowLeftIcon /> : <MoreHorizIcon />}
+                        </IconButton>
+                    </Tooltip>
+                )}
+            </div>
+        );
     };
 
     return (
@@ -624,7 +723,7 @@ function Organizations() {
                 <MDBox display="flex" flexDirection="column" alignItems="center">
                     <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto" sx={{margin: 'auto'}}>
                         <List sx={{width: '100%', mb: 2}}>
-                            {Array.isArray(nonAdminEmployees) ? nonAdminEmployees.map((employee) => (
+                            {Array.isArray(adminEmployees) && Array.isArray(nonAdminEmployees) ? [...adminEmployees, ...nonAdminEmployees].map((employee) => (
                                 <ListItem
                                     button
                                     key={employee.id}
@@ -637,7 +736,7 @@ function Organizations() {
                                     }}
                                 >
                                     <ListItemText primary={employee.email} sx={{
-                                        textAlign: 'left',
+                                        textAlign: 'center',
                                         '& .MuiListItemText-primary': {fontSize: '1rem', padding: '2px'}
                                     }}/>
                                 </ListItem>
@@ -665,7 +764,7 @@ function Organizations() {
                     <MDTypography
                         variant="button"
                         fontWeight="medium"
-                        color="black"
+                        color="text"
                     >
                         &nbsp; Organization Administrators
                     </MDTypography>
@@ -740,7 +839,7 @@ function Organizations() {
                     <MDTypography
                         variant="button"
                         fontWeight="medium"
-                        color="black"
+                        color="text"
                     >
                         &nbsp; Organization Departments
                     </MDTypography>
@@ -789,16 +888,24 @@ function Organizations() {
                                 ),
                                 admin: (
                                     <MDTypography variant="caption" color="text" fontWeight="regular">
-                                        {department.admins.map(admin => admin.email).join(', ')}
+                                        <EmailList admins={department.admins} />
                                     </MDTypography>
                                 ),
                                 actions: deptEditMode ? (
-                                    <IconButton
-                                        onClick={() => handleRemoveDept(department._id)}
-                                        sx={{padding: 0}}
-                                    >
-                                        <RemoveCircleOutlineIcon sx={{fontSize: 'medium !important'}}/>
-                                    </IconButton>
+                                    <div>
+                                        <IconButton
+                                            onClick={() => handleEditSingleDeptClick(department)}
+                                            sx={{ padding: 0, marginRight: 1 }}
+                                        >
+                                            <EditIcon sx={{ fontSize: 'medium !important' }} />
+                                        </IconButton>
+                                        <IconButton
+                                            onClick={() => handleRemoveDept(department._id)}
+                                            sx={{ padding: 0 }}
+                                        >
+                                            <RemoveCircleOutlineIcon sx={{ fontSize: 'medium !important' }} />
+                                        </IconButton>
+                                    </div>
                                 ) : null,
                             };
                         }),
@@ -870,11 +977,62 @@ function Organizations() {
                 </DialogContent>
             </Dialog>
 
+            <Dialog sx={{'& .MuiDialog-paper': {minWidth: '700px'}}} open={isEditDeptDialogOpen}
+                    onClose={() => setIsEditDeptDialogOpen(false)}>
+                <DialogTitle sx={{lineHeight: "2", textAlign: "center"}}>Edit Department: {editDept ? editDept.departmentName : ''}</DialogTitle>
+                <DialogContent>
+                    <MDBox display="flex" flexDirection="column" alignItems="center" p={3}>
+                        <MDTypography variant="subtitle2" sx={{textAlign: "center"}}>
+                            Please select an employee to assign as an administrator:
+                        </MDTypography>
+                    </MDBox>
+                    <MDBox display="flex" flexDirection="column" alignItems="center">
+                        <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto"
+                               sx={{margin: 'auto'}}>
+                            <List sx={{width: '100%', mb: 2}}>
+                                {Array.isArray(adminEmployees) && Array.isArray(nonAdminEmployees) ? [...adminEmployees, ...nonAdminEmployees].map((employee) => (
+                                    <ListItem
+                                        button
+                                        key={employee.id}
+                                        onClick={() => handleEditDeptSelectEmail(employee.email)}
+                                        sx={{
+                                            width: '100%',
+                                            backgroundColor: employee.email === editDeptSelectionWarning ? '#e0e0e0' : 'transparent',
+                                            justifyContent: 'center',
+                                            mx: 'auto'
+                                        }}
+                                    >
+                                        <ListItemText primary={employee.email} sx={{
+                                            textAlign: 'center',
+                                            '& .MuiListItemText-primary': {fontSize: '1rem', padding: '2px'}
+                                        }}/>
+                                    </ListItem>
+                                )) : 'Something unexpected happened while fetching organization employees.'}
+                            </List>
+                        </MDBox>
+                        {editDeptSelectedEmail && (
+                            <MDTypography variant="body2" style={{margin: '20px 0'}}>
+                                {editDeptSelectedEmail} will be added as the department administrator
+                            </MDTypography>
+                        )}
+                        {editDeptSelectionWarning && (
+                            <MDTypography variant="body2" sx={{color: 'red', textAlign: 'center', mt: 2}}>
+                                {editDeptSelectionWarning}
+                            </MDTypography>
+                        )}
+                        <MDButton onClick={handleEditDeptConfirm} color="info" variant="contained"
+                                  sx={{color: 'white', mt: 2, mb: 2}}>
+                            Edit Department
+                        </MDButton>
+                    </MDBox>
+                </DialogContent>
+            </Dialog>
+
             <MDBox>
                 <MDTypography
                     variant="button"
                     fontWeight="medium"
-                    color="black"
+                    color="text"
                     style={{marginLeft: "1rem"}}
                 >
                     &nbsp; Organization Projects
