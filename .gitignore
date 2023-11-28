@@ -2,7 +2,6 @@
 node_modules/
 npm-debug.log
 package-lock.json
-backend
 # macOS
 .DS_Store
 
@@ -11,3 +10,7 @@ backend
 
 # Coverage Files
 coverage/
+
+# extra
+backend
+.gitignore
