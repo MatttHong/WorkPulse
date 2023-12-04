@@ -203,25 +203,41 @@ exports.endLogSession = (req, res, next) => {
             return log.endSession();
         })
         .then(() => {
-            axios.post(funcUrl, temp)
-                .then(axiosResponse => {
-                    console.log(axiosResponse);
-                    res.json({
-                        message: "Log session ended successfully",
-                        logId: logId,
-                        employee: logEmpId
-                    });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    res.status(500).json({
-                        message: error.message || "Failed to run Azure function!",
-                    });
+            tempfunc = funcUrl + "&_id=" + logId
+            axios.post(tempfunc)
+            .then(axiosResponse => {
+                console.log(axiosResponse);
+                res.json({
+                    message: "Log session ended successfully",
+                    logId: logId,
+                    employee: logEmpId
                 });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                res.status(500).json({
+                    message: error.message || "Failed to run Azure function!",
+                });
+            });
+            // axios.post(funcUrl, temp)
+            //     .then(axiosResponse => {
+            //         console.log(axiosResponse);
+            //         res.json({
+            //             message: "Log session ended successfully",
+            //             logId: logId,
+            //             employee: logEmpId
+            //         });
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //         res.status(500).json({
+            //             message: error.message || "Failed to run Azure function!",
+            //         });
+            //     });
         })
         .catch((err) => {
             console.log(err);
-            res.status(500).json({
+            res.status(400).json({
                 message: err.message || "Failed to end log session!",
             });
         });
