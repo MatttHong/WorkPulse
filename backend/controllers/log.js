@@ -204,8 +204,8 @@ exports.endLogSession = (req, res, next) => {
         })
         .then(() => {
             axios.post(funcUrl, temp)
-                .then(res => {
-                    console.log(res);
+                .then(axiosResponse => {
+                    console.log(axiosResponse);
                     res.json({
                         message: "Log session ended successfully",
                         logId: logId,
