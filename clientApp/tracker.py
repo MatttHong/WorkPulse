@@ -17,6 +17,8 @@ global_bearer_token = None
 USER_ID = None
 LOG_ID = None
 END = False
+function_url = 'https://app-trackervariancealgo.azurewebsites.net/api/http_trigger?code=olQrLPqMdULrdatXD2uyPke2X_xLoisd_pRmtv3ZahxlAzFuVymqoA%3D%3D&_id='
+
 
 # Mock responses for testing
 mock_post_response = Mock()
@@ -175,7 +177,7 @@ class LoggingApp(tk.Tk):
             self.login_page = LoginPage(self)
 
     def logout(self):
-        global LOG_ID, END
+        global LOG_ID, END, function_url
 
         # Stop all active timers
         self.stop_all_timers()
@@ -200,6 +202,15 @@ class LoggingApp(tk.Tk):
         # If a logging session is active, stop it
         if LOG_ID:
             self.stop_logging()  # This will handle the API call to stop logging
+        function_url+=LOG_ID
+        response = requests.get(function_url)
+        if response.status_code == 200:
+            # Request was successful, and you can access the response content
+            print("Response Content:", response.text)
+        else:
+            # Request failed with an error status code
+            print("Request failed with status code:", response.status_code)
+            print("Error Response Content:", response.text)
 
         LOG_ID = None
 
