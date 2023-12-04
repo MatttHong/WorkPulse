@@ -1,5 +1,6 @@
 const Log = require("../models/logs");
 const Status = require('../utils/status');
+const axios = require('axios');
 
 // Create a new log
 exports.createLog = (req, res, next) => {
@@ -125,31 +126,6 @@ exports.deleteLog = (req, res, next) => {
     });
 };
 
-// End a log session
-exports.endLogSession = (req, res, next) => {
-    const logId = req.params.id;
-
-    Log.findById(logId)
-    .then((log) => {
-        if (!log) {
-            throw new Error("Log not found");
-        }
-
-        return log.endSession();
-    })
-    .then(() => {
-        res.json({
-            message: "Log session ended successfully",
-        });
-    })
-    .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-            message: err.message || "Failed to end log session!",
-        });
-    });
-};
-
 // Get logs by employee ID
 exports.getLogsByEmployeeId = (req, res, next) => {
     const employeeId = req.params.employeeId;
@@ -215,20 +191,33 @@ exports.addLogEntry = (req, res, next) => {
 exports.endLogSession = (req, res, next) => {
     const logId = req.params.id;
     let logEmpId
+    let temp
+    let funcUrl = process.env.FUNCTION_URL
     Log.findById(logId)
         .then((log) => {
             if (!log) {
                 throw new Error("Log not found");
             }
             logEmpId = log.employee
+            temp = log
             return log.endSession();
         })
         .then(() => {
-            res.json({
-                message: "Log session ended successfully",
-                logId: logId,
-                employee: logEmpId
-            });
+            axios.post(funcUrl, temp)
+                .then(res => {
+                    console.log(res);
+                    res.json({
+                        message: "Log session ended successfully",
+                        logId: logId,
+                        employee: logEmpId
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    res.status(500).json({
+                        message: err.message || "Failed to run Azure function!",
+                    });
+                });
         })
         .catch((err) => {
             console.log(err);
