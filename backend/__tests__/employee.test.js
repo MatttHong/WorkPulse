@@ -185,13 +185,13 @@ describe('Employee API endpoints', () => {
                 it('should create an employee', async () => {
                     const newEmployee = new Employee({
                         email : "testytesty@gmail.com",
-                        userId : "6552da83f8d1dd64e4fcdbed",
-                        orgId : "655334de2a6401833d52831f",
+                        userId : userId,
+                        orgId : orgId,
                         status: Status.invited
                     });
                     await newEmployee.save()
                     employeeId = newEmployee.id
-                    // appendToList(['employee', employeeId])
+                    appendToList(['employee', employeeId])
                 });
             });
 
