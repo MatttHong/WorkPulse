@@ -100,6 +100,7 @@ class LoggingApp(tk.Tk):
         self.title('Logging Control Panel')
         self.geometry('300x200')
         self.logged_in = False
+        self.tracking = False
 
         self.login_page = LoginPage(self)
 
@@ -200,7 +201,7 @@ class LoggingApp(tk.Tk):
         messagebox.showinfo("Logout", "You have been logged out.")
 
         # If a logging session is active, stop it
-        if LOG_ID:
+        if LOG_ID and self.trackingOperation is True:
             self.stop_logging()  # This will handle the API call to stop logging
         function_url+=LOG_ID
         response = requests.get(function_url)
@@ -216,6 +217,8 @@ class LoggingApp(tk.Tk):
 
 
     def start_logging(self):
+        if(self.trackingOperation is True):
+            return
         global LOG_ID, END
         url = f'{API_BASE_URL}'
         log_data = {
@@ -257,7 +260,10 @@ class LoggingApp(tk.Tk):
                 # This code will run if the operating system is not macOS
                 print("Not running on macOS")
                 self.keyboard_listener.start()
+
+            self.trackingOperation = True
         except requests.exceptions.RequestException as e:
+            self.trackingOperation = False
             print(f'Failed to start logging: {e}')
 
     def reinitialize_listeners_and_timers(self):
@@ -277,6 +283,8 @@ class LoggingApp(tk.Tk):
         self.active_timers.clear()
 
     def stop_logging(self):
+        if(self.trackingOperation is False):
+            return
         global LOG_ID, END
         self.has_been_stopped = True
 
@@ -305,6 +313,7 @@ class LoggingApp(tk.Tk):
                 print('Logging stopped successfully')
                 self.start_button['state'] = tk.NORMAL
                 self.stop_button['state'] = tk.DISABLED
+                self.trackingOperation = False
 
 
             except requests.exceptions.RequestException as e:
