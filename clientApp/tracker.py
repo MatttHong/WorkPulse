@@ -100,7 +100,7 @@ class LoggingApp(tk.Tk):
         self.title('Logging Control Panel')
         self.geometry('300x200')
         self.logged_in = False
-        self.tracking = False
+        self.trackingOperation = False
 
         self.login_page = LoginPage(self)
 
@@ -203,18 +203,8 @@ class LoggingApp(tk.Tk):
         # If a logging session is active, stop it
         if LOG_ID and self.trackingOperation is True:
             self.stop_logging()  # This will handle the API call to stop logging
-        function_url+=LOG_ID
-        response = requests.get(function_url)
-        if response.status_code == 200:
-            # Request was successful, and you can access the response content
-            print("Response Content:", response.text)
-        else:
-            # Request failed with an error status code
-            print("Request failed with status code:", response.status_code)
-            print("Error Response Content:", response.text)
-
         LOG_ID = None
-
+        self.trackingOperation = False
 
     def start_logging(self):
         if(self.trackingOperation is True):
