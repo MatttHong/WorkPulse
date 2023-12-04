@@ -9,7 +9,7 @@ router.use(checkBodyForLongValues, validateAndFormatEmailParams);
 
 router.post('', validatePasswordForm, userController.createUser);
 
-router.put('/:id', userController.updateUser);
+router.put('/:id', validateSession, userController.updateUser);
 
 router.get('/email/:email', validateSession, userController.getUserByEmail);
 
