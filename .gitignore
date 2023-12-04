@@ -12,5 +12,4 @@ package-lock.json
 coverage/
 
 # extra
-backend
 .gitignore

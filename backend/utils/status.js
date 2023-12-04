@@ -23,7 +23,7 @@ const Status = Object.freeze({
     available: 'Available',
     pendingApproval: 'Pending Approval',
     onboarding: "On Boarding",
-    starting: "Active",
+    starting: "Starting",
     closed: "Closed",
 
 });

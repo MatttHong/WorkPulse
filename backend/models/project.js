@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Status = require('../utils/status');
 
 const projectSchema = mongoose.Schema({
 
@@ -7,7 +8,12 @@ const projectSchema = mongoose.Schema({
     employees : { type: [String], default: [], required: true},
     tasks : { type: [String], default: [], required: true},
     departments: { type: [String], default: [], required: true},
-    status : { type: String, default: "Active", required: true },
+    status: {
+        type: String,
+        required: true,
+        enum: Object.values(Status),
+        default: Status.active
+      },
 
 });
 

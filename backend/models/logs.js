@@ -20,7 +20,11 @@ const logSchema = mongoose.Schema({
     }] 
 
 });
-
+// if the log is a post-algorithm log =
+// log: [(timestampA, timestampB, result)]
+// timestampA = start time
+// timestampB = end time
+// Result for that time chunk
 logSchema.methods.endSession = function () {
     return new Promise(async (resolve, reject) => {
       const end = Date.now(); 
