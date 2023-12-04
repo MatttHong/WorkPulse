@@ -203,37 +203,24 @@ exports.endLogSession = (req, res, next) => {
             return log.endSession();
         })
         .then(() => {
-            tempfunc = funcUrl + "&_id=" + logId
-            axios.post(tempfunc)
-            .then(axiosResponse => {
-                console.log(axiosResponse);
-                res.json({
-                    message: "Log session ended successfully",
-                    logId: logId,
-                    employee: logEmpId
+            console.log("jump to here code 112")
+            console.log(funcUrl)
+            console.log(temp)
+            axios.post(funcUrl, temp)
+                .then(axiosResponse => {
+                    console.log(axiosResponse);
+                    res.json({
+                        message: "Log session ended successfully",
+                        logId: logId,
+                        employee: logEmpId
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    res.status(500).json({
+                        message: error.message || "Failed to run Azure function!",
+                    });
                 });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                res.status(500).json({
-                    message: error.message || "Failed to run Azure function!",
-                });
-            });
-            // axios.post(funcUrl, temp)
-            //     .then(axiosResponse => {
-            //         console.log(axiosResponse);
-            //         res.json({
-            //             message: "Log session ended successfully",
-            //             logId: logId,
-            //             employee: logEmpId
-            //         });
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //         res.status(500).json({
-            //             message: error.message || "Failed to run Azure function!",
-            //         });
-            //     });
         })
         .catch((err) => {
             console.log(err);
