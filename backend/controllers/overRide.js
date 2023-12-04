@@ -6,6 +6,10 @@ const Project = require("../models/project");
 const Task = require("../models/tasks");
 const User = require("../models/user");
 
+// This file does not need to be tested since it is only creating a method for the jest testing suite to 
+// have maximal permission and break permission sets on token - Lets all data be deleted in this mode
+// used by the garbage collection like system in the cleanup file and afterall sections
+
 exports.deleteModel = (req, res, next) => {
     const id = req.params.id;
     let modelType = req.body.type;

@@ -215,7 +215,7 @@ exports.endLogSession = (req, res, next) => {
                 .catch(error => {
                     console.error('Error:', error);
                     res.status(500).json({
-                        message: err.message || "Failed to run Azure function!",
+                        message: error.message || "Failed to run Azure function!",
                     });
                 });
         })
