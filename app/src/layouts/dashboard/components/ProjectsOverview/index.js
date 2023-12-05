@@ -39,7 +39,7 @@ function Projects() {
                     const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
                         headers: {
                             Authorization: "Bearer " + token,
-                        }
+                        } 
                     });
 
                     if (response.ok) {
@@ -70,12 +70,14 @@ function Projects() {
     const {columns, rows} = data(userLogs);
     console.log("LOGSSSSSSSSSSS:", userLogs);
     return (
-        <Card>
+        <Card data-testid="card-component">
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                 <MDBox>
+                    <div data-testid="Card title">
                     <MDTypography variant="h6" gutterBottom>
                         Sessions
                     </MDTypography>
+                    </div>
                     <MDBox display="flex" alignItems="center" lineHeight={0}>
                         <Icon
                             sx={{
@@ -93,6 +95,7 @@ function Projects() {
                 </MDBox>
             </MDBox>
             <MDBox>
+            <div data-testid="data-table-component">
                 <DataTable
                     table={{columns, rows}}
                     showTotalEntries={false}
@@ -100,6 +103,7 @@ function Projects() {
                     noEndBorder
                     entriesPerPage={false}
                 />
+            </div>
             </MDBox>
         </Card>
     );

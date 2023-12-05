@@ -30,7 +30,6 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 // Images
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
-import Dashboard from "layouts/dashboard";
 
 
 
@@ -41,7 +40,6 @@ export default function App() {
     direction,
     layout,
     openConfigurator,
-    sidenavColor,
     transparentSidenav,
     whiteSidenav,
     darkMode,
@@ -122,7 +120,6 @@ export default function App() {
       {layout === "dashboard" && (
         <>
           <Sidenav
-            color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
             brandName="WorkPulse"
             routes={routes}

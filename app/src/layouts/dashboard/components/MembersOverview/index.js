@@ -201,7 +201,7 @@ function MembersOverview() {
 
 
     return (
-        <Card>
+        <Card data-testid="card-component">
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                 <MDBox>
                     <MDTypography variant="h6" gutterBottom>
@@ -224,7 +224,7 @@ function MembersOverview() {
                 </MDBox>
             </MDBox>
             <MDBox>
-                <DataTable
+                <DataTable data-testid="data-table-component"
                     table={{
                         columns: [
                             {Header: " ", accessor: "checkbox"},
