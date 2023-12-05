@@ -12,29 +12,23 @@
 
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
-
+import React from 'react';
 import {useEffect, useState} from "react";
 
 // @mui material components
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Grid from "@mui/material/Grid";
-
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDInput from "components/MDInput";
 
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
 import Checkbox from "@mui/material/Checkbox";
 
-
 function MembersOverview() {
-    const Company = ({image, name}) => (
+    const Company = ({name}) => (
         <MDBox display="flex" alignItems="center" lineHeight={1}>
             <MDTypography variant="button" fontWeight="medium" ml={1} lineHeight={1}>
                 {name}
@@ -62,7 +56,7 @@ function MembersOverview() {
         if (taskA.status !== taskB.status) {
             return taskA.status === 'Completed' ? 1 : -1;
         }
-
+ 
         // Sort by project name
         const projectNameA = findProjectNameByTaskId(taskA._id);
         const projectNameB = findProjectNameByTaskId(taskB._id);

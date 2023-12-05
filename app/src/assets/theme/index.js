@@ -14,6 +14,7 @@ Coded by www.creative-tim.com
 */
 
 // @mui material components
+import React from "react";
 import { createTheme } from "@mui/material/styles";
 
 // Material Dashboard 2 React base styles

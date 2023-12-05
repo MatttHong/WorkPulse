@@ -13,27 +13,19 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 
-import {useState, useCallback, useEffect} from "react";
-
-
+ import React from 'react';
+import {useState, useEffect} from "react";
 
 import Card from "@mui/material/Card";
-import Icon from "@mui/material/Icon";
-
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDButton from "components/MDButton";
 
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
-
 // Data
 import data from "layouts/dashboard/components/TasksOverview/data";
-
-
-
 
 function Tasks() {
     const [userProjects, setUserProjects] = useState([]); // Initial state as null or appropriate default
