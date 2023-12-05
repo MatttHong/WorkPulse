@@ -25,6 +25,7 @@ import DataTable from "examples/Tables/DataTable";
 import axios from "axios";
 import Tooltip from '@mui/material/Tooltip';
 import Checkbox from "@mui/material/Checkbox";
+import data from "layouts/dashboard/components/ProjectsOverview/data";
 import * as PropTypes from "prop-types";
 
 function Organizations() {
@@ -35,6 +36,7 @@ function Organizations() {
     const [userOrganization, setUserOrganization] = useState([]);
     const [adminEmployees, setAdminEmployees] = useState([]);
     const [adminUsers, setAdminUsers] = useState([]);
+    const [userLogs, setUserLogs] = useState([]);
     const [nonAdminEmployees, setNonAdminEmployees] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [dummyOrg, setDummyOrg] = useState([]);
@@ -84,6 +86,40 @@ function Organizations() {
 
         const employeeData = await response.json();
         return employeeData.employee;
+    };
+
+    const fetchLogs = async () => {
+        const token = localStorage.getItem('token');
+
+        try {
+            // Aggregate logs from all employees
+            let allLogs = [];
+            for (const employeeId of userOrganization.employees) {
+                const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const logIds = data.employee.logs;
+
+                    // Fetch logs for each ID and aggregate
+                    const logs = await Promise.all(logIds.map(logId =>
+                        fetch(`http://localhost:3000/api/log/${logId}`, {
+                            headers: { Authorization: "Bearer " + token }
+                        }).then(res => res.json())
+                    ));
+                    allLogs = allLogs.concat(logs);
+                } else {
+                    console.error('Failed to fetch employee data:', response.status);
+                }
+            }
+            setUserLogs(allLogs);
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        }
     };
 
     const fetchData = async () => {
@@ -258,6 +294,9 @@ function Organizations() {
 
     useEffect(() => {
         fetchData();
+        if (userOrganization && userOrganization.employees) {
+            fetchLogs();
+        }
         if (userOrganization && userOrganization.organizationAdministrators && userOrganization.departments) {
             fetchAdministrators();
             fetchDepartments();
@@ -273,6 +312,7 @@ function Organizations() {
     console.log("ADMIN EMPLOYEES:", adminEmployees);
     console.log("NONADMIN EMPLOYEES:", nonAdminEmployees);
     console.log("*****************************");
+    console.log("KKKKKKKKKLOGS:", userLogs);
 
     // visual vars
     const [editMode, setEditMode] = useState(false);
@@ -1046,6 +1086,8 @@ function Organizations() {
         );
     };
 
+    const { columns, rows } = data(userLogs);
+
     return (
         <Card style={{maxWidth: '100%'}}>
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3.5}>
@@ -1723,6 +1765,22 @@ function Organizations() {
                     noEndBorder
                     entriesPerPage={false}
                 />
+                <MDBox p={3}>
+                    <MDTypography
+                        variant="button"
+                        fontWeight="medium"
+                        color="text"
+                    >
+                        &nbsp; Organization Logs
+                    </MDTypography>
+                    <DataTable
+                        table={{ columns, rows }}
+                        showTotalEntries={false}
+                        isSorted={false}
+                        noEndBorder
+                        entriesPerPage={false}
+                    />
+                </MDBox>
             </MDBox>
         </Card>
     )

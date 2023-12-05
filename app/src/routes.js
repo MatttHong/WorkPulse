@@ -18,7 +18,7 @@ import Dashboard from "layouts/dashboard"
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-import ProjecsPage from "layouts/projects"
+import BusinessIcon from '@mui/icons-material/Business';
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -34,14 +34,14 @@ const routes = [
     route: "/dashboard",
     component: <Dashboard />,
   },
-  {
-      type: "collapse",
-      name: "Projects",
-      key: "projects-page",
-      icon: <Icon fontSize="small">projects</Icon>,
-      route: "/projects",
-      component: <ProjecsPage />,
-    },
+  // {
+  //     type: "collapse",
+  //     name: "Projects",
+  //     key: "projects-page",
+  //     icon: <Icon fontSize="small">projects</Icon>,
+  //     route: "/projects",
+  //     component: <ProjecsPage />,
+  //   },
   {
     type: "collapse",
     name: "Profile",
@@ -71,6 +71,7 @@ const routes = [
     name: "Organizations",
     key: "orgs",
     route: "/organizations",
+    icon: <BusinessIcon />,
     component: <OrgsPage />,
   },
 ];
