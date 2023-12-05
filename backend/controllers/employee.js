@@ -79,6 +79,7 @@ exports.updateEmployee = (req, res, next) => {
             if (req.body.employees !== undefined) employee.employees = req.body.employees;
             if (req.body.orgId !== undefined) employee.orgId = req.body.orgId;
             if (req.body.status !== undefined) employee.status = req.body.status;
+            if (req.body.tasks !== undefined) employee.tasks = req.body.tasks;
 
             return employee.save();
         };

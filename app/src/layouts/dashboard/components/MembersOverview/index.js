@@ -1,17 +1,3 @@
-/**
- =========================================================
- * Material Dashboard 2 React - v2.2.0
- =========================================================
-
- * Product Page: https://www.creative-tim.com/product/material-dashboard-react
- * Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
- Coded by www.creative-tim.com
-
- =========================================================
-
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- */
 import React from 'react';
 import {useEffect, useState} from "react";
 // @mui material components
@@ -25,17 +11,40 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
 import Checkbox from "@mui/material/Checkbox";
+import axios from "axios";
 
+const fetchUserData = async () => {
+    const userEmail = localStorage.getItem("email");
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
+        headers: {
+            Authorization: "Bearer " + token,
+        }
+    });
+    return response.data.user;
+};
+
+const fetchEmployeeData = async (employeeID) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`http://localhost:3000/api/employee/${employeeID}`, {
+        headers: {
+            Authorization: "Bearer " + token,
+        }
+    });
+    return response.data.employee.tasks;
+};
+
+const fetchTaskData = async (taskId) => {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`http://localhost:3000/api/task/${taskId}`, {
+        headers: {
+            Authorization: "Bearer " + token,
+        }
+    });
+    return response.data.task;
+};
 
 function MembersOverview() {
-    const Company = ({name}) => (
-        <MDBox display="flex" alignItems="center" lineHeight={1}>
-            <MDTypography variant="button" fontWeight="medium" ml={1} lineHeight={1}>
-                {name}
-            </MDTypography>
-        </MDBox>
-    );
-
     const completedTaskStyle = {
         textDecoration: 'line-through',
         color: 'lightgrey'
@@ -54,7 +63,7 @@ function MembersOverview() {
     function sortTasks(taskA, taskB) {
         // Sort by status (Active tasks first)
         if (taskA.status !== taskB.status) {
-            return taskA.status === 'Completed' ? 1 : -1;
+            return taskA.status === 'Finished' ? 1 : -1;
         }
  
         // Sort by project name
@@ -69,8 +78,8 @@ function MembersOverview() {
     }
 
     function handleUpdateTask(task) {
-        const newStatus = task.status === 'Completed' ? 'Active' : 'Completed';
-        setUserTasks(userTasks.map(f => {
+        const newStatus = task.status === 'Finished' ? 'Active' : 'Finished';
+        setBestUserTasks(bestUserTasks.map(f => {
             if (f._id === task._id) {
                 return {...task, status: newStatus}
             }
@@ -105,6 +114,7 @@ function MembersOverview() {
     const [userProjects, setUserProjects] = useState([]);
     const [userAdmins, setUserAdmins] = useState([]);
     const [userTasks, setUserTasks] = useState([]);
+    const [bestUserTasks, setBestUserTasks] = useState([]);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -149,6 +159,7 @@ function MembersOverview() {
 
                             if (userResponse.ok) {
                                 const taskData = await userResponse.json();
+                                console.log("OOOOOOOOOOOOOOOOOTASKDATA:", taskData);
                                 setUserTasks(prevTasks => [...prevTasks, taskData.task]);
                             } else {
                                 console.error('Failed to fetch task data:', userResponse.status);
@@ -163,12 +174,31 @@ function MembersOverview() {
             }
         };
 
+        const initializeData = async () => {
+            try {
+                const userData = await fetchUserData();
+                console.log("USERDATA", userData);
+                const taskIds = await fetchEmployeeData(userData.employments[0]);
+                // Fetch all tasks concurrently
+                const tasksPromises = taskIds.map(taskId => fetchTaskData(taskId));
+                const tasks = await Promise.all(tasksPromises);
+
+                // Update bestUserTasks with the fetched tasks
+                setBestUserTasks(tasks);
+            } catch (error) {
+                console.error('Error fetching user tasks:', error);
+            }
+        };
+
         fetchProjects();
+        initializeData();
     }, []);
 
     console.log("PROJECTS", userProjects);
     console.log("ADMINS", userAdmins);
     console.log("TASKS", userTasks);
+    console.log("BESTTASKS", bestUserTasks);
+
 
     return (
         <Card>
@@ -188,7 +218,7 @@ function MembersOverview() {
                             done
                         </Icon>
                         <MDTypography variant="button" fontWeight="regular" color="text">
-                            &nbsp;<strong>{userTasks.filter(task => task.status === 'Completed').length}</strong> done
+                            &nbsp;<strong>{Array.isArray(bestUserTasks) ? bestUserTasks.filter(task => task.status === 'Finished').length : 0}</strong> done
                         </MDTypography>
                     </MDBox>
                 </MDBox>
@@ -199,14 +229,13 @@ function MembersOverview() {
                         columns: [
                             {Header: " ", accessor: "checkbox"},
                             {Header: "Task Name", accessor: "name", width: "45%", align: "left"},
-                            {Header: "Project", accessor: "project", width: "45%", align: "left"},
                             {Header: "Admin", accessor: "admin", align: "center"},
                             {Header: "Status", accessor: "status", align: "center"},
                         ],
-                        rows: Array.isArray(userTasks) ? userTasks.sort(sortTasks).map((task) => ({
+                        rows: Array.isArray(bestUserTasks) ? bestUserTasks.map((task) => ({
                             checkbox: (
                                 <Checkbox
-                                    checked={task.status === 'Completed'}
+                                    checked={task.status === 'Finished'}
                                     onChange={() => handleUpdateTask(task)}
                                     color="primary"
                                     inputProps={{
@@ -218,15 +247,10 @@ function MembersOverview() {
                                     variant="caption"
                                     color="text"
                                     fontWeight="medium"
-                                    style={task.status === 'Completed' ? completedTaskStyle : null}
+                                    style={task.status === 'Finished' ? completedTaskStyle : null}
                                   >
                                     {task.taskName}
                             </MDTypography>,
-                            project: (
-                                <MDTypography variant="caption" color="text" fontWeight="medium">
-                                    {findProjectNameByTaskId(task._id)}
-                                </MDTypography>
-                            ),
                             admin: (
                                 <MDTypography variant="caption" color="text" fontWeight="medium">
                                     {Array.isArray(task.taskAdministrators) ? task.taskAdministrators.map(findUserNameById).join(', ') : 'No Admins'}

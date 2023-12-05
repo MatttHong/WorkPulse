@@ -10,6 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import {Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Button} from '@mui/material';
 
 
@@ -24,6 +25,7 @@ import DataTable from "examples/Tables/DataTable";
 import axios from "axios";
 import Tooltip from '@mui/material/Tooltip';
 import Checkbox from "@mui/material/Checkbox";
+import * as PropTypes from "prop-types";
 
 function Organizations() {
     // data vars
@@ -48,7 +50,7 @@ function Organizations() {
         return response.data;
     };
 
-    const fetchOrgID = async (employeeID) => {
+    const fetchEmployeeData = async (employeeID) => {
         const response = await axios.get(`http://localhost:3000/api/employee/${employeeID}`, {
             headers: {
                 Authorization: "Bearer " + token,
@@ -91,7 +93,7 @@ function Organizations() {
                 const employeeID = userData.user.employments[0];
                 setEmployeeID(employeeID);
 
-                const employeeData = await fetchOrgID(employeeID);
+                const employeeData = await fetchEmployeeData(employeeID);
                 if (employeeData.employee) {
                     const organizationId = employeeData.employee.orgId;
 
@@ -278,24 +280,28 @@ function Organizations() {
     const [deptEditMode, setDeptEditMode] = useState(false);
     const [projectEditMode, setProjectEditMode] = useState(false);
     const [editDept, setEditDept] = useState(undefined);
-    const [editProject, setEditProject] = useState(undefined);
     const [isAddAdminDialogOpen, setIsAddAdminDialogOpen] = useState(false);
     const [isAddDeptDialogOpen, setIsAddDeptDialogOpen] = useState(false);
     const [isEditDeptDialogOpen, setIsEditDeptDialogOpen] = useState(false);
-    const [isEditProjectDialogOpen, setIsEditProjectDialogOpen] = useState(false);
     const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = useState(false);
+    const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
     const [addAdminSelectedEmail, setAddAdminSelectedEmail] = useState(null);
     const [addDeptSelectedEmail, setAddDeptSelectedEmail] = useState(null);
     const [editDeptSelectedEmail, setEditDeptSelectedEmail] = useState(null);
     const [addProjectSelectedEmail, setAddProjectSelectedEmail] = useState(null);
     const [addProjectSelectedDept, setAddProjectSelectedDept] = useState(null);
     const [addProjectSelectedTeam, setAddProjectSelectedTeam] = useState([]);
+    const [addTaskSelectedEmail, setAddTaskSelectedEmail] = useState(null);
+    const [addTaskSelectedProject, setAddTaskSelectedProject] = useState(null);
+    const [addTaskSelectedTeam, setAddTaskSelectedTeam] = useState([]);
     const [addAdminSelectionWarning, setAddAdminSelectionWarning] = useState("");
     const [addDeptSelectionWarning, setAddDeptSelectionWarning] = useState("");
     const [editDeptSelectionWarning, setEditDeptSelectionWarning] = useState("");
     const [addProjectSelectionWarning, setAddProjectSelectionWarning] = useState("");
+    const [addTaskSelectionWarning, setAddTaskSelectionWarning] = useState("");
     const [addDeptNewDeptName, setAddDeptNewDeptName] = useState("");
     const [addProjectNewProjectName, setAddProjectNewProjectName] = useState("");
+    const [addTaskNewTaskName, setAddTaskNewTaskName] = useState("");
 
 
     // visual funcs
@@ -358,18 +364,16 @@ function Organizations() {
         setIsAddProjectDialogOpen(true);
     }
 
+    const handleAddTaskClick = async (project) => {
+        setAddTaskSelectedProject(project);
+        setIsAddTaskDialogOpen(true);
+    }
+
     const handleEditSingleDeptClick = (selectedDepartment) => {
         console.log("Department being edited before:", selectedDepartment);
         setEditDept(selectedDepartment);
         console.log("Department being edited after:", editDept);
         setIsEditDeptDialogOpen(true);
-    }
-
-    const handleEditSingleProjectClick = (selectedProject) => {
-        console.log("Project being edited before:", selectedProject);
-        setEditDept(selectedProject);
-        console.log("Project being edited after:", editProject);
-        setIsEditProjectDialogOpen(true);
     }
 
     const handleAddAdminEditToggle = () => {
@@ -410,6 +414,10 @@ function Organizations() {
 
     const handleAddProjectNameChange = (event) => {
         setAddProjectNewProjectName(event.target.value);
+    }
+
+    const handleAddTaskNameChange = (event) => {
+        setAddTaskNewTaskName(event.target.value);
     }
 
     const handleAddAdminConfirm = async () => {
@@ -505,7 +513,7 @@ function Organizations() {
 
             console.log("NEWDEPTDATA!!!!!!!!!!!!!:", newDeptData);
 
-            const updatedDepartments = [...userOrganization.departments, newDeptData.dept._id];
+            const updatedDepartments = [...userOrganization.departments, newDeptData.dept.id];
             setUserOrganization(prevState => ({
                 ...prevState,
                 departments: updatedDepartments
@@ -524,6 +532,9 @@ function Organizations() {
                 setAddAdminSelectionWarning('Failed to add new department. Please try again.');
                 return;
             }
+
+            setAddDeptNewDeptName("");
+            setAddDeptSelectedEmail("");
 
             setIsAddDeptDialogOpen(false);
         } catch (error) {
@@ -651,16 +662,29 @@ function Organizations() {
         setAddProjectSelectedTeam(newAddProjectTeam);
     };
 
+    const handleAddTaskTeamToggle = (email) => {
+        const currentIndex = addTaskSelectedTeam.indexOf(email);
+        const newAddTaskTeam = [...addTaskSelectedTeam];
+
+        if (currentIndex === -1) {
+            newAddTaskTeam.push(email);
+        } else {
+            newAddTaskTeam.splice(currentIndex, 1);
+        }
+
+        setAddTaskSelectedTeam(newAddTaskTeam);
+    };
+
     const handleAddProjectConfirm = async () => {
         setAddProjectSelectionWarning("");
 
         if (!addProjectNewProjectName) {
-            setAddDeptSelectionWarning("Please enter a name for new project.");
+            setAddProjectSelectionWarning("Please enter a name for new project.");
             return;
         }
 
         if (!addProjectSelectedDept) {
-            setAddDeptSelectionWarning("Please select a department for new project.");
+            setAddProjectSelectionWarning("Please select a department for new project.");
             return;
         }
 
@@ -680,7 +704,7 @@ function Organizations() {
         console.log("SELECTED EMPLOYEES:", selectedEmployees);
 
         if (!selectedAdminEmployee) {
-            setAddDeptSelectionWarning("Selected administrator not found.");
+            setAddProjectSelectionWarning("Selected administrator not found.");
             return;
         }
 
@@ -730,7 +754,7 @@ function Organizations() {
             });
 
             if (!updateDepartmentResponse.ok) {
-                setAddDeptSelectionWarning('Failed to update related department while adding the project. Please try again.');
+                setAddProjectSelectionWarning('Failed to update related department while adding the project. Please try again.');
                 return;
             }
 
@@ -749,6 +773,121 @@ function Organizations() {
         } catch (error) {
             console.error('Error creating a projects: ', error);
             setAddDeptSelectionWarning('An error occurred while creating a new project. Please try again.');
+            setUserOrganization(prevState => ({
+                ...prevState,
+            }));
+        }
+    };
+
+    const handleAddTaskConfirm = async () => {
+        setAddTaskSelectionWarning("");
+
+        if (!addTaskNewTaskName) {
+            setAddDeptSelectionWarning("Please enter a description for new task.");
+            return;
+        }
+
+        if (!addProjectSelectedTeam) {
+            setAddProjectSelectionWarning("Please select employee(s) to assign the task.");
+        }
+
+        const userId = localStorage.getItem("id");
+        const allEmployees = [...adminEmployees, ...nonAdminEmployees];
+        const selectedAdminEmployee = allEmployees.find(emp => emp.userId === userId);
+        const selectedEmployees = allEmployees.filter(emp => addProjectSelectedTeam.includes(emp.email));
+        console.log("SELECTED EMPLOYEES:", selectedEmployees);
+
+        if (!selectedAdminEmployee) {
+            setAddTaskSelectionWarning("Selected administrator not found.");
+            return;
+        }
+
+        if (!selectedEmployees) {
+            setAddTaskSelectionWarning("Selected employees could not found.");
+            return;
+        }
+
+        const newTask = {
+            taskName: addTaskNewTaskName,
+            taskAdministrators: [selectedAdminEmployee._id],
+            employees: selectedEmployees.map(emp => emp._id),
+        };
+
+        try {
+            let addTaskResponse = await fetch("http://localhost:3000/api/task", {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newTask)
+            });
+
+            console.log("NEW TASK RESPONSE:", addTaskResponse);
+
+            if (!addTaskResponse.ok) {
+                setAddTaskSelectionWarning('Failed to add new project. Please try again.');
+                return;
+            }
+
+            const newTaskData = await addTaskResponse.json();
+            console.log("NEW TASK DATA:", newTaskData);
+
+            const employeesToUpdate = [selectedAdminEmployee, ...selectedEmployees];
+            for (const employee of employeesToUpdate) {
+                const updatedEmployeeTasks = {
+                    tasks: [...employee.tasks, newTaskData.task._id]
+                };
+
+                let updateEmployeeResponse = await fetch(`http://localhost:3000/api/employee/${employee._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedEmployeeTasks)
+                });
+
+                if (!updateEmployeeResponse.ok) {
+                    console.error('Failed to update tasks for employee:', employee._id);
+
+                }
+            }
+
+            const updatedTasks = {
+                projects: [...addTaskSelectedProject.tasks, newTaskData.task._id]
+            };
+
+            let updateProjectResponse = await fetch(`http://localhost:3000/api/proj/${addTaskSelectedProject._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedTasks)
+            });
+
+            if (!updateProjectResponse.ok) {
+                setAddTaskSelectionWarning('Failed to update related department while adding the project. Please try again.');
+                return;
+            }
+
+            setAddTaskNewTaskName("");
+            setAddTaskSelectedEmail("");
+            setAddTaskSelectedTeam([]);
+
+            fetchData();
+            if (userOrganization && userOrganization.organizationAdministrators && userOrganization.departments) {
+                fetchAdministrators();
+                fetchDepartments();
+                fetchNonAdminEmployees();
+            }
+
+            setIsAddProjectDialogOpen(false);
+        } catch
+            (error) {
+            console.error('Error creating a projects: ', error);
+            setAddTaskSelectionWarning('An error occurred while creating a new task. Please try again.');
             setUserOrganization(prevState => ({
                 ...prevState,
             }));
@@ -871,7 +1010,7 @@ function Organizations() {
         }
     };
 
-    const EmailList = ({ admins }) => {
+    const EmailList = ({admins}) => {
         const [showFullList, setShowFullList] = useState(false);
 
         const handleToggleList = () => {
@@ -899,7 +1038,7 @@ function Organizations() {
                 {admins.length > 2 && (
                     <Tooltip title={showFullList ? 'Collapse list' : 'Expand list'}>
                         <IconButton size="small" onClick={handleToggleList}>
-                            {showFullList ? <ArrowUpwardIcon /> : <MoreHorizIcon />}
+                            {showFullList ? <ArrowUpwardIcon/> : <MoreHorizIcon/>}
                         </IconButton>
                     </Tooltip>
                 )}
@@ -908,7 +1047,7 @@ function Organizations() {
     };
 
     return (
-        <Card>
+        <Card style={{maxWidth: '100%'}}>
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3.5}>
                 <MDBox>
                     {editMode ? (
@@ -939,7 +1078,10 @@ function Organizations() {
                                     value={dummyOrg.industry}
                                     name="industry"
                                     label={<MDTypography fontWeight={"bold"}
-                                                         sx={{color: 'grey', fontSize: '1rem'}}>Industry</MDTypography>}
+                                                         sx={{
+                                                             color: 'grey',
+                                                             fontSize: '1rem'
+                                                         }}>Industry</MDTypography>}
                                     onChange={handleInputChange}
                                     variant="outlined"
                                     fullWidth
@@ -977,7 +1119,8 @@ function Organizations() {
                     </MDTypography>
                 </DialogContent>
                 <MDBox display="flex" flexDirection="column" alignItems="center">
-                    <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto" sx={{margin: 'auto'}}>
+                    <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto"
+                           sx={{margin: 'auto'}}>
                         <List sx={{width: '100%', mb: 2}}>
                             {Array.isArray(adminEmployees) && Array.isArray(nonAdminEmployees) ? [...adminEmployees, ...nonAdminEmployees].map((employee) => (
                                 <ListItem
@@ -1417,6 +1560,71 @@ function Organizations() {
                 </DialogContent>
             </Dialog>
 
+            <Dialog sx={{'& .MuiDialog-paper': {minWidth: '700px'}}} open={isAddTaskDialogOpen}
+                    onClose={() => setIsAddTaskDialogOpen(false)}>
+                <DialogTitle sx={{lineHeight: "2", textAlign: "center"}}>Add New Task</DialogTitle>
+                <DialogContent>
+                    <MDBox display="flex" flexDirection="column" alignItems="center" p={3}>
+                        <TextField
+                            label={<MDTypography fontWeight="bold" sx={{color: 'grey', fontSize: '1rem'}}>
+                                Task Description
+                            </MDTypography>}
+                            variant="outlined"
+                            value={addTaskNewTaskName}
+                            onChange={handleAddTaskNameChange}
+                            fullWidth
+                            sx={{mb: 2}}
+                        />
+                        <MDTypography variant="subtitle2" sx={{textAlign: "center"}}>
+                            Please select employee(s) to assign a task:
+                        </MDTypography>
+                        <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto"
+                               sx={{margin: 'auto'}}>
+                            <List sx={{width: '100%', mb: 2}}>
+                                {Array.isArray(adminEmployees) && Array.isArray(nonAdminEmployees) ? (
+                                    [...adminEmployees, ...nonAdminEmployees].map((employee) => (
+                                        <ListItem
+                                            key={employee.id}
+                                            sx={{
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                                mx: 'auto'
+                                            }}
+                                            button
+                                            onClick={() => handleAddTaskTeamToggle(employee.email)}
+                                        >
+                                            <Checkbox
+                                                checked={addTaskSelectedTeam.indexOf(employee.email) !== -1}
+                                                tabIndex={-1}
+                                                disableRipple
+                                            />
+                                            <ListItemText
+                                                primary={employee.email}
+                                                sx={{
+                                                    textAlign: 'center',
+                                                    '& .MuiListItemText-primary': {fontSize: '1rem', padding: '2px'}
+                                                }}
+                                            />
+                                        </ListItem>
+                                    ))
+                                ) : (
+                                    'Something unexpected happened while fetching organization employees.'
+                                )}
+                            </List>
+                        </MDBox>
+                        {addTaskSelectionWarning && (
+                            <MDTypography variant="body2" sx={{color: 'red', textAlign: 'center', mt: 2}}>
+                                {addTaskSelectionWarning}
+                            </MDTypography>
+                        )}
+                        <MDButton onClick={handleAddTaskConfirm} color="info" variant="contained"
+                                  sx={{color: 'white', mt: 2, mb: 2}}>
+                            Assign Task
+                        </MDButton>
+                    </MDBox>
+                </DialogContent>
+            </Dialog>
+
             <MDBox display="flex" flexDirection="column">
                 <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                     <MDTypography
@@ -1461,6 +1669,7 @@ function Organizations() {
                             {Header: "Department", accessor: "departmentName", align: "left"},
                             {Header: "Admins", accessor: "projectAdmins", align: "left"},
                             {Header: "Team", accessor: "projectTeam", align: "left"},
+                            {Header: "Status", accessor: "status", align: "left"},
                             {Header: "", accessor: "actions", align: "left"}
                         ],
                         rows: departments.flatMap(department =>
@@ -1485,13 +1694,18 @@ function Organizations() {
                                         <EmailList admins={project.employees}/>
                                     </MDTypography>
                                 ),
+                                status: (
+                                    <MDTypography variant="caption" color="text" fontWeight="regular">
+                                        {project.status}
+                                    </MDTypography>
+                                ),
                                 actions: projectEditMode ? (
                                     <div>
                                         <IconButton
-                                            onClick={() => handleEditSingleProjectClick(project)}
-                                            sx={{padding: 0, marginRight: 1}}
+                                            onClick={() => handleAddTaskClick(project)}
+                                            sx={{padding: 0}}
                                         >
-                                            <EditIcon sx={{fontSize: 'medium !important'}}/>
+                                            <AddCircleOutlineIcon sx={{fontSize: 'medium !important'}}/>
                                         </IconButton>
                                         <IconButton
                                             onClick={() => handleRemoveProject(project._id, department._id)}

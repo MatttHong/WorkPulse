@@ -26,6 +26,7 @@ const employeeSchema = new Schema({
     type: Date,
     required: false,
   },
+  tasks: [String]
 });
 
 // Function to generate and set the inviteToken
