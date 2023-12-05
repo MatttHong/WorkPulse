@@ -210,12 +210,15 @@ exports.endLogSession = (req, res, next) => {
                 temp = log
             }
             // This should be adding the token
-            temp.token = token
+            // temp.token = token
             // printing what axios is going to send
-            console.log("what Axios is sending " + temp);
+            // console.log("what Axios is sending " + temp);
         })
         .then(() => {
-            axios.post(funcUrl, temp)
+            axios.post(funcUrl, {
+                logData : temp,
+                loginToken : token
+            })
                 .then(axiosResponse => {
                     console.log(axiosResponse);
                     res.json({
