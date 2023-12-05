@@ -17,24 +17,12 @@ function Dashboard() {
         <DashboardLayout>
             <DashboardNavbar/>
             <MDBox py={3}>
-<<<<<<< Updated upstream
-                <MDBox mt={4.5}>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={6} lg={4}>
-                        </Grid>
-                    </Grid>
-                </MDBox>
-=======
->>>>>>> Stashed changes
                 <MDBox>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={6} lg={8}>
                             <div data-testid="Organization-component">
                             <OrganizationsOverview/>
-<<<<<<< Updated upstream
-=======
                             </div>
->>>>>>> Stashed changes
                         </Grid>
                     </Grid>
                 </MDBox>
