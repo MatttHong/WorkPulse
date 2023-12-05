@@ -278,9 +278,11 @@ function Organizations() {
     const [deptEditMode, setDeptEditMode] = useState(false);
     const [projectEditMode, setProjectEditMode] = useState(false);
     const [editDept, setEditDept] = useState(undefined);
+    const [editProject, setEditProject] = useState(undefined);
     const [isAddAdminDialogOpen, setIsAddAdminDialogOpen] = useState(false);
     const [isAddDeptDialogOpen, setIsAddDeptDialogOpen] = useState(false);
     const [isEditDeptDialogOpen, setIsEditDeptDialogOpen] = useState(false);
+    const [isEditProjectDialogOpen, setIsEditProjectDialogOpen] = useState(false);
     const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = useState(false);
     const [addAdminSelectedEmail, setAddAdminSelectedEmail] = useState(null);
     const [addDeptSelectedEmail, setAddDeptSelectedEmail] = useState(null);
@@ -357,10 +359,17 @@ function Organizations() {
     }
 
     const handleEditSingleDeptClick = (selectedDepartment) => {
-        console.log("BIZI TANI YARRAK:", selectedDepartment);
+        console.log("Department being edited before:", selectedDepartment);
         setEditDept(selectedDepartment);
-        console.log("BIZI TANI YARRAK:", editDept);
+        console.log("Department being edited after:", editDept);
         setIsEditDeptDialogOpen(true);
+    }
+
+    const handleEditSingleProjectClick = (selectedProject) => {
+        console.log("Project being edited before:", selectedProject);
+        setEditDept(selectedProject);
+        console.log("Project being edited after:", editProject);
+        setIsEditProjectDialogOpen(true);
     }
 
     const handleAddAdminEditToggle = () => {
@@ -814,6 +823,55 @@ function Organizations() {
             }));
         }
     };
+
+    const handleRemoveProject = async (projId, deptId) => {
+        console.log("PROJECT ID:", projId);
+        console.log("DEPARTMENT ID:", deptId);
+        console.log("DEPARTMENTS:", departments);
+        // Find the department that the project belongs to
+        const projectDept = departments.find(department => department._id === deptId);
+        console.log("PROJECT DEPARTMENT:", projectDept);
+
+        // Assuming `projects` is an array of objects, we filter by the `id` property of each project
+        const updatedProjects = projectDept.projects.filter(project => project._id !== projId);
+
+        // Delete project
+        const deleteProjResponse = await fetch(`http://localhost:3000/api/org/${projId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!deleteProjResponse.ok) {
+            console.log("There is a problem deleting a project:", deleteProjResponse);
+        }
+
+        // Update department
+        const updateDeptResponse = await fetch(`http://localhost:3000/api/dep/${deptId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({projects: updatedProjects})
+        });
+
+        if (!updateDeptResponse.ok) {
+            console.log("There is a problem updating the dept after deleting the project:", updateDeptResponse);
+        }
+
+        fetchData();
+        if (userOrganization && userOrganization.organizationAdministrators && userOrganization.departments) {
+            fetchAdministrators();
+            fetchDepartments();
+            fetchNonAdminEmployees();
+        }
+    };
+
+
+
 
     const EmailList = ({admins}) => {
         const [showFullList, setShowFullList] = useState(false);
@@ -1407,7 +1465,7 @@ function Organizations() {
                             {Header: "Department", accessor: "departmentName", align: "left"},
                             {Header: "Admins", accessor: "projectAdmins", align: "left"},
                             {Header: "Team", accessor: "projectTeam", align: "left"},
-                            // ...other columns if needed
+                            {Header: "", accessor: "actions", align: "left"}
                         ],
                         rows: departments.flatMap(department =>
                             department.projects.map(project => ({
@@ -1430,8 +1488,23 @@ function Organizations() {
                                     <MDTypography variant="caption" color="text" fontWeight="regular">
                                         <EmailList admins={project.employees}/>
                                     </MDTypography>
-                                )
-                                // ...other fields if needed
+                                ),
+                                actions: projectEditMode ? (
+                                    <div>
+                                        <IconButton
+                                            onClick={() => handleEditSingleProjectClick(project)}
+                                            sx={{padding: 0, marginRight: 1}}
+                                        >
+                                            <EditIcon sx={{fontSize: 'medium !important'}}/>
+                                        </IconButton>
+                                        <IconButton
+                                            onClick={() => handleRemoveProject(project._id, department._id)}
+                                            sx={{padding: 0}}
+                                        >
+                                            <RemoveCircleOutlineIcon sx={{fontSize: 'medium !important'}}/>
+                                        </IconButton>
+                                    </div>
+                                ) : null
                             }))
                         ),
                     }}

@@ -56,25 +56,10 @@ function ProfileInfoCard({
     const {socialMediaColors} = colors;
     const {size} = typography;
 
-    // Convert this form `objectKey` of the object key in to this `object key`
-    // Object.keys(info).forEach((el) => {
-    //     if (el.match(/[A-Z\s]+/)) {
-    //         const uppercaseLetter = Array.from(el).find((i) => i.match(/[A-Z]+/));
-    //         const newElement = el.replace(uppercaseLetter, ` ${uppercaseLetter.toLowerCase()}`);
-    //
-    //         labels.push(newElement);
-    //     } else {
-    //         labels.push(el);
-    //     }
-    // });
-
-    // Push the object values into the values array
-    // Object.values(info).forEach((el) => values.push(el));
-
     const [firstName, setFirstName] = useState(firstNameProp);
     const [lastName, setLastName] = useState(lastNameProp);
     const [birthday, setBirthday] = useState(birthdayProp);
-    const [bio, setBio] = useState(bioProp); // Add this state for bio
+    const [bio, setBio] = useState(bioProp);
 
     useEffect(() => {
         setFirstName(firstNameProp);
@@ -86,9 +71,9 @@ function ProfileInfoCard({
     const editOrSaveIcon = editMode ? <SaveIcon /> : <EditIcon />;
     const handleEditSaveClick = () => {
         if (editMode) {
-            updateUserInfo(); // Save the user info
+            updateUserInfo();
         } else {
-            onToggleEditMode(); // Just enter edit mode
+            onToggleEditMode();
         }
     };
     const updateUserInfo = async () => {
@@ -112,7 +97,7 @@ function ProfileInfoCard({
 
             if (response.status === 200) {
                 console.log('User updated successfully');
-                onSave(updatedInfo); // Call onSave with the updated info
+                onSave(updatedInfo);
             } else {
                 console.error('Update failed:', response.data.message);
             }
@@ -121,7 +106,6 @@ function ProfileInfoCard({
         }
     };
 
-    // Render the card info items
     const renderItems = () => (
         <>
             <MDBox display="flex" py={1} pr={2}>
@@ -137,7 +121,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        {firstName} {/* Use the state variable instead of the prop */}
+                        {firstName}
                     </MDTypography>
                 )}
             </MDBox>
@@ -154,7 +138,7 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        {lastName} {/* Use the state variable instead of the prop */}
+                        {lastName}
                     </MDTypography>
                 )}
             </MDBox>
@@ -172,31 +156,12 @@ function ProfileInfoCard({
                     />
                 ) : (
                     <MDTypography variant="button" fontWeight="regular" color="text">
-                        {birthday} {/* Use the state variable instead of the prop */}
+                        {birthday}
                     </MDTypography>
                 )}
             </MDBox>
-            {/* Add other fields as needed */}
         </>
     );
-
-    // Render the card social media icons
-    const renderSocial = social.map(({link, icon, color}) => (
-        <MDBox
-            key={color}
-            component="a"
-            href={link}
-            target="_blank"
-            rel="noreferrer"
-            fontSize={size.lg}
-            color={socialMediaColors[color].main}
-            pr={1}
-            pl={0.5}
-            lineHeight={1}
-        >
-            {icon}
-        </MDBox>
-    ));
 
     return (
         <Card sx={{height: "100%", boxShadow: !shadow && "none"}}>
@@ -219,11 +184,11 @@ function ProfileInfoCard({
                             variant="standard"
                             fullWidth
                             multiline
-                            rows={1} // Adjust the number of rows as needed
+                            rows={1}
                         />
                     ) : (
                         <MDTypography variant="button" fontWeight="regular" color="text">
-                            {bio} {/* Display the state variable */}
+                            {bio}
                         </MDTypography>
                     )}
                 </MDBox>
@@ -233,12 +198,6 @@ function ProfileInfoCard({
                 </MDBox>
                 <MDBox>
                     {renderItems}
-                    <MDBox display="flex" py={1} pr={2}>
-                        <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
-                            social: &nbsp;
-                        </MDTypography>
-                        {renderSocial}
-                    </MDBox>
                 </MDBox>
             </MDBox>
         </Card>
@@ -256,12 +215,10 @@ ProfileInfoCard.propTypes = {
     editMode: PropTypes.bool,
     onToggleEditMode: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
-    // Add any other props you're using
 };
 
 ProfileInfoCard.defaultProps = {
     shadow: true,
     editMode: false,
-    // Add any other default props you're using
 };
 export default ProfileInfoCard;
