@@ -25,6 +25,7 @@ const Status = Object.freeze({
     onboarding: "On Boarding",
     starting: "Starting",
     closed: "Closed",
+    finished: "Finished",
 
 });
 

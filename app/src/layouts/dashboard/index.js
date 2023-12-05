@@ -1,4 +1,5 @@
 // @mui material components
+import React, { useEffect } from 'react';
 import Grid from "@mui/material/Grid";
 
 // Material Dashboard 2 React components
@@ -7,15 +8,14 @@ import MDBox from "components/MDBox";
 // Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
 
 // Dashboard components
 import ProjectsOverview from "layouts/dashboard/components/ProjectsOverview";
 import TasksOverview from "layouts/dashboard/components/TasksOverview";
 import MembersOverview from "layouts/dashboard/components/MembersOverview";
 
-import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router} from "react-router-dom";
 // import InviteComponent from "components/MembersOverview/invite/invite";
 
 
@@ -49,7 +49,6 @@ function Dashboard() {
                     </Grid>
                 </MDBox>
             </MDBox>
-            <Footer/>
         </DashboardLayout>
     );
 }

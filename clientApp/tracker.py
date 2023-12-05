@@ -98,7 +98,7 @@ class LoggingApp(tk.Tk):
         self.title('Logging Control Panel')
         self.geometry('300x200')
         self.logged_in = False
-
+        self.tracking = False
         self.login_page = LoginPage(self)
 
         self.start_button = tk.Button(self, text='Start Logging', command=self.start_logging, state=tk.DISABLED)
@@ -114,8 +114,8 @@ class LoggingApp(tk.Tk):
         self.mouse_listener = mouse.Listener(on_click=self.on_click, on_scroll=self.on_scroll)
         self.keyboard_listener = keyboard.Listener(on_press=self.on_press)
 
-        self.track_intervals = [10, 30, 50]  # Seconds after the minute to start tracking
-        self.track_duration = 2  # Duration of tracking in seconds
+        self.track_intervals = [5, 30, 50]  # Seconds after the minute to start tracking
+        self.track_duration = .1  # Duration of tracking in seconds
         self.tracking = False  # Flag to indicate if tracking is active
         self.active_timers = []
         self.has_been_stopped = False 
@@ -175,7 +175,7 @@ class LoggingApp(tk.Tk):
             self.login_page = LoginPage(self)
 
     def logout(self):
-        global LOG_ID, END
+        global LOG_ID, END, function_url
 
         # Stop all active timers
         self.stop_all_timers()
@@ -200,9 +200,7 @@ class LoggingApp(tk.Tk):
         # If a logging session is active, stop it
         if LOG_ID:
             self.stop_logging()  # This will handle the API call to stop logging
-
         LOG_ID = None
-
 
     def start_logging(self):
         global LOG_ID, END
@@ -294,6 +292,7 @@ class LoggingApp(tk.Tk):
                 print('Logging stopped successfully')
                 self.start_button['state'] = tk.NORMAL
                 self.stop_button['state'] = tk.DISABLED
+
 
 
             except requests.exceptions.RequestException as e:

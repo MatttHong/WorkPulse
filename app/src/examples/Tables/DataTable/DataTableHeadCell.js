@@ -14,6 +14,7 @@ Coded by www.creative-tim.com
 */
 
 // prop-types is a library for typechecking of props
+import React from "react";
 import PropTypes from "prop-types";
 
 // @mui material components

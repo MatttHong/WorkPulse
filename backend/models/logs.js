@@ -37,6 +37,8 @@ logSchema.methods.endSession = function () {
               status: Status.closed
             } } ,
           );
+          this.endTimestamp = end
+          this.status = Status.closed
           resolve();
         } catch (error) {
           reject(error); 

@@ -90,6 +90,16 @@ describe('Auth API endpoints', () => {
         // expect(res.body.message).toEqual('Wrong Login Details');
       });
 
+      it('should fail to login', async () => {
+        const res = await request.post('/api/auth')
+          .send({
+              email: "notandemail@notawebsite.com",
+              password: userpas
+              })
+        console.log("1234321: " + res.statusCode)
+        expect(res.statusCode).toEqual(400);
+      });
+
       it('should get a user by ID with new Token', async () => {
         const res = await request.get(`/api/users/${id}`)
           .set('Authorization', `Bearer ${firstToken}`);

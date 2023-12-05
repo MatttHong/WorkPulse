@@ -17,6 +17,7 @@ Coded by www.creative-tim.com
   The linearGradient() function helps you to create a linear gradient color background
  */
 
+import React from "react";
 function linearGradient(color, colorState, angle = 195) {
   return `linear-gradient(${angle}deg, ${color}, ${colorState})`;
 }
