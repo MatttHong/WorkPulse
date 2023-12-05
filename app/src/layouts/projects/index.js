@@ -64,7 +64,7 @@ function ProjectsPage() {
     
     try {
       const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4NDMyOTEsImV4cCI6MTY5OTg3MjA5MX0.refMWOUKBdRHyLUqi0l8NuGKj5Du_dmiFkEXya4DuRU";
-      const BACKEND_ENDPOINT = 'http://localhost:3000/api/proj';
+      const BACKEND_ENDPOINT = '${process.env.REACT_APP_API_URL}/api/proj';
       const response = await axios.get(BACKEND_ENDPOINT, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -127,7 +127,7 @@ function ProjectsPage() {
   const handleAddProject = async (projectData) => {
     try {
       const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQ0Njc5MTgxMTFhODlmNmNkZDk1NDYiLCJpYXQiOjE2OTk4NDMyOTEsImV4cCI6MTY5OTg3MjA5MX0.refMWOUKBdRHyLUqi0l8NuGKj5Du_dmiFkEXya4DuRU";
-      const BACKEND_ENDPOINT = 'http://localhost:3000/api/proj';
+      const BACKEND_ENDPOINT = `${process.env.REACT_APP_API_URL}/api/proj`;
       const response = await axios.post(BACKEND_ENDPOINT, data, {
         headers: {
           Authorization: `Bearer ${token}`

@@ -52,7 +52,7 @@ const EditProjectComponent = ({ project, onSave }) => {
     // Validate input data
 
     // Send the updated project data to the backend
-    const BACKEND_ENDPOINT = `http://localhost:3000/api/projects/${project.id}`;
+    const BACKEND_ENDPOINT = `${process.env.REACT_APP_API_URL}:3000/api/projects/${project.id}`;
     try {
       const response = await fetch(BACKEND_ENDPOINT, {
         method: 'PUT', // or 'PATCH'

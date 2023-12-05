@@ -76,7 +76,7 @@ function Projects() {
   );
   
   const handleAddProject = async (projectData) => {
-    const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
+    const BACKEND_ENDPOINT = '${process.env.REACT_APP_API_URL}:3000/api/projects';
     
     try {
         const response = await fetch(BACKEND_ENDPOINT, {

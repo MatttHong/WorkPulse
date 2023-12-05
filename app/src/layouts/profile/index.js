@@ -53,7 +53,7 @@ function Overview() {
             try {
                 const token = localStorage.getItem("token");
                 const userEmail = localStorage.getItem("email");
-                const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/email/${userEmail}`, {
                     headers: {
                         Authorization: "Bearer " + token,
                     }

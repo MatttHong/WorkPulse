@@ -88,7 +88,7 @@ function ProfileInfoCard({
                 bio
             };
 
-            const response = await axios.put(`http://localhost:3000/api/users/${userId}`, updatedInfo, {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/users/${userId}`, updatedInfo, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

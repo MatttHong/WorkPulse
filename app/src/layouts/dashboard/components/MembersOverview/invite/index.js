@@ -54,7 +54,7 @@ function InviteComponent() {
             header: header,
             body: body,
         };
-        const BACKEND_ENDPOINT = 'http://localhost:3000/api/invite';
+        const BACKEND_ENDPOINT = `${process.env.REACT_APP_API_URL}/api/invite`;
         try {
             const response = await fetch(BACKEND_ENDPOINT, {
                 method: 'POST',

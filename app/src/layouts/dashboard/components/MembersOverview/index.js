@@ -16,7 +16,7 @@ import axios from "axios";
 const fetchUserData = async () => {
     const userEmail = localStorage.getItem("email");
     const token = localStorage.getItem("token");
-    const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/email/${userEmail}`, {
         headers: {
             Authorization: "Bearer " + token,
         }
@@ -26,7 +26,7 @@ const fetchUserData = async () => {
 
 const fetchEmployeeData = async (employeeID) => {
     const token = localStorage.getItem("token");
-    const response = await axios.get(`http://localhost:3000/api/employee/${employeeID}`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/${employeeID}`, {
         headers: {
             Authorization: "Bearer " + token,
         }
@@ -36,7 +36,7 @@ const fetchEmployeeData = async (employeeID) => {
 
 const fetchTaskData = async (taskId) => {
     const token = localStorage.getItem("token");
-    const response = await axios.get(`http://localhost:3000/api/task/${taskId}`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/task/${taskId}`, {
         headers: {
             Authorization: "Bearer " + token,
         }
@@ -52,7 +52,7 @@ function MembersOverview() {
 
     function findUserNameById(userId) {
         const user = userAdmins.find((admin) => admin._id === userId);
-        return user ? `${user.firstName} ${user.lastName}` : 'Unknown';
+        return user ? `${user.firstName} ${user.lastName}` : '';
     }
 
     function findProjectNameByTaskId(taskId) {
@@ -88,7 +88,7 @@ function MembersOverview() {
         const token = localStorage.getItem('token');
         const updateTask = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/task/${task._id}`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/task/${task._id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ function MembersOverview() {
             const token = localStorage.getItem('token');
 
             try {
-                const response = await fetch(`http://localhost:3000/api/proj/`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/proj/`, {
                     headers: {
                         Authorization: "Bearer " + token,
                     }
@@ -134,7 +134,7 @@ function MembersOverview() {
                     // Fetch each project administrator's details
                     for (const project of data.projects) {
                         for (const adminId of project.projectAdministrators) {
-                            const userResponse = await fetch(`http://localhost:3000/api/users/${adminId}`, {
+                            const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${adminId}`, {
                                 headers: {
                                     Authorization: "Bearer " + token,
                                 }
@@ -151,7 +151,7 @@ function MembersOverview() {
 
                     for (const project of data.projects) {
                         for (const taskID of project.tasks) {
-                            const userResponse = await fetch(`http://localhost:3000/api/task/${taskID}`, {
+                            const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/task/${taskID}`, {
                                 headers: {
                                     Authorization: "Bearer " + token,
                                 }
@@ -253,7 +253,7 @@ function MembersOverview() {
                             </MDTypography>,
                             admin: (
                                 <MDTypography variant="caption" color="text" fontWeight="medium">
-                                    {Array.isArray(task.taskAdministrators) ? task.taskAdministrators.map(findUserNameById).join(', ') : 'No Admins'}
+                                    {Array.isArray(task.taskAdministrators) ? task.taskAdministrators.map(findUserNameById).join(' ') : 'No Admins'}
                                 </MDTypography>
                             ),
                             tasks: (

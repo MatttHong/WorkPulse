@@ -21,6 +21,7 @@
     "axios": "^1.5.1",
     "chart.js": "^4.3.0",
     "chroma-js": "2.4.2",
+    "dotenv": "^16.3.1",
     "prop-types": "15.8.1",
     "react": "18.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -35,7 +36,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
@@ -62,6 +63,7 @@
     "@babel/plugin-transform-runtime": "^7.23.4",
     "@testing-library/react": "^14.1.2",
     "babel-plugin-module-resolver": "^5.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "8.39.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-import": "2.27.5",

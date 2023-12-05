@@ -56,7 +56,7 @@ function Basic() {
 
         try {
             console.log("Sending request with data:", {email, password});
-            const response = await axios.post("http://localhost:3000/api/auth", {email, password});
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth`, {email, password});
 
             if (response.data.status === "Success") {
                 console.log("Received response:", response);
@@ -117,16 +117,16 @@ function Basic() {
                                      onChange={(e) => setPassword(e.target.value)}/>
                         </MDBox>
                         <MDBox display="flex" alignItems="center" ml={-1}>
-                            <Switch checked={rememberMe} onChange={handleSetRememberMe}/>
-                            <MDTypography
-                                variant="button"
-                                fontWeight="regular"
-                                color="text"
-                                onClick={handleSetRememberMe}
-                                sx={{cursor: "pointer", userSelect: "none", ml: -1}}
-                            >
-                                &nbsp;&nbsp;Remember me
-                            </MDTypography>
+                            {/*<Switch checked={rememberMe} onChange={handleSetRememberMe}/>*/}
+                            {/*<MDTypography*/}
+                            {/*    variant="button"*/}
+                            {/*    fontWeight="regular"*/}
+                            {/*    color="text"*/}
+                            {/*    onClick={handleSetRememberMe}*/}
+                            {/*    sx={{cursor: "pointer", userSelect: "none", ml: -1}}*/}
+                            {/*>*/}
+                            {/*    &nbsp;&nbsp;Remember me*/}
+                            {/*</MDTypography>*/}
                         </MDBox>
                         <MDBox mt={4} mb={1}>
                             <MDButton type="submit" variant="gradient" color="info" fullWidth>

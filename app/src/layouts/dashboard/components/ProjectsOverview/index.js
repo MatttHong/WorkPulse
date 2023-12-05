@@ -17,7 +17,7 @@ import axios from "axios";
 const fetchEmployeeID = async () => {
     const token = localStorage.getItem('token');
     const userEmail = localStorage.getItem("email");
-    const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/email/${userEmail}`, {
         headers: {
             Authorization: "Bearer " + token,
         }
@@ -36,7 +36,7 @@ function Projects() {
 
             if (employeeId) {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+                    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employee/${employeeId}`, {
                         headers: {
                             Authorization: "Bearer " + token,
                         }
@@ -48,7 +48,7 @@ function Projects() {
 
                         // Fetch all logs concurrently
                         const logPromises = logIds.map(logId =>
-                            fetch(`http://localhost:3000/api/log/${logId}`, {
+                            fetch(`${process.env.REACT_APP_API_URL}/api/log/${logId}`, {
                                 headers: { Authorization: "Bearer " + token }
                             }).then(res => res.json())
                         );

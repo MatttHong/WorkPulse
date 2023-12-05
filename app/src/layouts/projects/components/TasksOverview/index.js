@@ -76,7 +76,7 @@ function Tasks() {
   );
   
   const handleAddTask = async (taskData) => {
-    const BACKEND_ENDPOINT = 'http://localhost:3000/api/projects';
+    const BACKEND_ENDPOINT = `${process.env.REACT_APP_API_URL}/api/projects`;
     
     try {
         const response = await fetch(BACKEND_ENDPOINT, {

@@ -37,7 +37,7 @@ function Tasks() {
             const token = localStorage.getItem('token');
 
             try {
-                const response = await fetch(`http://localhost:3000/api/proj/`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/proj/`, {
                     headers: {
                         Authorization: "Bearer " + token,
                     }
@@ -50,7 +50,7 @@ function Tasks() {
                     // Fetch each project administrator's details
                     for (const project of data.projects) {
                         for (const adminId of project.projectAdministrators) {
-                            const userResponse = await fetch(`http://localhost:3000/api/users/${adminId}`, {
+                            const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${adminId}`, {
                                 headers: {
                                     Authorization: "Bearer " + token,
                                 }

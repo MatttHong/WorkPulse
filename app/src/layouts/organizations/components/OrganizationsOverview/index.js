@@ -44,7 +44,7 @@ function Organizations() {
     // data funcs
     const fetchUserData = async () => {
         const userEmail = localStorage.getItem("email");
-        const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/email/${userEmail}`, {
             headers: {
                 Authorization: "Bearer " + token,
             }
@@ -53,7 +53,7 @@ function Organizations() {
     };
 
     const fetchEmployeeData = async (employeeID) => {
-        const response = await axios.get(`http://localhost:3000/api/employee/${employeeID}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/${employeeID}`, {
             headers: {
                 Authorization: "Bearer " + token,
             }
@@ -62,7 +62,7 @@ function Organizations() {
     };
 
     const fetchOrg = async (orgId) => {
-        const response = await axios.get(`http://localhost:3000/api/org/${orgId}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/org/${orgId}`, {
             headers: {
                 Authorization: "Bearer " + token,
             }
@@ -71,7 +71,7 @@ function Organizations() {
     };
 
     const fetchEmployee = async (employeeId) => {
-        const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employee/${employeeId}`, {
             method: 'GET',
             headers: {
                 'Authorization': "Bearer " + token,
@@ -95,7 +95,7 @@ function Organizations() {
             // Aggregate logs from all employees
             let allLogs = [];
             for (const employeeId of userOrganization.employees) {
-                const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/employee/${employeeId}`, {
                     headers: {
                         Authorization: "Bearer " + token,
                     }
@@ -107,7 +107,7 @@ function Organizations() {
 
                     // Fetch logs for each ID and aggregate
                     const logs = await Promise.all(logIds.map(logId =>
-                        fetch(`http://localhost:3000/api/log/${logId}`, {
+                        fetch(`${process.env.REACT_APP_API_URL}/api/log/${logId}`, {
                             headers: { Authorization: "Bearer " + token }
                         }).then(res => res.json())
                     ));
@@ -152,7 +152,7 @@ function Organizations() {
         const adminEmps = [];
 
         for (const id of adminIds) {
-            const employeeResponse = await fetch(`http://localhost:3000/api/employee/${id}`, {
+            const employeeResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/employee/${id}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': "Bearer " + token,
@@ -168,23 +168,32 @@ function Organizations() {
             const employeeData = await employeeResponse.json();
             adminEmps.push(employeeData.employee);
 
-            const userId = employeeData.employee.userId;
+            if (employeeData.employee.userId) {
+                const userID = employeeData.employee.userId;
 
-            const userResponse = await fetch(`http://localhost:3000/api/users/${userId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': "Bearer " + token,
-                    'Content-Type': 'application/json'
+                const userResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${userID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': "Bearer " + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!userResponse.ok) {
+                    console.error("Error fetching user data: ", userResponse.statusText);
+                    continue;
                 }
-            });
+                const userData = await userResponse.json();
+                adminUsers.push(userData.user);
 
-            if (!userResponse.ok) {
-                console.error("Error fetching user data: ", userResponse.statusText);
-                continue;
+            } else {
+                throw Error("error");
             }
 
-            const userData = await userResponse.json();
-            adminUsers.push(userData.user);
+
+
+
+
         }
 
         setAdminUsers(adminUsers);
@@ -215,7 +224,7 @@ function Organizations() {
         const departmentList = [];
 
         for (const id of departmentIds) {
-            const departmentResponse = await fetch(`http://localhost:3000/api/dep/${id}`, {
+            const departmentResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/dep/${id}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': "Bearer " + token,
@@ -242,7 +251,7 @@ function Organizations() {
 
             // Fetch each project of the department
             for (const projId of departmentData.dept.projects) {
-                const projectResponse = await fetch(`http://localhost:3000/api/proj/${projId}`, {
+                const projectResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/proj/${projId}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': "Bearer " + token,
@@ -353,7 +362,7 @@ function Organizations() {
     const handleEditOrgSave = async () => {
         try {
             console.log("DUMMY ORG:", dummyOrg);
-            const response = await axios.put(`http://localhost:3000/api/org/${dummyOrg._id}`, dummyOrg, {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/org/${dummyOrg._id}`, dummyOrg, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -478,7 +487,7 @@ function Organizations() {
             }));
 
             try {
-                const response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/api/org/${userOrganization._id}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -533,7 +542,7 @@ function Organizations() {
         };
 
         try {
-            let response = await fetch("http://localhost:3000/api/dep", {
+            let response = await fetch(`${process.env.REACT_APP_API_URL}/api/dep`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -559,7 +568,7 @@ function Organizations() {
                 departments: updatedDepartments
             }));
 
-            response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+            response = await fetch(`${process.env.REACT_APP_API_URL}/api/org/${userOrganization._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -610,7 +619,7 @@ function Organizations() {
         };
 
         try {
-            let response = await fetch(`http://localhost:3000/api/dep/${editDept._id}`, {
+            let response = await fetch(`${process.env.REACT_APP_API_URL}/api/dep/${editDept._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -660,7 +669,7 @@ function Organizations() {
         };
 
         try {
-            let response = await fetch(`http://localhost:3000/api/dep/${editDept._id}`, {
+            let response = await fetch(`${process.env.REACT_APP_API_URL}/api/dep/${editDept._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -761,7 +770,7 @@ function Organizations() {
         };
 
         try {
-            let addProjectResponse = await fetch("http://localhost:3000/api/proj", {
+            let addProjectResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/proj`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -784,7 +793,7 @@ function Organizations() {
                 projects: [...addProjectSelectedDept.projects, newProjectData.project._id]
             };
 
-            let updateDepartmentResponse = await fetch(`http://localhost:3000/api/dep/${addProjectSelectedDept._id}`, {
+            let updateDepartmentResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/dep/${addProjectSelectedDept._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -831,9 +840,8 @@ function Organizations() {
             setAddProjectSelectionWarning("Please select employee(s) to assign the task.");
         }
 
-        const userId = localStorage.getItem("id");
         const allEmployees = [...adminEmployees, ...nonAdminEmployees];
-        const selectedAdminEmployee = allEmployees.find(emp => emp.userId === userId);
+        const selectedAdminEmployee = adminEmployees[0];
         const selectedEmployees = allEmployees.filter(emp => addProjectSelectedTeam.includes(emp.email));
         console.log("SELECTED EMPLOYEES:", selectedEmployees);
 
@@ -854,7 +862,7 @@ function Organizations() {
         };
 
         try {
-            let addTaskResponse = await fetch("http://localhost:3000/api/task", {
+            let addTaskResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/task`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -879,7 +887,7 @@ function Organizations() {
                     tasks: [...employee.tasks, newTaskData.task._id]
                 };
 
-                let updateEmployeeResponse = await fetch(`http://localhost:3000/api/employee/${employee._id}`, {
+                let updateEmployeeResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/employee/${employee._id}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -898,7 +906,7 @@ function Organizations() {
                 projects: [...addTaskSelectedProject.tasks, newTaskData.task._id]
             };
 
-            let updateProjectResponse = await fetch(`http://localhost:3000/api/proj/${addTaskSelectedProject._id}`, {
+            let updateProjectResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/proj/${addTaskSelectedProject._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -917,11 +925,7 @@ function Organizations() {
             setAddTaskSelectedTeam([]);
 
             fetchData();
-            if (userOrganization && userOrganization.organizationAdministrators && userOrganization.departments) {
-                fetchAdministrators();
-                fetchDepartments();
-                fetchNonAdminEmployees();
-            }
+
 
             setIsAddProjectDialogOpen(false);
         } catch
@@ -942,7 +946,7 @@ function Organizations() {
         }));
 
         try {
-            const response = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/org/${userOrganization._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -972,7 +976,7 @@ function Organizations() {
         }));
 
         try {
-            const deleteResponse = await fetch(`http://localhost:3000/api/dep/${deptId}`, {
+            const deleteResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/dep/${deptId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -984,7 +988,7 @@ function Organizations() {
                 throw new Error('Failed to remove department');
             }
 
-            const updateOrgResponse = await fetch(`http://localhost:3000/api/org/${userOrganization._id}`, {
+            const updateOrgResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/org/${userOrganization._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -1016,7 +1020,7 @@ function Organizations() {
         const updatedProjects = projectDept.projects.filter(project => project._id !== projId);
 
         // Delete project
-        const deleteProjResponse = await fetch(`http://localhost:3000/api/org/${projId}`, {
+        const deleteProjResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/org/${projId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -1029,7 +1033,7 @@ function Organizations() {
         }
 
         // Update department
-        const updateDeptResponse = await fetch(`http://localhost:3000/api/dep/${deptId}`, {
+        const updateDeptResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/dep/${deptId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
