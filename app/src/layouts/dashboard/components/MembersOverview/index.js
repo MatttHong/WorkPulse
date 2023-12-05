@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /**
  =========================================================
  * Material Dashboard 2 React - v2.2.0
@@ -15,25 +13,19 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 import React from 'react';
->>>>>>> d2da07f2fc3794a243f2b261472754dcc5b3b7e5
 import {useEffect, useState} from "react";
 // @mui material components
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
-<<<<<<< HEAD
-// Material Dashboard 2 React components
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-=======
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
->>>>>>> d2da07f2fc3794a243f2b261472754dcc5b3b7e5
 // Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
 import Checkbox from "@mui/material/Checkbox";
+
 
 function MembersOverview() {
     const Company = ({name}) => (
