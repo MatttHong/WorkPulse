@@ -12,43 +12,63 @@ import DataTable from "examples/Tables/DataTable";
 
 // Data
 import data from "layouts/dashboard/components/ProjectsOverview/data";
+import axios from "axios";
 
+const fetchEmployeeID = async () => {
+    const token = localStorage.getItem('token');
+    const userEmail = localStorage.getItem("email");
+    const response = await axios.get(`http://localhost:3000/api/users/email/${userEmail}`, {
+        headers: {
+            Authorization: "Bearer " + token,
+        }
+    });
+    return response.data.user.employments[0];
+};
 
 
 function Projects() {
     const [userLogs, setUserLogs] = useState([]); // Initial state as null or appropriate default
-    const {columns, rows} = data(userLogs);
 
     useEffect(() => {
-        // Function to fetch logs
         const fetchLogs = async () => {
-            // Get user id from local storage
-            const userId = localStorage.getItem('id');
             const token = localStorage.getItem('token');
+            const employeeId = await fetchEmployeeID(); // Ensure this function is defined and returns the employee ID
 
-            if (userId) {
+            if (employeeId) {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/log/employee/${userId}`,{
+                    const response = await fetch(`http://localhost:3000/api/employee/${employeeId}`, {
                         headers: {
                             Authorization: "Bearer " + token,
                         }
                     });
+
                     if (response.ok) {
                         const data = await response.json();
-                        setUserLogs(data.logs);
+                        const logIds = data.employee.logs;
+
+                        // Fetch all logs concurrently
+                        const logPromises = logIds.map(logId =>
+                            fetch(`http://localhost:3000/api/log/${logId}`, {
+                                headers: { Authorization: "Bearer " + token }
+                            }).then(res => res.json())
+                        );
+
+                        const logs = await Promise.all(logPromises);
+                        setUserLogs(logs);
                     } else {
-                        console.error('Failed to fetch logs:', response.status);
+                        console.error('Failed to fetch employee data:', response.status);
                     }
                 } catch (error) {
-                    console.error('Error fetching logs:', error);
+                    console.error('Error fetching employee data:', error);
                 }
             }
         };
+
         fetchLogs();
     }, []);
 
-    console.log(userLogs);
-
+    const {columns, rows} = data(userLogs);
+    console.log("LOGSSSSSSSSSSS:", userLogs);
     return (
         <Card>
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>

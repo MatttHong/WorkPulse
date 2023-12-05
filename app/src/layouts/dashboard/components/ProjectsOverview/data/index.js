@@ -11,6 +11,18 @@ function formatTimestamp(timestamp) {
     return date.toLocaleString(); // This will format the date and time according to the locale
 }
 
+function calculateIdleTime(logEntries) {
+    return logEntries.reduce((totalIdleTime, entry) => {
+        if (entry.status === "Idle") {
+            const start = new Date(entry.start);
+            const end = new Date(entry.end);
+            const idleDuration = (end - start) / 1000 / 60; // Convert to minutes
+            return totalIdleTime + idleDuration;
+        }
+        return totalIdleTime;
+    }, 0);
+}
+
 
 export default function data(userLogs) {
     // If userLogs is null or undefined, return default structure with no rows
@@ -42,32 +54,40 @@ export default function data(userLogs) {
 
 
     // Map sortedLogs to rows
-    const logRows = sortedLogs.map((log) => {
-        const formattedStartTime = formatTimestamp(log.startTimestamp);
+    const logRows = userLogs.map((logEntry) => {
+        // Check if logEntry.log and logEntry.log.status exist
+        const log = logEntry.log;
+        const status = log && log.status ? log.status.toLowerCase() : 'unknown';
+        const formattedStartTime = log ? formatTimestamp(log.startTimestamp) : 'Unknown Time';
+
         let statusComponent;
 
-        switch (log.status.toLowerCase()) {
-            case 'starting':
+        switch (status) {
+            case 'finished':
                 statusComponent = (
-                    <Tooltip title="Ongoing" placement="bottom" arrow>
-                        <AccessTimeIcon sx={{color: 'grey'}}/>
+                    <Tooltip title="Finished" placement="bottom" arrow>
+                        <CheckCircleRoundedIcon sx={{color: 'green'}}/>
                     </Tooltip>
                 );
                 break;
-            case 'closed':
+            case 'unknown':
                 statusComponent = (
-                    <Tooltip title="Closed" placement="bottom" arrow>
-                        <CheckCircleRoundedIcon sx={{color: 'green'}}/>
+                    <Tooltip title="Unknown Status" placement="bottom" arrow>
+                        <AccessTimeIcon sx={{color: 'orange'}}/>
                     </Tooltip>
                 );
                 break;
             default:
                 statusComponent = (
-                    <Tooltip title="Closed" placement="bottom" arrow>
-                        <CheckCircleRoundedIcon sx={{color: 'green'}}/>
+                    <Tooltip title="Active" placement="bottom" arrow>
+                        <AccessTimeIcon sx={{color: 'grey'}}/>
                     </Tooltip>
                 );
         }
+
+        const totalIdleTime = logEntry.log && Array.isArray(logEntry.log.log)
+            ? calculateIdleTime(logEntry.log.log)
+            : 0;
 
         return {
             info: (
@@ -76,13 +96,19 @@ export default function data(userLogs) {
                 </MDTypography>
             ),
             status: statusComponent,
+            idleTime: (
+                <MDTypography variant="caption" color="text" fontWeight="medium">
+                    {totalIdleTime} mins
+                </MDTypography>
+            ),
         };
     });
 
     return {
         columns: [
             {Header: "Session Info", accessor: "info", width: "45%", align: "left"},
-            {Header: "Status", accessor: "status", align: "right"},
+            {Header: "Idle Time (mins)", accessor: "idleTime", align: "right"},
+            {Header: "Status", accessor: "status", align: "right"}
         ],
         rows: logRows,
     };
