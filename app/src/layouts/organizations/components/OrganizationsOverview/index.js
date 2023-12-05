@@ -691,11 +691,10 @@ function Organizations() {
 
         const newProject = {
             projectName: addProjectNewProjectName,
-            departmentAdministrators: [selectedAdminEmployee._id],
+            projectAdministrators: [selectedAdminEmployee._id],
             employees: selectedEmployees.map(emp => emp._id),
             departments: addProjectSelectedDept._id
         };
-
 
         try {
             let addProjectResponse = await fetch("http://localhost:3000/api/proj", {
@@ -707,7 +706,7 @@ function Organizations() {
                 body: JSON.stringify(newProject)
             });
 
-            console.log("NEW PROJECT RESPONSE:",addProjectResponse);
+            console.log("NEW PROJECT RESPONSE:", addProjectResponse);
 
             if (!addProjectResponse.ok) {
                 setAddDeptSelectionWarning('Failed to add new project. Please try again.');
@@ -734,6 +733,10 @@ function Organizations() {
                 setAddDeptSelectionWarning('Failed to update related department while adding the project. Please try again.');
                 return;
             }
+
+            setAddProjectNewProjectName("");
+            setAddProjectSelectedEmail("");
+            setAddProjectSelectedTeam([]);
 
             fetchData();
             if (userOrganization && userOrganization.organizationAdministrators && userOrganization.departments) {
@@ -828,11 +831,9 @@ function Organizations() {
         console.log("PROJECT ID:", projId);
         console.log("DEPARTMENT ID:", deptId);
         console.log("DEPARTMENTS:", departments);
-        // Find the department that the project belongs to
         const projectDept = departments.find(department => department._id === deptId);
         console.log("PROJECT DEPARTMENT:", projectDept);
 
-        // Assuming `projects` is an array of objects, we filter by the `id` property of each project
         const updatedProjects = projectDept.projects.filter(project => project._id !== projId);
 
         // Delete project
@@ -870,43 +871,52 @@ function Organizations() {
         }
     };
 
-
-
-
-    const EmailList = ({admins}) => {
-        const [showFullList, setShowFullList] = useState(false);
-
-        const truncatedEmails = admins.slice(0, 2).map((admin) => admin.email).join(', ');
-
-        const fullEmails = showFullList
-            ? admins
-                .map((admin) => admin.email)
-                .reduce((acc, email, index) => {
-                    const groupIndex = Math.floor(index / 3);
-                    acc[groupIndex] = (acc[groupIndex] || []).concat(email);
-                    return acc;
-                }, [])
-                .map((group) => group.join(', '))
-                .join(', ')
-            : truncatedEmails;
-
-        const handleToggleList = () => {
-            setShowFullList(!showFullList);
-        };
+    const EmailList = ({ admins }) => {
+        // Check if admins is an array and has elements
+        const isValidArray = Array.isArray(admins) && admins.length;
 
         return (
             <div>
-                <MDTypography variant="caption" color="text" fontWeight="regular">
-                    {showFullList ? fullEmails : truncatedEmails + (admins.length > 2 ? ',' : '')}
-                </MDTypography>
-
-                {admins.length > 2 && (
-                    <Tooltip title={showFullList ? 'Collapse list' : 'Expand list'}>
-                        <IconButton size="small" onClick={handleToggleList}>
-                            {showFullList ? <ArrowLeftIcon/> : <MoreHorizIcon/>}
-                        </IconButton>
-                    </Tooltip>
+                {isValidArray && admins.length > 2 && (
+                    <>
+                        <input type="checkbox" id="toggleEmails" className="email-toggle" />
+                        <label htmlFor="toggleEmails">• Expand</label>
+                    </>
                 )}
+                <ul style={{ listStyleType: 'none' }}>
+                    {isValidArray ? (
+                        admins.map((admin, index) => {
+                            const email = typeof admin === 'string' ? admin : admin.email;
+                            return (
+                                <li key={email} className={`email-item ${index >= 2 ? 'hidden' : ''}`}>
+                                    {email}
+                                </li>
+                            );
+                        })
+                    ) : (
+                        <li>No emails available</li>
+                    )}
+                </ul>
+
+                <style>
+                    {`
+                      .hidden {
+                        display: none;
+                      }
+                      .email-toggle:checked + label + ul .hidden {
+                        display: list-item;
+                      }
+                      .email-toggle {
+                        display: none;
+                      }
+                      /* Optional: style for 'Show More' label */
+                      label[for="toggleEmails"] {
+                        cursor: pointer;
+                        color: frey;
+                        font-weight: bold;
+                      }
+                    `}
+                </style>
             </div>
         );
     };
@@ -1314,7 +1324,7 @@ function Organizations() {
                     <MDBox display="flex" flexDirection="column" alignItems="center">
                         <MDBox width="50%" bgcolor="background.paper" maxHeight={300} overflow="auto"
                                sx={{margin: 'auto'}}>
-                            <List sx={{ width: '100%', mb: 2 }}>
+                            <List sx={{width: '100%', mb: 2}}>
                                 {Array.isArray(adminEmployees) && Array.isArray(nonAdminEmployees) ? (
                                     [...adminEmployees, ...nonAdminEmployees].map((employee) => (
                                         <ListItem
@@ -1330,7 +1340,7 @@ function Organizations() {
                                         >
                                             <ListItemText primary={employee.email} sx={{
                                                 textAlign: 'center',
-                                                '& .MuiListItemText-primary': { fontSize: '1rem', padding: '2px' }
+                                                '& .MuiListItemText-primary': {fontSize: '1rem', padding: '2px'}
                                             }}/>
                                         </ListItem>
                                     ))
