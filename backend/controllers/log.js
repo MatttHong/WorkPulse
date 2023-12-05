@@ -191,40 +191,6 @@ exports.addLogEntry = (req, res, next) => {
 
 // End a log session by setting endTimestamp
 exports.endLogSession = (req, res, next) => {
-<<<<<<< Updated upstream
-  const logId = req.params.id
-  let logEmpId
-  let temp
-  let funcUrl = process.env.FUNCTION_URL
-  Log.findById(logId)
-    .then((log) => {
-      if (!log) {
-        throw new Error("Log not found")
-      }
-      logEmpId = log.employee
-      temp = log
-      return log.endSession()
-    })
-    .then(() => {
-      // console.log("jump to here code 112")
-      // console.log(funcUrl)
-      // console.log(temp)
-      axios
-        .post(funcUrl, temp)
-        .then((axiosResponse) => {
-          console.log(axiosResponse)
-          res.json({
-            message: "Log session ended successfully",
-            logId: logId,
-            employee: logEmpId,
-          })
-        })
-        .catch((error) => {
-          console.error("Error:", error)
-          res.status(500).json({
-            message: error.message || "Failed to run Azure function!",
-          })
-=======
     const logId = req.params.id;
     let logEmpId
     let temp
@@ -261,13 +227,11 @@ exports.endLogSession = (req, res, next) => {
                         message: error.message || "Failed to run Azure function!",
                     });
                 });
->>>>>>> Stashed changes
         })
-    })
-    .catch((err) => {
-      console.log(err)
-      res.status(400).json({
-        message: err.message || "Failed to end log session!",
-      })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).json({
+                message: err.message || "Failed to end log session!",
+        })
     })
 }
