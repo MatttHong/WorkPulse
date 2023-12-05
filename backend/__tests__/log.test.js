@@ -32,7 +32,7 @@ describe('Organization API endpoints', () => {
       
     userId = process.env.USER_ID;
     userToken = process.env.AUTH_TOKEN;
-
+    // var employeeId
     describe('Setup For Future Tests', () => {
 
         it('should create a new organization', async () => {
@@ -85,7 +85,7 @@ describe('Organization API endpoints', () => {
                 .send(newLog);
     
             if(response.statusCode === 201){
-                appendToList(['org', response.body.id]);
+                appendToList(['log', response.body.id]);
             }
             expect(response.statusCode).toEqual(201);
             expect(response.body).toHaveProperty('log');
@@ -107,7 +107,66 @@ describe('Organization API endpoints', () => {
             expect(response.body.log.task).toEqual(updatedLog.task);
         });
     
-        // Test for retrieving all logs
+        it('should add a log entry to an existing log', async () => {
+            const newLogEntry = {
+                log: {
+                    scoop : "floop",
+                    doop: "sloop"
+                }
+            };
+    
+            const response = await supertest(app)
+                .put(`/api/log/${logId}/entry`) 
+                .set('Authorization', `Bearer ${userToken}`)
+                .send(newLogEntry);
+    
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toHaveProperty('log');
+            expect(response.body.log.log).toContainEqual(newLogEntry['log']);
+        });
+
+        it('should fail to add a log entry to an existing log', async () => {
+            const newLogEntry = {
+                // log: {
+                scoop : "floop",
+                doop: "sloop"
+                // }
+            };
+    
+            const response = await supertest(app)
+                .put(`/api/log/${logId}/entry`) 
+                .set('Authorization', `Bearer ${userToken}`)
+                .send(newLogEntry);
+    
+            expect(response.statusCode).toEqual(400);
+        });
+
+        // var holdover
+        // it('should close a log entry by ID', async () => {
+        //     console.log("great stats: " + logId)
+        //     const response = await supertest(app)
+        //         .patch(`/api/log/${logId}/end`)
+        //         .set('Authorization', `Bearer ${userToken}`);
+
+        //     console.log("abcdefgg " + response.body.message);
+        //     expect(response.statusCode).toEqual(200);
+        //     expect(response.body).toHaveProperty('status');
+        //     expect(response.body.status).toBe('Closed');
+        //     holdover = response.body.endTimestamp
+        // });
+    
+    //     it('should close the same log entry by ID', async () => {
+    //         const response = await supertest(app)
+    //             .patch(`/api/log/${logForHere}/end`)
+    //             .set('Authorization', `Bearer ${userToken}`);
+
+    //         console.log("abcdefg " + response.body.message);
+    //         expect(response.statusCode).toEqual(200);
+    //         expect(response.body).toHaveProperty('status');
+    //         expect(response.body.endTimestamp).toBe(holdover);
+
+    //     });
+
         it('should retrieve all log entries', async () => {
             const response = await supertest(app)
                 .get('/api/log')
@@ -117,7 +176,6 @@ describe('Organization API endpoints', () => {
             expect(Array.isArray(response.body.logs)).toBeTruthy();
         });
     
-        // Test for retrieving a single log by ID
         it('should retrieve a log entry by ID', async () => {
             const response = await supertest(app)
                 .get(`/api/log/${logId}`)
@@ -127,29 +185,33 @@ describe('Organization API endpoints', () => {
             expect(response.statusCode).toEqual(200);
             expect(response.body).toHaveProperty('log');
         });
-        var holdover
 
-        it('should close a log entry by ID', async () => {
+        it('should retrieve all log entries for a specific employee', async () => {
             const response = await supertest(app)
-                .patch(`/api/log/${logId}/end`)
+                .get(`/api/log/employee/${userId}`)
                 .set('Authorization', `Bearer ${userToken}`);
-            console.log("abcdefg " + response.body.message);
+            // if (response.statusCode === 404) {
+            //     expect(response.body.message).toEqual("No logs found for the specified employee!");
+            // } else {
             expect(response.statusCode).toEqual(200);
-            expect(response.body).toHaveProperty('status');
-            expect(response.body.status).toBe('Closed');
-            holdover = response.body.endTimestamp
+            expect(Array.isArray(response.body.logs)).toBeTruthy();
+            // }
         });
+
+        it('should fail to retrieve all log entries for a specific employee', async () => {
+            const response = await supertest(app)
+                .get(`/api/log/employee/${employeeId}`)
+                .set('Authorization', `Bearer ${userToken}`);
     
-        it('should close the same log entry by ID', async () => {
-            const response = await supertest(app)
-                .patch(`/api/log/${logId}/end`)
-                .set('Authorization', `Bearer ${userToken}`);
-            console.log("abcdefgh " + response.body.message);
-            expect(response.statusCode).toEqual(200);
-            expect(response.body).toHaveProperty('status');
-            expect(response.body.endTimestamp).toBe(holdover);
-
+            // if (response.statusCode === 404) {
+            expect(response.statusCode).toEqual(404);
+            expect(response.body.message).toEqual("No logs found for the specified employee!");
+            // } else {
+            //     expect(response.statusCode).toEqual(200);
+            //     expect(Array.isArray(response.body.logs)).toBeTruthy();
+            // }
         });
+
 
         // Test for deleting a log
         it('should delete a log entry', async () => {
@@ -163,6 +225,51 @@ describe('Organization API endpoints', () => {
 
         });
     
+    });
+
+    describe('Log Close API Tests', () => {
+        var logForHere
+        it('should create a new log entry', async () => {
+            const newLog = {
+                employee: userId
+            };
+    
+            const response = await supertest(app)
+                .post('/api/log')
+                .set('Authorization', `Bearer ${userToken}`)
+                .send(newLog);
+    
+            if(response.statusCode === 201){
+                appendToList(['log', response.body.id]);
+            }
+            expect(response.statusCode).toEqual(201);
+            expect(response.body).toHaveProperty('log');
+            logForHere = response.body.log._id; // Save log ID for future tests
+        });
+        var holdover
+        it('should close a log entry by ID', async () => {
+            const response = await supertest(app)
+                .patch(`/api/log/${logForHere}/end`)
+                .set('Authorization', `Bearer ${userToken}`);
+
+            console.log("abcdefgg " + response.body.message);
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toHaveProperty('status');
+            expect(response.body.status).toBe('Closed');
+            holdover = response.body.endTimestamp
+        });
+    
+        it('should close the same log entry by ID', async () => {
+            const response = await supertest(app)
+                .patch(`/api/log/${logForHere}/end`)
+                .set('Authorization', `Bearer ${userToken}`);
+
+            console.log("abcdefg " + response.body.message);
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toHaveProperty('status');
+            expect(response.body.endTimestamp).toBe(holdover);
+
+        });
     });
    
 });

@@ -14,6 +14,8 @@ function emailNewUser(emailAddress, subject, body) {
             setTimeout(() => resolve(true), 100); // Using setTimeout instead of sleep
         });
     } else {
+        // Can't be tested by jest due to smtp requirements - must have a way for jest to confirm sent 
+        // this not a good return & leaves little to analyze 
         return new Promise((resolve, reject) => {
             mailTransporter.sendMail(mailDetails, function (err, data) {
                 if (err) {
