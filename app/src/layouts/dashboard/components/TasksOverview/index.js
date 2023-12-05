@@ -77,7 +77,7 @@ function Tasks() {
 
 
     return (
-        <Card>
+        <Card data-testid="card-component">
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                 <MDBox>
                     <MDTypography variant="h6" gutterBottom>
@@ -91,6 +91,7 @@ function Tasks() {
                 </MDBox>
             </MDBox>
             <MDBox>
+                <div data-testid="data-table-component">
                 <DataTable
                     table={{columns, rows}}
                     showTotalEntries={false}
@@ -98,6 +99,7 @@ function Tasks() {
                     noEndBorder
                     entriesPerPage={false}
                 />
+                </div>
             </MDBox>
 
         </Card>

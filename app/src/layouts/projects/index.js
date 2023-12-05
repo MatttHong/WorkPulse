@@ -20,10 +20,8 @@ import {useState, useEffect } from "react";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 
-
 // @mui material components
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 
@@ -41,13 +39,11 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import data from "layouts/projects/data/data/projectsTableData"
-// Material Dashboard 2 React examples
 import DataTable from "examples/Tables/DataTable";
+
 import ProjectDetails from "layouts/projects/components/projectDetails";
 import AddProjectComponent from "./components/addProject";
-// Custom components for Projects Page
-// import ProjectsComponent from "layouts/projects/components/ProjectsComponent";
+
 
 function ProjectsPage() {
   const [open, setOpen] = useState(false);
@@ -98,9 +94,6 @@ function ProjectsPage() {
     setOpen(true);
   };
 
-  // Now you can use openProjectDetails since it has been defined
-  // const { columns, rows } = data(openProjectDetails);
-  
   const handleClose = () => {
     setOpen(false);
   };
@@ -151,12 +144,11 @@ function ProjectsPage() {
 
   const rows = projects.map((project) => {
     return {
-      // Assuming your project object has 'name', 'status', and 'tasks' keys
+
       name: project.name,
       status: project.status,
-      tasks: project.tasks.length, // If you want to show the number of tasks
-      // Include other project details that correspond to your columns
-      // You can also add actions like edit or delete buttons
+      tasks: project.tasks.length, 
+      
       actions: (
         <MDButton
           variant="outlined"
@@ -220,7 +212,7 @@ function ProjectsPage() {
     columns: columns,
     rows: rows
   }}
-  // ... other props ...
+  
 />
       </MDBox>
       </MDBox>
@@ -236,8 +228,6 @@ function ProjectsPage() {
       <MDBox>
        <ProjectDetails open={open} onClose={handleClose} project={currentProject} />
       </MDBox>
-     
-
       </Card>
       <Footer />
     </DashboardLayout>
