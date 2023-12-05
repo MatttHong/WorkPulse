@@ -39,7 +39,7 @@ exports.updateProject = (req, res, next) => {
         if (!project) {
             throw new Error("Project not found");
         }
-
+        console.log(project)
         if(req.TokenUserId && !project.projectAdministrators.includes(req.TokenUserId)) {
             throw new Error("Invalid Credentials");
         }

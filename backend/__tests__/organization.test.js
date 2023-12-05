@@ -128,6 +128,17 @@ describe('Organization API endpoints', () => {
 
             });
 
+            it('should get organization by email', async () => {
+                // router.get('/email/:email', orgController.getOrgByEmail);
+                const response = await request.get('/api/org/email/testorg@example.com')
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toEqual(200);
+                    // .send(newOrg);
+            });
+
+            // exports.getOrgByEmail = (req, res, next) => {
+
+
         });
 
         describe('PUT /api/org/:id', () => {
