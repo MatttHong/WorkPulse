@@ -145,7 +145,7 @@ exports.getEmployees = (req, res, next) => {
     .catch((err) => {
         console.log(err);
         res.status(500).json({
-            message: err.message || "Failed to fetch departments!",
+            message: err.message || "Failed to fetch employees!",
         });
     });
 };

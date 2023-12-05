@@ -33,6 +33,8 @@ exports.inviteUser = async (req, res) => {
                                                     new: false
                                                   });
                 } else {
+                  // This has to be manually verified because how can I confirm I recieved an email with jest?
+                  // Thus, in process.env.NODE_ENV === 'test' we can ignore the below
                   return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
                 }
             } else {
@@ -107,7 +109,8 @@ exports.acceptInvite = async (req, res, next) => {
       // Find the user by their email
       let user = await User.findOne({ email });
       
-      // If the user does not exist, create a new user
+      // If the user does not exist, create a new user - not tested because it is super unnecessary
+      // same functionality tested else where
       if (!user) {
         user = new User({ email });
         await user.save();

@@ -127,7 +127,30 @@ describe('Organization API endpoints', () => {
             expect(response.statusCode).toEqual(200);
             expect(response.body).toHaveProperty('log');
         });
+        var holdover
+
+        it('should close a log entry by ID', async () => {
+            const response = await supertest(app)
+                .patch(`/api/log/${logId}/end`)
+                .set('Authorization', `Bearer ${userToken}`);
+            console.log("abcdefg " + response.body.message);
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toHaveProperty('status');
+            expect(response.body.status).toBe('Closed');
+            holdover = response.body.endTimestamp
+        });
     
+        it('should close the same log entry by ID', async () => {
+            const response = await supertest(app)
+                .patch(`/api/log/${logId}/end`)
+                .set('Authorization', `Bearer ${userToken}`);
+            console.log("abcdefgh " + response.body.message);
+            expect(response.statusCode).toEqual(200);
+            expect(response.body).toHaveProperty('status');
+            expect(response.body.endTimestamp).toBe(holdover);
+
+        });
+
         // Test for deleting a log
         it('should delete a log entry', async () => {
             

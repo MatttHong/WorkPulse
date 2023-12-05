@@ -197,6 +197,17 @@ describe('Employee API endpoints', () => {
 
         });
 
+        describe('GET /api/employee/', () => {
+            it('should get an array of employees', async () => {
+                const response = await request.get(`/api/employee/`)
+                    .set('Authorization', `Bearer ${userToken}`);
+
+                expect(response.status).toBe(200);
+                expect(response.body).toHaveProperty('employees');
+                expect(Array.isArray(response.body.employees)).toBeTruthy();
+            });
+        });
+
         describe('GET /api/employee/:id', () => {
             it('should get an employee by ID', async () => {
                 const response = await request.get(`/api/employee/${employeeId}`)
