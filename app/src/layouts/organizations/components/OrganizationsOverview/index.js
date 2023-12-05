@@ -8,7 +8,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import {Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Button} from '@mui/material';
 
@@ -872,51 +872,37 @@ function Organizations() {
     };
 
     const EmailList = ({ admins }) => {
-        // Check if admins is an array and has elements
-        const isValidArray = Array.isArray(admins) && admins.length;
+        const [showFullList, setShowFullList] = useState(false);
+
+        const handleToggleList = () => {
+            setShowFullList(!showFullList);
+        };
 
         return (
             <div>
-                {isValidArray && admins.length > 2 && (
-                    <>
-                        <input type="checkbox" id="toggleEmails" className="email-toggle" />
-                        <label htmlFor="toggleEmails">• Expand</label>
-                    </>
+                {/* Render emails in a column if showFullList is true, otherwise just show the first two */}
+                {showFullList ? (
+                    <div>
+                        {admins.map((admin, index) => (
+                            <div key={index}>{admin.email}</div>
+                        ))}
+                    </div>
+                ) : (
+                    <div>
+                        {admins.slice(0, 2).map((admin, index) => (
+                            <span key={index}>{(index ? ', ' : '') + admin.email}</span>
+                        ))}
+                        {admins.length > 2 && <span>, ...</span>}
+                    </div>
                 )}
-                <ul style={{ listStyleType: 'none' }}>
-                    {isValidArray ? (
-                        admins.map((admin, index) => {
-                            const email = typeof admin === 'string' ? admin : admin.email;
-                            return (
-                                <li key={email} className={`email-item ${index >= 2 ? 'hidden' : ''}`}>
-                                    {email}
-                                </li>
-                            );
-                        })
-                    ) : (
-                        <li>No emails available</li>
-                    )}
-                </ul>
 
-                <style>
-                    {`
-                      .hidden {
-                        display: none;
-                      }
-                      .email-toggle:checked + label + ul .hidden {
-                        display: list-item;
-                      }
-                      .email-toggle {
-                        display: none;
-                      }
-                      /* Optional: style for 'Show More' label */
-                      label[for="toggleEmails"] {
-                        cursor: pointer;
-                        color: frey;
-                        font-weight: bold;
-                      }
-                    `}
-                </style>
+                {admins.length > 2 && (
+                    <Tooltip title={showFullList ? 'Collapse list' : 'Expand list'}>
+                        <IconButton size="small" onClick={handleToggleList}>
+                            {showFullList ? <ArrowUpwardIcon /> : <MoreHorizIcon />}
+                        </IconButton>
+                    </Tooltip>
+                )}
             </div>
         );
     };
