@@ -45,8 +45,7 @@ exports.updateLog = (req, res, next) => {
 
       if (req.body.employee !== undefined) log.employee = req.body.employee
       if (req.body.task !== undefined) log.task = req.body.task
-      if (req.body.department !== undefined)
-        log.department = req.body.department
+      if (req.body.department !== undefined) log.department = req.body.department
       if (req.body.project !== undefined) log.project = req.body.project
       if (req.body.status !== undefined) log.status = req.body.status
       if (req.body.log !== undefined) log.log = req.body.log
@@ -155,7 +154,7 @@ exports.getLogsByEmployeeId = (req, res, next) => {
 // Add a log entry to an existing log
 exports.addLogEntry = (req, res, next) => {
   const logId = req.params.id
-  const logEntry = req.body.log // Assuming the new log entry is sent in the request body
+  const logEntry = req.body.log
   if (!logEntry) {
     return res.status(400).json({
       message: "Log entry to add must be provided!",
@@ -194,6 +193,8 @@ exports.endLogSession = (req, res, next) => {
     const logId = req.params.id;
     let logEmpId
     let temp
+    // This is the added token
+    let token = req.headers.authorization?.split(" ")[1]
     let funcUrl = process.env.FUNCTION_URL
     Log.findById(logId)
         .then((log) => {
@@ -208,6 +209,10 @@ exports.endLogSession = (req, res, next) => {
             } else {
                 temp = log
             }
+            // This should be adding the token
+            temp.token = token
+            // printing what axios is going to send
+            console.log("what Axios is sending " + temp);
         })
         .then(() => {
             axios.post(funcUrl, temp)
