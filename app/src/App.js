@@ -133,8 +133,28 @@ export default function App() {
        {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<ConditionalRedirect />} />
       </Routes>
     </ThemeProvider>
   );
 }
+
+const ConditionalRedirect = () => {
+  const id = localStorage.getItem('id');
+  const email = localStorage.getItem('email');
+
+  // Check if id and email exist in local storage
+  if (id && email) {
+    return <Navigate to="/organizations" />;
+  } else {
+    // If token and employeeId are present in URL, navigate to sign-up
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get('token');
+    const employeeId = searchParams.get('employeeId');
+    if (token && employeeId) {
+      return <Navigate to={`/authentication/sign-up?token=${token}&employeeId=${employeeId}`} />;
+    }
+    // Default redirect if none of the above conditions are met
+    return <Navigate to="/default-route" />;
+  }
+};

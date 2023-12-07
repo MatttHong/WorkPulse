@@ -27,8 +27,10 @@ import Tooltip from '@mui/material/Tooltip';
 import Checkbox from "@mui/material/Checkbox";
 import data from "layouts/dashboard/components/ProjectsOverview/data";
 import * as PropTypes from "prop-types";
+import Grid from "@mui/material/Grid";
 
 function Organizations() {
+    const [isAdmin, setIsAdmin] = useState(false);
     // data vars
     const token = localStorage.getItem("token");
     const [employeeID, setEmployeeID] = useState("");
@@ -40,6 +42,7 @@ function Organizations() {
     const [nonAdminEmployees, setNonAdminEmployees] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [dummyOrg, setDummyOrg] = useState([]);
+    const [empId, setEmpId] = useState("");
 
     // data funcs
     const fetchUserData = async () => {
@@ -52,12 +55,43 @@ function Organizations() {
         return response.data;
     };
 
+    const handleDeleteOrg = async () => {
+        console.log('Delete Organization clicked.');
+
+        const userData = await fetchUserData();
+        const zEmployeeID = userData.user.employments[0];
+        console.log("sljhdfkjsdhf", userOrganization._id);
+        try {
+            const deleteOrgResponse = await axios.delete(`${process.env.REACT_APP_API_URL}/api/org/${userOrganization._id}`, {
+                headers: {
+                    Authorization: "Bearer " + token,
+                }
+            });
+
+            console.log("DELETEORGRESPONSE:", deleteOrgResponse);
+
+            const editUserResponse = await axios.put(`${process.env.REACT_APP_API_URL}/api/employee/${zEmployeeID}`, {
+                orgId: ""
+            }, {
+                headers: {
+                    Authorization: "Bearer " + token,
+                }
+            });
+
+            console.log("EDITUSER RESPONSE:", editUserResponse);
+
+
+        } catch (error) {
+            console.error('Error deleting organization:', error);
+        }
+    };
     const fetchEmployeeData = async (employeeID) => {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/${employeeID}`, {
             headers: {
                 Authorization: "Bearer " + token,
             }
         });
+
         return response.data;
     };
 
@@ -108,10 +142,11 @@ function Organizations() {
                     // Fetch logs for each ID and aggregate
                     const logs = await Promise.all(logIds.map(logId =>
                         fetch(`${process.env.REACT_APP_API_URL}/api/log/${logId}`, {
-                            headers: { Authorization: "Bearer " + token }
+                            headers: {Authorization: "Bearer " + token}
                         }).then(res => res.json())
                     ));
                     allLogs = allLogs.concat(logs);
+                    console.log("99999999999:", allLogs);
                 } else {
                     console.error('Failed to fetch employee data:', response.status);
                 }
@@ -130,6 +165,7 @@ function Organizations() {
                 setEmployeeID(employeeID);
 
                 const employeeData = await fetchEmployeeData(employeeID);
+                setEmpId(employeeData.employee._id);
                 if (employeeData.employee) {
                     const organizationId = employeeData.employee.orgId;
 
@@ -189,9 +225,6 @@ function Organizations() {
             } else {
                 throw Error("error");
             }
-
-
-
 
 
         }
@@ -311,8 +344,31 @@ function Organizations() {
             fetchDepartments();
             fetchNonAdminEmployees();
         }
-        //here
-    }, [userOrganization]);
+    }, [userOrganization, orgaId]);
+
+    useEffect(() => {
+        if (adminEmployees && empId) {
+            // Creating an array of _id values from adminEmployees
+            const adminIds = adminEmployees.map(admin => admin._id);
+
+            // Logging the array of IDs and empId
+            console.log("adminEmployees:", adminEmployees);
+            console.log("adminIds:", adminIds);
+            console.log("empId:", empId);
+
+            // Check if empId is in the array of admin IDs
+            const adminStatus = adminIds.includes(empId);
+
+            console.log("adminStatus:", adminStatus); // Log the result of the includes check
+
+            if (adminStatus !== isAdmin) {
+                setIsAdmin(adminStatus); // Update the state only if the value has changed
+            }
+        }
+    }, [userOrganization, adminEmployees, empId]);
+
+    console.log("LAKSJNCMVLKAJSDF:", isAdmin);
+    // setIsAdmin(adminEmployees.some(admin => admin._id === empId));
 
     console.log("employeeID:", employeeID);
     console.log("orgaID:", orgaId);
@@ -1090,13 +1146,13 @@ function Organizations() {
         );
     };
 
-    const { columns, rows } = data(userLogs);
+    const {columns, rows} = data(userLogs);
 
     return (
         <Card style={{maxWidth: '100%'}}>
             <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3.5}>
                 <MDBox>
-                    {editMode ? (
+                    {isAdmin && editMode ? (
                         <>
                             <TextField
                                 value={dummyOrg.organizationName}
@@ -1139,6 +1195,19 @@ function Organizations() {
                             <MDTypography variant="h6" gutterBottom>
                                 {userOrganization.organizationName}
                             </MDTypography>
+                            <MDBox>
+                                <MDTypography
+                                    variant="button"
+                                    fontWeight={"light"}
+                                    color="text"
+                                    sx={{
+                                        fontSize: '0.6rem', // Makes the text smaller
+                                        fontStyle: 'italic' // Makes the text italic
+                                    }}
+                                >
+                                    &nbsp;{userOrganization._id}
+                                </MDTypography>
+                            </MDBox>
                             <MDTypography variant="button" fontWeight={"light"} color="text">
                                 &nbsp;{userOrganization.organizationEmail}
                             </MDTypography>
@@ -1150,10 +1219,12 @@ function Organizations() {
                         </>
                     )}
                 </MDBox>
-                <IconButton onClick={editMode ? handleEditOrgSave : handleEditOrgClick}>
-                    {editMode ? <SaveIcon sx={{fontSize: 'medium !important'}}/> :
-                        <EditIcon sx={{fontSize: 'medium !important'}}/>}
-                </IconButton>
+                {isAdmin && (
+                    <IconButton onClick={editMode ? handleEditOrgSave : handleEditOrgClick}>
+                        {isAdmin && editMode ? <SaveIcon sx={{fontSize: 'medium !important'}}/> :
+                            <EditIcon sx={{fontSize: 'medium !important'}}/>}
+                    </IconButton>
+                )}
             </MDBox>
 
             <Dialog sx={{'& .MuiDialog-paper': {minWidth: '700px'}}} open={isAddAdminDialogOpen}
@@ -1213,33 +1284,33 @@ function Organizations() {
                     >
                         &nbsp; Organization Administrators
                     </MDTypography>
-                    {adminEditMode ? (
+                    {isAdmin && adminEditMode ? (
                         <>
                             <MDTypography>
                                 <IconButton
                                     onClick={handleAddAdminEditToggle}
-                                    sx={{padding: 0}}
+                                    sx={{ padding: 0 }}
                                 >
-                                    <SaveIcon sx={{fontSize: 'medium !important'}}/>
+                                    <SaveIcon sx={{ fontSize: 'medium !important' }}/>
                                 </IconButton>
                             </MDTypography>
-                            <MDTypography sx={{padding: '0 !important'}}>
+                            <MDTypography sx={{ padding: '0 !important' }}>
                                 <IconButton
                                     onClick={handleAddAdminClick}
-                                    sx={{padding: '0 !important'}}
+                                    sx={{ padding: '0 !important' }}
                                 >
-                                    <AddIcon sx={{fontSize: 'medium !important'}}/>
+                                    <AddIcon sx={{ fontSize: 'medium !important' }}/>
                                 </IconButton>
                             </MDTypography>
                         </>
-                    ) : (
+                    ) : isAdmin ? (
                         <IconButton
                             onClick={handleAdminEditClick}
-                            sx={{padding: 0}}
+                            sx={{ padding: 0 }}
                         >
-                            <EditIcon sx={{fontSize: 'medium !important'}}/>
+                            <EditIcon sx={{ fontSize: 'medium !important' }}/>
                         </IconButton>
-                    )}
+                    ) : null}
                 </MDBox>
 
                 <DataTable
@@ -1262,7 +1333,7 @@ function Organizations() {
                                         {adminEmployee.email}
                                     </MDTypography>
                                 ) : null,
-                                actions: adminEditMode ? (
+                                actions: isAdmin && adminEditMode ? (
                                     <IconButton
                                         onClick={() => handleRemoveAdmin(adminEmployee._id)}
                                         sx={{padding: 0}}
@@ -1288,7 +1359,7 @@ function Organizations() {
                     >
                         &nbsp; Organization Departments
                     </MDTypography>
-                    {deptEditMode ? (
+                    {isAdmin && deptEditMode ? (
                         <>
                             <MDTypography>
                                 <IconButton
@@ -1307,14 +1378,14 @@ function Organizations() {
                                 </IconButton>
                             </MDTypography>
                         </>
-                    ) : (
+                    ) : isAdmin ? (
                         <IconButton
                             onClick={handleDeptEditClick}
                             sx={{padding: 0}}
                         >
                             <EditIcon sx={{fontSize: 'medium !important'}}/>
                         </IconButton>
-                    )}
+                    ) : null}
                 </MDBox>
 
                 <DataTable
@@ -1336,7 +1407,7 @@ function Organizations() {
                                         <EmailList admins={department.admins}/>
                                     </MDTypography>
                                 ),
-                                actions: deptEditMode ? (
+                                actions: isAdmin && deptEditMode ? (
                                     <div>
                                         <IconButton
                                             onClick={() => handleEditSingleDeptClick(department)}
@@ -1680,7 +1751,7 @@ function Organizations() {
                     >
                         &nbsp; Organization Projects
                     </MDTypography>
-                    {projectEditMode ? (
+                    {isAdmin && projectEditMode ? (
                         <>
                             <MDTypography>
                                 <IconButton
@@ -1699,14 +1770,14 @@ function Organizations() {
                                 </IconButton>
                             </MDTypography>
                         </>
-                    ) : (
+                    ) : isAdmin ? (
                         <IconButton
                             onClick={handleProjectEditClick}
                             sx={{padding: 0}}
                         >
                             <EditIcon sx={{fontSize: 'medium !important'}}/>
                         </IconButton>
-                    )}
+                    ) : null }
                 </MDBox>
                 <DataTable
                     table={{
@@ -1745,7 +1816,7 @@ function Organizations() {
                                         {project.status}
                                     </MDTypography>
                                 ),
-                                actions: projectEditMode ? (
+                                actions: isAdmin && projectEditMode ? (
                                     <div>
                                         <IconButton
                                             onClick={() => handleAddTaskClick(project)}
@@ -1778,7 +1849,7 @@ function Organizations() {
                         &nbsp; Organization Logs
                     </MDTypography>
                     <DataTable
-                        table={{ columns, rows }}
+                        table={{columns, rows}}
                         showTotalEntries={false}
                         isSorted={false}
                         noEndBorder
@@ -1786,9 +1857,14 @@ function Organizations() {
                     />
                 </MDBox>
             </MDBox>
+            <Grid item>
+                <Button variant="contained" onClick={handleDeleteOrg}
+                        sx={{color:'white !important', backgroundColor: 'red !important'}}>
+                    Delete Organization
+                </Button>
+            </Grid>
         </Card>
-    )
-        ;
+    );
 
 }
 

@@ -7,80 +7,90 @@ const { createSession } = require('../controllers/session.js');
 const REACTURL = process.env.REACTURL || 'http://localhost:3001'
 
 exports.inviteUser = async (req, res) => {
-  try {
-    const { orgId, email } = req.body;
-    // Check if email, header, and body are provided in the request body
-    if (!orgId || !email) {
-      return res.status(400).json({ message: 'Email and orgId are required.' });
-    }
+    let inviteEmail;
+    try {
+        const {orgId, email} = req.body;
+        // Check if email, header, and body are provided in the request body
+        if (!orgId || !email) {
+            return res.status(400).json({message: 'Email and orgId are required.'});
+        }
 
-    // Use async/await to query the employee
-    const existingEmployee = await Employee.findOne({ email, orgId });
+        // Use async/await to query the employee
+        const existingEmployee = await Employee.findOne({email, orgId});
 
-    if (existingEmployee) {
-      // Employee with the same email and orgId found; proceed with sending an email
-      existingEmployee.generateInviteToken(); // Generate a new token
-      await existingEmployee.save(); // Save the updated employee with the new token
-      //existingEmployee.addToOrg();
-      CreateEmailInvite(email, existingEmployee._id, true, existingEmployee.inviteToken)
-        .then((inviteEmail) => {
+        if (existingEmployee) {
+            // Employee with the same email and orgId found; proceed with sending an email
+            existingEmployee.generateInviteToken(); // Generate a new token
+            await existingEmployee.save(); // Save the updated employee with the new token
+            //existingEmployee.addToOrg();
+            CreateEmailInvite(email, existingEmployee._id, true, existingEmployee.inviteToken)
+                .then((inviteEmail) => {
+                    if (inviteEmail) {
+                        if (process.env.NODE_ENV === 'test') {
+                            return res.status(200).json({
+                                message: 'Invitation email sent successfully.',
+                                employeeId: existingEmployee._id,
+                                inviteToken: existingEmployee.inviteToken,
+                                email: email,
+                                new: false
+                            });
+                        } else {
+                            // This has to be manually verified because how can I confirm I recieved an email with jest?
+                            // Thus, in process.env.NODE_ENV === 'test' we can ignore the below
+                            return res.status(200).json({
+                                message: 'Invitation email sent successfully.',
+                                employeeId: existingEmployee._id
+                            });
+                        }
+                    } else {
+                        return res.status(500).json({message: 'Internal server error'});
+                    }
+                })
+                .catch((error) => {
+                    return res.status(500).json({
+                        message: 'Internal server error',
+                        error: error
+                    });
+                });
+        } else {
+            // Create a new employee object with default values
+            const newEmployee = new Employee({
+                userId: "1",
+                email,
+                orgId,
+                status: Status.invited,
+            });
+            if(process.env.NODE_ENV === 'test'){
+            }
+            newEmployee.generateInviteToken();
+            newEmployee.addToOrg();
+            //Save the new employee object to the database
+            await newEmployee.save();
+            let inviteEmail = await CreateEmailInvite(email, newEmployee._id, false, newEmployee.inviteToken);
             if (inviteEmail) {
-                if(process.env.NODE_ENV === 'test'){
-                  return res.status(200).json({ message: 'Invitation email sent successfully.', 
-                                             employeeId: existingEmployee._id,
-                                            inviteToken: existingEmployee.inviteToken,
-                                                  email: email,
-                                                    new: false
-                                                  });
+                if (process.env.NODE_ENV === 'test') {
+                    return res.status(200).json({
+                        message: 'Invitation email sent successfully.',
+                        employeeId: newEmployee._id,
+                        inviteToken: newEmployee.inviteToken,
+                        email: email,
+                        new: true
+                    });
                 } else {
-                  // This has to be manually verified because how can I confirm I recieved an email with jest?
-                  // Thus, in process.env.NODE_ENV === 'test' we can ignore the below
-                  return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
+                    return res.status(200).json({
+                        message: 'Invitation email sent successfully.',
+                        employeeId: existingEmployee._id
+                    });
                 }
             } else {
-                return res.status(500).json({ message: 'Internal server error' });
+                return res.status(500).json({message: 'Internal server error'});
             }
-        })
-        .catch((error) => {
-            return res.status(500).json({ 
-              message: 'Internal server error', 
-              error: error
-          });
-        });
-    } else {
-      // Create a new employee object with default values
-      const newEmployee = new Employee({
-        email,
-        orgId,
-        status: Status.invited,
-      });
-      // if(process.env.NODE_ENV === 'test'){
-      // }
-      newEmployee.generateInviteToken();
-      newEmployee.addToOrg();
-      // Save the new employee object to the database
-      await newEmployee.save();
-      inviteEmail = await CreateEmailInvite(email, newEmployee._id, false, newEmployee.inviteToken)
-      if (inviteEmail) {
-          if(process.env.NODE_ENV === 'test'){
-            return res.status(200).json({ message: 'Invitation email sent successfully.', 
-                                       employeeId: newEmployee._id,
-                                      inviteToken: newEmployee.inviteToken,
-                                            email: email,
-                                              new: true
-                                          });
-          } else {
-              return res.status(200).json({ message: 'Invitation email sent successfully.', employeeId: existingEmployee._id });
-          }
-      } else {
-          return res.status(500).json({ message: 'Internal server error' });
-      }
 
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: 'Internal server error'});
     }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
 };
 
 exports.acceptInvite = async (req, res, next) => {

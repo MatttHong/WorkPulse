@@ -116,9 +116,9 @@ exports.deleteEmployeeModel = (req, res, next) => {
         }
 
         // Check if the user has the necessary credentials to delete the employee
-        if (employee.userId != req.TokenUserId) {
-            throw new Error("Invalid Credentials");
-        }
+        // if (employee.userId != req.TokenUserId) {
+        //     throw new Error("Invalid Credentials");
+        // }
 
         // If the user has the credentials, proceed with employee deletion
         return EmployeeModel.findByIdAndRemove(id);
