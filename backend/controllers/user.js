@@ -28,8 +28,8 @@ exports.createUser = async (req, res, next) => {
             lastName: req.body.lastName,
             email: req.body.email,
             birthday: req.body.birthday,
+            employments: req.body.employment,
             bio: req.body.bio,
-            employments: ["655d660ee6078cbf8cde7954"],
             logs: req.body.logs,
         });
 

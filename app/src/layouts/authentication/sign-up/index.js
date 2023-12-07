@@ -70,7 +70,7 @@ function Cover() {
         const payload = {
             ...formData,
             inviteToken,
-            employeeId
+            employments: [employeeId]
         };
 
         // Make an API call to create user

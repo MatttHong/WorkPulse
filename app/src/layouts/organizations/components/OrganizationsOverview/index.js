@@ -1289,26 +1289,26 @@ function Organizations() {
                             <MDTypography>
                                 <IconButton
                                     onClick={handleAddAdminEditToggle}
-                                    sx={{ padding: 0 }}
+                                    sx={{padding: 0}}
                                 >
-                                    <SaveIcon sx={{ fontSize: 'medium !important' }}/>
+                                    <SaveIcon sx={{fontSize: 'medium !important'}}/>
                                 </IconButton>
                             </MDTypography>
-                            <MDTypography sx={{ padding: '0 !important' }}>
+                            <MDTypography sx={{padding: '0 !important'}}>
                                 <IconButton
                                     onClick={handleAddAdminClick}
-                                    sx={{ padding: '0 !important' }}
+                                    sx={{padding: '0 !important'}}
                                 >
-                                    <AddIcon sx={{ fontSize: 'medium !important' }}/>
+                                    <AddIcon sx={{fontSize: 'medium !important'}}/>
                                 </IconButton>
                             </MDTypography>
                         </>
                     ) : isAdmin ? (
                         <IconButton
                             onClick={handleAdminEditClick}
-                            sx={{ padding: 0 }}
+                            sx={{padding: 0}}
                         >
-                            <EditIcon sx={{ fontSize: 'medium !important' }}/>
+                            <EditIcon sx={{fontSize: 'medium !important'}}/>
                         </IconButton>
                     ) : null}
                 </MDBox>
@@ -1777,7 +1777,7 @@ function Organizations() {
                         >
                             <EditIcon sx={{fontSize: 'medium !important'}}/>
                         </IconButton>
-                    ) : null }
+                    ) : null}
                 </MDBox>
                 <DataTable
                     table={{
@@ -1858,10 +1858,15 @@ function Organizations() {
                 </MDBox>
             </MDBox>
             <Grid item>
-                <Button variant="contained" onClick={handleDeleteOrg}
-                        sx={{color:'white !important', backgroundColor: 'red !important'}}>
-                    Delete Organization
-                </Button>
+                {isAdmin ?
+                    (
+                        <Button variant="contained" onClick={handleDeleteOrg}
+                                sx={{color: 'white !important', backgroundColor: 'red !important'}}>
+                            Delete Organization
+                        </Button>
+                    ) : null
+                }
+
             </Grid>
         </Card>
     );

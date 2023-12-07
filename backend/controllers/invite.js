@@ -55,7 +55,6 @@ exports.inviteUser = async (req, res) => {
         } else {
             // Create a new employee object with default values
             const newEmployee = new Employee({
-                userId: "1",
                 email,
                 orgId,
                 status: Status.invited,

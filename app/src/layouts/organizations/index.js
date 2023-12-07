@@ -26,6 +26,7 @@ function Dashboard() {
     useEffect(() => {
         async function fetchData() {
             const userData = await fetchUserData();
+            console.log("X1:", userData);
             if (userData.employments[0]) {
                 const employeeID = userData.employments[0];
                 const employeeData = await fetchEmployeeData(employeeID);
