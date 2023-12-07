@@ -27,23 +27,20 @@ def generate_test_data(start_time, duration_minutes, interval_minutes=5):
 
     return test_data
 
-
 def main():
-    # Function URL
     url = 'https://app-trackervariancealgo.azurewebsites.net/api/http_trigger?code=olQrLPqMdULrdatXD2uyPke2X_xLoisd_pRmtv3ZahxlAzFuVymqoA%3D%3D'
-
-    # Generate 40 minutes of test data starting from the current time
     test_logs = generate_test_data(datetime.now(), 40)
 
-    # Prepare the request payload
+    # Prepare the payload to match the expected format of the Azure Function
     payload = {
-        'log': test_logs
+        'logData': {
+            'log': test_logs,
+            '_id': 'test_id'  # Replace with a relevant id, if needed
+        },
+        'loginToken': 'test_token'  # Include this only if your function requires a token
     }
 
-    # Send the request to the Azure Function
     response = requests.post(url, json=payload)
-
-    # Log the response
     print(f"Status Code: {response.status_code}")
     print("Response:")
     print(response.json())
