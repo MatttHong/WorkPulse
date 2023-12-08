@@ -19,9 +19,10 @@ async function main() {
     await initializeFirebase();
     await mongoose.connect(`mongodb://${MONGO}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server listening on port ${PORT}`);
     });
+
 }
 
 main().catch((err) => console.log(err));

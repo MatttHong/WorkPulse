@@ -45,8 +45,8 @@ export default function data(userLogs) {
             return 1;
         } else {
             // If statuses are the same, compare by timestamp
-            const dateA = new Date(a.startTimestamp).getTime();
-            const dateB = new Date(b.startTimestamp).getTime();
+            const dateA = new Date(a.log.startTimestamp).getTime();
+            const dateB = new Date(b.log.startTimestamp).getTime();
             return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
         }
     });
@@ -57,7 +57,7 @@ export default function data(userLogs) {
     const logRows = userLogs.map((logEntry) => {
         // Check if logEntry.log and logEntry.log.status exist
         const log = logEntry.log;
-        const status = log && log.status ? log.status.toLowerCase() : 'unknown';
+        const status = log && log.log.status ? log.status.toLowerCase() : 'unknown';
         const formattedStartTime = log ? formatTimestamp(log.startTimestamp) : 'Unknown Time';
 
         let statusComponent;

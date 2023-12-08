@@ -1860,10 +1860,18 @@ function Organizations() {
             <Grid item>
                 {isAdmin ?
                     (
-                        <Button variant="contained" onClick={handleDeleteOrg}
-                                sx={{color: 'white !important', backgroundColor: 'red !important'}}>
+                        <Button
+                            variant="contained"
+                            onClick={handleDeleteOrg}
+                            sx={{
+                                color: 'white !important',
+                                backgroundColor: 'red !important',
+                                margin: '2px' // Adjust the margin value as needed
+                            }}
+                        >
                             Delete Organization
                         </Button>
+
                     ) : null
                 }
 
